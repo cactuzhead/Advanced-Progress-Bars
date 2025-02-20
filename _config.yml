@@ -1,5 +1,5 @@
 title: cactuzhead
-#logo
+logo: docs/assets/cactuzhead avatar.png
 description: the spiky headed one
 #show_downloads: true
 theme: jekyll-theme-minimal
