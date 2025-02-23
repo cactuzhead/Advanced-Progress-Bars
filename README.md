@@ -13,7 +13,7 @@ Within your `obsidian-bar` code block, specify the attributes `Title`, `Valu
 
 ## Installation
 ### Installing via Obsidian
-Search "APB" in Settings -> Community plugins, you can find and install this plugin.
+Navigate to Settings -> Community Plugins -> Browse and then search for `APB`.  Now select the Advance Progress Bars plugin and click the install button.
 
 ### Manual Install
 Navigate to https://cactuzhead.github.io/Advanced-Progress-Bars/ and copy the `main.js` and `manifest.json` to your vault's .obsidian/plugins/obsidian-apb directory (ex. `VaultFolder/.obsidian/plugins/obsidian-apb/`).
