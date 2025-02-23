@@ -4,11 +4,11 @@ Obsidian plugin to create custom progress bars
 ![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Hero Banner.png)
 
 ### Header 3
-```js
-/`/`/`obsidian-bar
+````
+```obsidian-bar
 Progress: 57/100
-/`/`/`
 ```
+````
 ```ruby
 # Ruby code with syntax highlighting
 GitHubPages::Dependencies.gems.each do |gem, version|
