@@ -5,10 +5,9 @@ Obsidian plugin to create custom progress bars
 
 ### Header 3
 ```js
-// Javascript code with syntax highlighting.
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
+<pre><code>```obsidian-bar
+Progress: 57/100
+```</pre></code>
 }
 ```
 ```ruby
