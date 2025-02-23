@@ -3,18 +3,14 @@ Obsidian plugin to create custom progress bars
 
 ![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Hero Banner.png)
 
-### Header 3
+### Code Block
+To insert an Advance Progress Bar into obsidian, you use a fenced code block similar to the one below.
 ````
 ```obsidian-bar
 Progress: 57/100
 ```
 ````
-```ruby
-# Ruby code with syntax highlighting
-GitHubPages::Dependencies.gems.each do |gem, version|
-  s.add_dependency(gem, "= #{version}")
-end
-```
+Within your `obsidian-bar` code block, specify the attributes `Title`, `Value`, and `Total`.
 
 #### Header 4
 This is an unordered list following a header.
