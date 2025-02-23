@@ -5,9 +5,9 @@ Obsidian plugin to create custom progress bars
 
 ### Header 3
 ```js
-\`\`\`obsidian-bar
+/`/`/`obsidian-bar
 Progress: 57/100
-\`\`\`
+/`/`/`
 ```
 ```ruby
 # Ruby code with syntax highlighting
