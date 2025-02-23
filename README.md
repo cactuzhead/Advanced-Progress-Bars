@@ -9,7 +9,7 @@ To insert an Advance Progress Bar into obsidian, you use a fenced code block sim
 Progress: 57/100
 ```
 ````
-Within your `obsidian-bar` code block, specify the attributes `Title`, `Value`, and `Total`.
+Within your `obsidian-bar` code block, specify the attributes `Title`: `Value`/ `Total`.
 
 ## Installation
 ### Installing via Obsidian
