@@ -17,3 +17,5 @@ Navigate to Settings -> Community Plugins -> Browse and then search for `APB`.  
 
 ### Manual Install
 Navigate to https://cactuzhead.github.io/Advanced-Progress-Bars/ and copy the `main.js` and `manifest.json` to your vault's .obsidian/plugins/obsidian-apb directory (ex. `VaultFolder/.obsidian/plugins/obsidian-apb/`).
+
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
