@@ -27,8 +27,7 @@ My Title: 57/100
 ```
 ````
 In the `obsidian-apb` code block, you define the attributes as `Title`: `Value` / `Total`.
-
-![[Obsidian Advanced Progress Bars - Text Diagram 2.png]]
+![Text Diagram](/docs/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
 Note: the text within the code block example on the settings page will automatically be updated to reflect the changes you make in the other settings.
 ### Hotkey Setup
 To make it more convenient, you can add a hotkey that automatically inserts a progress bar code block into Obsidian. Simply follow these steps:
