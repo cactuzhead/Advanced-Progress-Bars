@@ -3,7 +3,7 @@
 This plugin extends obsidian to allow you to create custom progress bars by using a simple markdown code block.
 
 <div style="display: flex; align-items: center; justify-content: space-between;">
-  <div style="flex: 1; padding-right: 20px;">
+  <div style="flex: 1; padding-right: 10px; width: 100px;">
     <img src="https://storage.ko-fi.com/cdn/fullLogoKofi.png" alt="ko-fi" style="width: 100px; height: auto;">
   </div>
   <div style="flex: 1;">
