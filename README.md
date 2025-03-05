@@ -57,18 +57,22 @@ Very Large Total: 2034/2345
 ```
 ````
 The above stacked bars example would be rendered like this (using default dark colors & settings)
-![[Obsidian Advanced Progress Bars - Settings - Stacked Bars.png]]
+
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Stacked Bars.png)
+
 Note: The code block example on the settings page will only include one progress bar. You will need to manually add any additional progress bars once pasted into Obsidian.
 
 ## Light & Dark Settings
-![[Obsidian Advanced Progress Bars - Settings - Light and Dark.png]]
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Light and Dark.png)
+
 These two buttons (`Light` & `Dark`) will change **ALL** the color settings to their respective defaults.
 All other settings will remain unchanged.
 **Note:** once selected, all previous colors will be lost forever and can *not* be retrieved.
 
 ## Progress Bar Settings
 ### Default Title
-![[Obsidian Advanced Progress Bars - Settings - Title.png]]
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Title.png)
+
 You can use this to setup your default progress bar title.
 By clicking the `Reset to Default` button this will change the title back to `Progress`.
 If you change this, the `Title` will be automatically changed in the example code block at the top of the settings for easy copy and pasting later on.
@@ -76,10 +80,12 @@ If you change this, the `Title` will be automatically changed in the example cod
 ### Default Total
 This setting is used to set the `total` you wand for your default progress bar.
 This is does not need to be set to `100` (as in percentage). For example, you could set it to `7` if you are tracking seven subtasks.
-![[Obsidian Advanced Progress Bars - Smaller Total.png]]
+
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Smaller Total.png)
 
 ### Progress Percentage
-![[Obsidian Advanced Progress Bars - Settings - Slider 1.png]]
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Slider.png)
+
 This slider is used to change the percentage of the demonstration progress bar found near the top of the settings.
 It is meant as an aid so you can see how your progress bar will look with different settings.
 
@@ -89,7 +95,8 @@ If you want to use the example code block's `Copy to Clipboard` feature to later
 It is recommended that you do this *after* you are happy with all the other settings and no longer need to see the demonstration progress bar.
 
 ### Full Width
-![[Obsidian Advanced Progress Bars - Settings - Toggle.png]]
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Toggle.png)
+
 If this is toggled `on`, then the entire progress bar will expand to fill the width of its container.
 
 If toggled `off` then a new `Width` setting will appear below this setting.
@@ -97,7 +104,8 @@ The new `Width` setting will allow you to enter in a number to fix the width of 
 This is helpful when you have a progress bar on a full-screen page, as without a fixed width, the progress bar would become overly stretched.
 
 ### Height
-![[Obsidian Advanced Progress Bars - Settings - Slider.png]]
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Slider.png)
+
 This slider allows you to set the height of the progress bar from a range of 1 to 15 pixels.
 
 Pressing the `Reset to Default` button changes this value back to 8 pixels tall.
@@ -106,10 +114,11 @@ Pressing the `Reset to Default` button changes this value back to 8 pixels tall.
 If this is toggled `on`, then the progress bar (and its background) will have rounded ends.
 Toggling it `off` will change them to square ends.
 
-![[Obsidian Advanced Progress Bars - Settings - End Caps 3.png]]
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - End Caps.png)
 
 ### Section Marks
-![[Obsidian Advanced Progress Bars - Settings - Toggle 2.png]]
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Toggle.png)
+
 If the `Number of Colors` setting (located further down on the settings page) is set to a value greater than 1, you can turn this toggle `on`  to display evenly spaced markers along your progress bars.
 
 | Number of Colors | Number of Marks |
@@ -125,19 +134,27 @@ This is a slider to set the width of each marker from a range of 1 to 5 pixels.
 Pressing the `Reset to Default` button changes this value back to 3 pixels wide.
 
 ## Text Settings
-There are four pairs of settings which relate to `Title`, `Percentage`, `Fraction` (value/total) and `Completed Text`.![[Obsidian Advanced Progress Bars - Text Diagram.png]]
+There are four pairs of settings which relate to `Title`, `Percentage`, `Fraction` (value/total) and `Completed Text`.
+
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
+
 If you toggle each text item `on`, it will display that particular text on your progress bar.
 
 The `completed` text will be displayed over the top of the progress bar, and will only be shown when it reaches 100%.
-![[Obsidian Advanced Progress Bars - Settings - Completed.png]]
+
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Completed.png)
+
 (as always, you can see what it will look like by viewing the demo progress bar near the top of the settings.).
-![[Obsidian Advanced Progress Bars - Settings - Color Picker.png]]
+
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Color Picker.png)
+
 Using the accompanying color settings will allow you to pick your desired custom color for each of the four text items.
 Alternatively, you could use one of the Light or Dark defaults by pressing the appropriate buttons.
 
 ## Container Settings
 Similar to the text settings above, this section includes two pairs of options for customizing the Border and Background of the container.
-![[Obsidian Advanced Progress Bars - Settings - Container.png]]
+
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Container.png)
 
 ## Progress Bar Color Settings
 Here, you will find all the available color options for customizing the progress bar.
@@ -159,7 +176,8 @@ What this means is that when the Value is between 0 and 33% the entire bar will 
 
 In the image below, you'll see another example showcasing how this works with the maximum of 5 colors and the marks toggle enabled for clearer definition.
 As the percentage progresses, the entire bar will change to the color you've set for each of the 5 color settings, updating every 20% increment.
-![[Obsidian Advanced Progress Bars - Settings - Colors 1.png]]
+
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Colors.png)
 
 When your progress bar reaches 100%, it will change to the color specified in the `Completed Color` setting.
 In this example, you'll also see the `COMPLETED` text, which has been set using the text settings mentioned earlier.
@@ -173,4 +191,5 @@ You can see in the image above, that the bottom progress bar is set to the defau
 ### Bar Background Color
 This is the color that the remaining par of the progress bar will be.
 In this example it is a mid blue-grey color.
-![[Obsidian Advanced Progress Bars - Bar Diagram.png]]
+
+![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Bar Diagram.png)
