@@ -7,7 +7,7 @@ This plugin extends obsidian to allow you to create custom progress bars by usi
     <img src="https://storage.ko-fi.com/cdn/fullLogoKofi.png" alt="ko-fi" style="width: 100px; height: auto;">
   </div>
   <div style="flex: 1; display: flex; align-items: center;">
-    <p>
+    <p style="padding: 0px">
       If you find value in this plugin and would like to support us, please consider using our <a href="https://ko-fi.com/cactuzhead" target="_blank">ko-fi</a>
     </p>
   </div>
