@@ -38,8 +38,8 @@ My Title: 57/100
 ````
 In the `obsidian-apb` code block, you define the attributes as `Title`: `Value` / `Total`.
 
-> ![Text Diagram](/docs/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
-Note: the text within the code block example on the settings page will automatically be updated to reflect the changes you make in the other settings.
+![Text Diagram](/docs/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
+> Note: the text within the code block example on the settings page will automatically be updated to reflect the changes you make in the other settings.
 
 ### Hotkey Setup
 To make it more convenient, you can add a hotkey that automatically inserts a progress bar code block into Obsidian. Simply follow these steps:
@@ -68,7 +68,7 @@ The above stacked bars example would be rendered like this (using default dark c
 
 ![Stacked Bars](/docs/assets/Obsidian Advanced Progress Bars - Settings - Stacked Bars.png)
 
-Note: The code block example on the settings page will only include one progress bar. You will need to manually add any additional progress bars once pasted into Obsidian.
+> Note: The code block example on the settings page will only include one progress bar. You will need to manually add any additional progress bars once pasted into Obsidian.
 
 ## Light & Dark Settings
 ![Light and Dark](/docs/assets/Obsidian Advanced Progress Bars - Settings - Light and Dark.png)
