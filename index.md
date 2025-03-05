@@ -46,7 +46,7 @@ To make it more convenient, you can add a hotkey that automatically inserts a pr
 
 1. **Open Obsidian** and go to the **Settings** by clicking the gear icon in the bottom left corner.
 2. From the **Settings** menu, go to the **Hotkeys** section on the left sidebar.
-3. In the filter search bar found at the top of the Hotkeys section, start typing **"Advanced Progress Bars"** to find the **"Advance Progress Bars: Paste Code Block"** action.
+3. In the filter search bar found at the top of the Hotkeys section, start typing **"Advanced Progress Bars"** to find the **"Advanced Progress Bars: Paste Code Block"** action.
 ![Hotkey Search](/docs/assets/Obsidian Advanced Progress Bars - Hotkey Search.png)
 4. Click on the round plus button next to the found action, and assign the desired hotkey combination (e.g., `Ctrl + Shift + B` or any other combo that suits you).
 5. 
