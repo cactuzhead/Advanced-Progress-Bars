@@ -4,7 +4,7 @@ This plugin extends obsidian to allow you to create custom progress bars by usi
 
 If you find value in this plugin and would like to support us, please consider using our [ko-fi](https://ko-fi.com/cactuzhead)
 
-![ko-fi|100](https://storage.ko-fi.com/cdn/fullLogoKofi.png)
+![ko-fi](https://storage.ko-fi.com/cdn/fullLogoKofi.png)
 
 
 ## Installation
