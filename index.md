@@ -68,7 +68,7 @@ The above stacked bars example would be rendered like this (using default dark c
 
 ![Stacked Bars](/docs/assets/Obsidian Advanced Progress Bars - Settings - Stacked Bars.png)
 
-> Note: The code block example on the settings page will only include one progress bar. You will need to manually add any additional progress bars once pasted into Obsidian.
+> [!Note] The code block example on the settings page will only include one progress bar. You will need to manually add any additional progress bars once pasted into Obsidian.
 
 ## Light & Dark Settings
 ![Light and Dark](/docs/assets/Obsidian Advanced Progress Bars - Settings - Light and Dark.png)
