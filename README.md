@@ -15,6 +15,7 @@ This plugin extends obsidian to allow you to create custom progress bars by usi
 
 <img src="https://storage.ko-fi.com/cdn/fullLogoKofi.png" alt="Ko-Fi" width="100" height="auto" style="float: left; margin-right: 15px;">
 If you find value in this plugin and would like to support us, please consider using our <a href="https://ko-fi.com/cactuzhead">ko-fi</a>
+<br style="clear: both;">
 
 ### Installing via Obsidian
 - Navigate to Settings -> Community Plugins -> Browse and then search for `APB`.
