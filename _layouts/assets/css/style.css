@@ -11,3 +11,7 @@ blockquote {
     padding: 0 0 0 20px;
     font-style: italic;
 }
+
+p {
+    color: #689DED;
+}
