@@ -3,8 +3,17 @@
 This plugin extends obsidian to allow you to create custom progress bars by using a simple markdown code block.
 
 ## Support Us
-| ![Ko-Fi](https://storage.ko-fi.com/cdn/fullLogoKofi.png) | If you find value in this plugin and would like to support us, please consider using our [Ko-Fi](https://ko-fi.com/cactuzhead) |
-| --- | --- |
+<table style="border: 0; width: 100%;">
+  <tr>
+    <td style="padding-right: 15px; vertical-align: middle;">
+      <img src="https://storage.ko-fi.com/cdn/fullLogoKofi.png" alt="Ko-Fi" width="100" height="auto">
+    </td>
+    <td style="vertical-align: middle;">
+      If you find value in this plugin and would like to support us, please consider using our [Ko-Fi](https://ko-fi.com/cactuzhead).
+    </td>
+  </tr>
+</table>
+
 
 ## Installation
 ### Installing via Obsidian
