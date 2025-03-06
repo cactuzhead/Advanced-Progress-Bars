@@ -2,16 +2,9 @@
 <img src="/docs/assets/Obsidian Advanced Progress Bars - Hero Banner.png" alt="Advanced Progress Bars" style="width: 500px; height: auto;">
 This plugin extends obsidian to allow you to create custom progress bars by using a simple markdown code block.
 
-<div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0;">
-  <div style="flex: 0 0 auto; padding-right: 20px; display: flex; align-items: center;">
-    <img src="https://storage.ko-fi.com/cdn/fullLogoKofi.png" alt="ko-fi" style="width: 100px; height: auto;">
-  </div>
-  <div style="flex: 1; display: flex; align-items: center;">
-    <p style="margin: 0px">
-      If you find value in this plugin and would like to support us, please consider using our <a href="https://ko-fi.com/cactuzhead" target="_blank">ko-fi</a>
-    </p>
-  </div>
-</div>
+## Support Us
+| ![Ko-Fi](https://storage.ko-fi.com/cdn/fullLogoKofi.png) | If you find value in this plugin and would like to support us, please consider using our [Ko-Fi](https://ko-fi.com/cactuzhead) |
+| --- | --- |
 
 ## Installation
 ### Installing via Obsidian
