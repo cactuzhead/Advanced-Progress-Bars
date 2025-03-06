@@ -2,7 +2,6 @@
 <img src="/docs/assets/Obsidian Advanced Progress Bars - Hero Banner.png" alt="Advanced Progress Bars" style="width: 500px; height: auto;">
 This plugin extends obsidian to allow you to create custom progress bars by using a simple markdown code block.
 
-## Support Us
 <table style="border: 0; width: 100%;">
   <tr>
     <td style="padding-right: 15px; vertical-align: middle;">
@@ -14,7 +13,6 @@ This plugin extends obsidian to allow you to create custom progress bars by usi
   </tr>
 </table>
 
-## Installation
 ### Installing via Obsidian
 - Navigate to Settings -> Community Plugins -> Browse and then search for `APB`.
 - Now select the Advanced Progress Bars plugin and click the install button.
