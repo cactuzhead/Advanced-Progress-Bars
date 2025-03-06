@@ -36,4 +36,4 @@ My Title: 57/100
 In the `obsidian-apb` code block, you define the attributes as `Title`: `Value` / `Total`.
 
 ## More Information
-For full details about Advanced Progress Bars, please visit our <a href="[https://ko-fi.com/cactuzhead](https://github.com/cactuzhead/Advanced-Progress-Bars)" target="_blank">github page</a>
+For full details about Advanced Progress Bars, please visit our <a href="https://github.com/cactuzhead/Advanced-Progress-Bars" target="_blank">github page</a>
