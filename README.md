@@ -13,6 +13,15 @@ This plugin extends obsidian to allow you to create custom progress bars by usi
   </tr>
 </table>
 
+<div style="display: flex; align-items: center;">
+  <div style="margin-right: 15px;">
+    <img src="https://storage.ko-fi.com/cdn/fullLogoKofi.png" alt="Ko-Fi" width="100" height="auto">
+  </div>
+  <div>
+    If you find value in this plugin and would like to support us, please consider using our <a href="https://ko-fi.com/cactuzhead">ko-fi</a>
+  </div>
+</div>
+
 ### Installing via Obsidian
 - Navigate to Settings -> Community Plugins -> Browse and then search for `APB`.
 - Now select the Advanced Progress Bars plugin and click the install button.
