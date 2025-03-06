@@ -17,7 +17,7 @@ This plugin extends obsidian to allow you to create custom progress bars by usi
 
 ## Installation
 ### Installing via Obsidian
-- Navigate to Settings -> Community Plugins -> Browse and then search for `APB`.
+- Navigate to Settings -> Community Plugins -> Browse and then search for `Advanced Progress Bars`.
 - Now select the Advanced Progress Bars plugin and click the install button.
 - Remember to activate the plugin by going to `Settings` -> `Community Plugins` -> `Installed Plugins` and toggling the `APB` plugin on.
 
