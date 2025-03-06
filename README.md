@@ -6,6 +6,17 @@ If you find value in this plugin and would like to support us, please consider u
 
 <img src="https://storage.ko-fi.com/cdn/fullLogoKofi.png" alt="ko-fi" style="width: 200px; height: auto;">
 
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px;">
+  <div style="flex: 0 0 auto; padding-right: 20px; display: flex; align-items: center;">
+    <img src="https://storage.ko-fi.com/cdn/fullLogoKofi.png" alt="ko-fi" style="width: 100px; height: auto;">
+  </div>
+  <div style="flex: 1; display: flex; align-items: center;">
+    <p style="margin: 0px">
+      If you find value in this plugin and would like to support us, please consider using our <a href="https://ko-fi.com/cactuzhead" target="_blank">ko-fi</a>
+    </p>
+  </div>
+</div>
+
 
 ## Installation
 ### Installing via Obsidian
