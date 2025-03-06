@@ -2,27 +2,10 @@
 <img src="/docs/assets/Obsidian Advanced Progress Bars - Hero Banner.png" alt="Advanced Progress Bars" style="width: 500px; height: auto;">
 This plugin extends obsidian to allow you to create custom progress bars by using a simple markdown code block.
 
-<table style="border: 0; width: 100%;">
-  <tr>
-    <td style="padding-right: 15px; vertical-align: middle;">
-      <img src="https://storage.ko-fi.com/cdn/fullLogoKofi.png" alt="Ko-Fi" width="100" height="auto">
-    </td>
-    <td style="vertical-align: middle;">
-      If you find value in this plugin and would like to support us, please consider using our <a href="https://ko-fi.com/cactuzhead">ko-fi</a>      
-    </td>
-  </tr>
-</table>
-
 <div>
   <img src="https://storage.ko-fi.com/cdn/fullLogoKofi.png" alt="Ko-Fi" width="100" height="auto" style="vertical-align: middle; margin-right: 15px;">
   <span>If you find value in this plugin and would like to support us, please consider using our <a href="https://ko-fi.com/cactuzhead">ko-fi</a></span>
 </div>
-
-![Ko-Fi|100](https://storage.ko-fi.com/cdn/fullLogoKofi.png#width=100) If you find value in this plugin and would like to support us, please consider using our [ko-fi](https://ko-fi.com/cactuzhead)
-
-<img src="https://storage.ko-fi.com/cdn/fullLogoKofi.png" alt="Ko-Fi" width="100" height="auto" style="float: left; margin-right: 15px;">
-If you find value in this plugin and would like to support us, please consider using our <a href="https://ko-fi.com/cactuzhead">ko-fi</a>
-<br style="clear: both;">
 
 ### Installing via Obsidian
 - Navigate to Settings -> Community Plugins -> Browse and then search for `APB`.
