@@ -17,20 +17,20 @@ This plugin extends obsidian to allow you to create custom progress bars by usi
 
 ## Installation
 ### Installing via Obsidian
-- Navigate to Settings -> Community Plugins -> Browse and then search for `Advanced Progress Bars`.
+- Navigate to **Settings** -> **Community Plugins** -> Browse and then search for `Advanced Progress Bars`.
 - Now select the Advanced Progress Bars plugin and click the install button.
-- Remember to activate the plugin by going to `Settings` -> `Community Plugins` -> `Installed Plugins` and toggling the `APB` plugin on.
+- Remember to activate the plugin by going to **Settings** -> **Community Plugins** -> **Installed Plugins** and toggling the `APB` plugin on.
 
 ### Manual Install
-- Find the latest release from https://cactuzhead.github.io/Advanced-Progress-Bars/ and download the files (`main.js`,  `manifest.json` and `styles.css`).
+- Find the latest release from <a href="https://cactuzhead.github.io/Advanced-Progress-Bars/">https://cactuzhead.github.io/Advanced-Progress-Bars/</a> and download the files (`main.js`,  `manifest.json` and `styles.css`).
 - Navigate to your vault's plugin folder `[your vault]/.obsidian/plugins`, and create a new folder called `obsidian-advanced-progress-bars`.
 - Copy the downloaded files into this new folder.
 - Reload Obsidian.
-- Remember to activate the plugin by going to `Settings` -> `Community Plugins` -> `Installed Plugins` and toggling the `APB` plugin on.
+- Remember to activate the plugin by going to **Settings** -> **Community Plugins** -> **Installed Plugins** and toggling the `APB` plugin on.
 
 # Obsidian Settings
 ## Usage Example Code Block
-To insert an `Advanced Progress Bar` into `Obsidian`, you use a fenced code block similar to the one below.
+To insert an `Advanced Progress Bar` into Obsidian, you use a fenced code block similar to the one below.
 ````
 ```obsidian-apb
 My Title: 57/100
@@ -44,7 +44,7 @@ In the `obsidian-apb` code block, you define the attributes as `Title`: `Value` 
 ### Hotkey Setup
 To make it more convenient, you can add a hotkey that automatically inserts a progress bar code block into Obsidian. Simply follow these steps:
 
-1. **Open Obsidian** and go to the **Settings** by clicking the gear icon in the bottom left corner.
+1. Open Obsidian and go to the **Settings** by clicking the gear icon in the bottom left corner.
 2. From the **Settings** menu, go to the **Hotkeys** section on the left sidebar.
 3. In the filter search bar found at the top of the Hotkeys section, start typing **"Advanced Progress Bars"** to find the **"Advanced Progress Bars: Paste Code Block"** action.
 ![Hotkey Search](/docs/assets/Obsidian Advanced Progress Bars - Hotkey Search.png)
