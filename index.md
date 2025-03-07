@@ -17,13 +17,13 @@ This plugin extends obsidian to allow you to create custom progress bars by usi
 
 ## Installation
 ### Installing via Obsidian
-- Navigate to **Settings** -> **Community Plugins** -> Browse and then search for `Advanced Progress Bars`.
+- Navigate to **Settings** -> **Community Plugins** -> **Browse** and then search for `Advanced Progress Bars`.
 - Now select the Advanced Progress Bars plugin and click the install button.
 - Remember to activate the plugin by going to **Settings** -> **Community Plugins** -> **Installed Plugins** and toggling the `APB` plugin on.
 
 ### Manual Install
-- Find the latest release from <a href="https://cactuzhead.github.io/Advanced-Progress-Bars/">https://cactuzhead.github.io/Advanced-Progress-Bars/</a> and download the files (`main.js`,  `manifest.json` and `styles.css`).
-- Navigate to your vault's plugin folder `[your vault]/.obsidian/plugins`, and create a new folder called `obsidian-advanced-progress-bars`.
+- Find the latest release from https://cactuzhead.github.io/Advanced-Progress-Bars/ and download the files (`main.js`,  `manifest.json` and `styles.css`).
+- Navigate to your vault's plugin folder **[your vault]/.obsidian/plugins**, and create a new folder called `obsidian-advanced-progress-bars`.
 - Copy the downloaded files into this new folder.
 - Reload Obsidian.
 - Remember to activate the plugin by going to **Settings** -> **Community Plugins** -> **Installed Plugins** and toggling the `APB` plugin on.
