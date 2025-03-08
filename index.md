@@ -55,7 +55,7 @@ To make it more convenient, you can add a hotkey that automatically inserts a pr
 ![Hotkey](/docs/assets/Obsidian Advanced Progress Bars - Hotkey.png)
   
 ## Copy to Clipboard
-Instead of manually typing the code block, or setting up a hotkey,  you can use the `Copy to Clipboard` button, found at the top of the settings page to quickly copy it for later pasting into Obsidian.
+Instead of manually typing the code block, or setting up a hotkey,  you can use the `Copy to Clipboard` button, found at the top of the `APB` settings page to quickly copy it for later pasting into Obsidian.
 
 ## Multiple Advanced Progress Bars
 You can also stack progress bars by adding additional bars within the same code block, see example below.
