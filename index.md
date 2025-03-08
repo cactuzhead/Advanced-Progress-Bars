@@ -39,9 +39,11 @@ My Title: 57/100
 In the `obsidian-apb` code block, you define the attributes as `Title`: `Value` / `Total`.
 
 ![Text Diagram](/docs/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
+
+The `percentage` will be automatically calculated based on your `Value` and `Total`.
 > Note: the text within the code block example on the settings page will automatically be updated to reflect the changes you make in the other settings.
 
-### Hotkey Setup
+## Hotkey Setup
 To make it more convenient, you can add a hotkey that automatically inserts a progress bar code block into Obsidian. Simply follow these steps:
 
 1. Open Obsidian and go to the **Settings** by clicking the gear icon in the bottom left corner.
@@ -52,10 +54,10 @@ To make it more convenient, you can add a hotkey that automatically inserts a pr
 5. Click on the round plus button next to the found action, and assign the desired hotkey combination (e.g., `Ctrl + Shift + B` or any other combo that suits you).
 ![Hotkey](/docs/assets/Obsidian Advanced Progress Bars - Hotkey.png)
   
-### Copy to Clipboard
+## Copy to Clipboard
 Instead of manually typing the code block, or setting up a hotkey,  you can use the `Copy to Clipboard` button, found at the top of the settings page to quickly copy it for later pasting into Obsidian.
 
-### Multiple Advanced Progress Bars
+## Multiple Advanced Progress Bars
 You can also stack progress bars by adding additional bars within the same code block, see example below.
 ````
 ```obsidian-apb
