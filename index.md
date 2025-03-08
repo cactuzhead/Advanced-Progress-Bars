@@ -198,7 +198,7 @@ As the percentage increases, the entire bar will change to the color you've set 
 
 When your progress bar reaches 100%, it will change to the color specified in the `Completed Color` setting.
 In this example, you'll also see the `COMPLETED` text, which has been set using the text settings mentioned earlier.<br>
-**Note:** that your `Title` will not change once set - the titles in the above image where only manually changed to better explain what was happening.
+> Note that your `Title` will not change once set - the titles in the above image where only manually changed to better explain what was happening.
 
 ### Completed Color
 This color is what the progress bar will be when it has reached 100%.
