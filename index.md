@@ -57,6 +57,11 @@ To make it more convenient, you can add a hotkey that automatically inserts a pr
 ## Copy to Clipboard
 Instead of manually typing the code block, or setting up a hotkey,  you can use the `Copy to Clipboard` button, found at the top of the `APB` settings page to quickly copy it for later pasting into Obsidian.
 
+## Applying Settings Changes
+To see the changes you've made in the settings, you may need to switch back and forth between notes or reload Obsidian to refresh the active note.
+
+However, if a new progress bar is added to a note, it will display correctly, even if the existing progress bars on the same page haven't been refreshed yet.
+
 ## Multiple Advanced Progress Bars
 You can also stack progress bars by adding additional bars within the same code block, see example below.
 ````
@@ -115,7 +120,7 @@ If toggled `off` then a new `Width` setting will appear below this setting.
 
 The new `Width` setting will allow you to enter in a number to fix the width of the progress bar (in pixels).
 
-This is particularly useful when displaying a progress bar on a full-screen page, as a flexible width without a fixed limit can cause the progress bar to stretch excessively.
+This is particularly useful when displaying a progress bar on a full-screen note, as a flexible width without a fixed limit can cause the progress bar to stretch excessively.
 
 ### Height
 ![Slider](/docs/assets/Obsidian Advanced Progress Bars - Settings - Slider.png)
