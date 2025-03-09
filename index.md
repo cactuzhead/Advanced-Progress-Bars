@@ -60,7 +60,7 @@ Instead of manually typing the code block, or setting up a hotkey,  you can use 
 ## Refreshing Notes after Settings Changes
 To see the changes you've made in the settings, you may need to switch back and forth between notes or reload Obsidian to refresh the active note.
 
-However, if a new progress bar is added to a note, it will display correctly, even if the existing progress bars on the same page haven't been refreshed yet.
+However, if a new progress bar is added to a note, it *will* display correctly, even if the existing progress bars on the same page haven't been refreshed yet.
 
 ## Multiple Advanced Progress Bars
 You can also stack progress bars by adding additional bars within the same code block, see example below.
