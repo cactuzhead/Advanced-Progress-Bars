@@ -57,7 +57,7 @@ To make it more convenient, you can add a hotkey that automatically inserts a pr
 ## Copy to Clipboard
 Instead of manually typing the code block, or setting up a hotkey,  you can use the `Copy to Clipboard` button, found at the top of the `APB` settings page to quickly copy it for later pasting into Obsidian.
 
-## Refreshing Notes after Settings Changes
+## Refreshing Notes After Changes
 To see the changes you've made in the settings, you may need to switch back and forth between notes or reload Obsidian to refresh the active note.
 
 However, if a new progress bar is added to a note, it *will* display correctly, even if the existing progress bars on the same page haven't been refreshed yet.
