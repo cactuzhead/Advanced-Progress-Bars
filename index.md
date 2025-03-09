@@ -62,6 +62,8 @@ To see the changes you've made in the settings, you may need to switch back and 
 
 However, if a new progress bar is added to a note, it *will* display correctly, even if the existing progress bars on the same page haven't been refreshed yet.
 
+> Note, This will only be a problem directly after you make changes to the settings.
+
 ## Multiple Advanced Progress Bars
 You can also stack progress bars by adding additional bars within the same code block, see example below.
 ````
