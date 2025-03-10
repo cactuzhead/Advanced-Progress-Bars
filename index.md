@@ -152,9 +152,9 @@ If the `Number of Colors` setting (located further down on the settings page) is
 | 5                | 4               |
 
 ### Section Mark Color
-This is what the color of the vertical section markers will set to.
+This will define the color of the vertical section markers.
 
-Use the colorpicker to select a custom color with the colorpicker or alternatively, use one of the `Light` or `Dark` defaults by pressing the appropriate buttons.
+Use the colorpicker to select a custom color or alternatively, use one of the `Light` or `Dark` defaults by pressing the appropriate buttons.
 
 Note that the color selected will automatically be set to 50% transparency, allowing the progress bar's color to blend and influence the final appearance.
 
