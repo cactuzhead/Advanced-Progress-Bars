@@ -137,6 +137,7 @@ Toggling it `off` will change them to square ends.
 
 ![End Caps](/docs/assets/Obsidian Advanced Progress Bars - Settings - End Caps.png)
 
+## Section Mark Settings
 ### Section Marks
 ![Toggle](/docs/assets/Obsidian Advanced Progress Bars - Settings - Toggle.png)
 
@@ -149,6 +150,13 @@ If the `Number of Colors` setting (located further down on the settings page) is
 | 3                | 2               |
 | 4                | 3               |
 | 5                | 4               |
+
+### Section Mark Color
+This is what the color of the vertical section markers will set to.
+
+Use the colorpicker to select a custom color with the colorpicker or alternatively, use one of the `Light` or `Dark` defaults by pressing the appropriate buttons.
+
+Note that the color selected will automatically be set to 50% transparency, allowing the progress bar's color to blend and influence the final appearance.
 
 ### Section Mark Width
 This is a slider to set the width of each marker from a range of 1 to 5 pixels.
