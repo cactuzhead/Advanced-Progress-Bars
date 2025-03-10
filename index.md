@@ -156,7 +156,7 @@ This setting defines the color of the vertical section markers.
 
 Use the colorpicker to select a custom color or alternatively, use one of the `Light` or `Dark` defaults by pressing the appropriate buttons.
 
-Note that the color selected will automatically be set to 50% transparency, allowing the progress bar's color to blend and influence the final appearance.
+> Note: the color selected will automatically be set to 50% transparency, allowing the progress bar's color to blend and influence the final appearance.
 
 ### Section Mark Width
 This is a slider to set the width of each marker from a range of 1 to 5 pixels.
