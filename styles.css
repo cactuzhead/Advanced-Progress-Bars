@@ -1,0 +1,154 @@
+:root {
+    color-scheme: light dark;
+}
+
+h3, .markdown-rendered h3 {
+    color: #a3be8c;
+}
+
+h4, .markdown-rendered h4 {
+    color: #689DED;
+}
+
+.highlight-text {
+    color: light-dark(#ec7e83, #71d1c4);
+}
+
+.custom-textbox {
+    width: 60px;
+}
+
+.custom-container {
+	align-Items: center;
+	border-Radius: 7px;
+	border: 1px solid #689ded;		
+	display: flex;
+	justify-Content: space-between;
+	margin: 0px;
+}
+
+.custom-container img {
+    padding-right: 1em;
+}
+
+.custom-container p {
+    color: #8fa0ba;
+    flex: 1 1 auto;
+    min-width: 10px;     
+    overflow: hidden;
+    padding-left: 1em;
+    white-space: wrap;
+    width: 160px;
+}
+
+.progressBar-container {
+    border-radius: 7px;
+    display: flex;
+    flex-flow: row wrap;    
+    margin-top: 7px;   
+    overflow: hidden;
+    padding: 5px;
+    position: relative;
+    width: 100%;
+}
+
+.progressBar-text-container {
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: row nowrap;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.75rem;
+    justify-content: space-between;
+    overflow: hidden;
+    padding: 0 0 0.3em 0;
+    width: 100%;
+}
+
+.progressBar-title {
+    color: #8fa0ba;
+    flex: 1 1 0;
+    min-width: 10px;     
+    overflow: hidden;
+    padding: 0 0.3em;
+    text-overflow: ellipsis;  
+    white-space: nowrap;
+    width: 10px;
+}
+
+.progressBar-percentage {
+    color: #c1d7f9;
+    flex: 0 0 auto;
+    padding: 0 0 0 0.3em;
+    text-align: right;
+}
+
+.progressBar-value {
+    color: #8fa0ba;
+    flex: 0 0 auto;
+    padding: 0 0.3em;
+    text-align: right;
+}
+
+.progressBar-completed {
+    color: #c1d7f9;
+    font-size: 0.75em;
+    font-weight: 500;
+    overflow: hidden;
+    padding: 0 0 0 0.3em;    
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;               
+    width: 100%;
+}
+
+.progressBar-background {
+    display: flex;
+    flex-flow: row nowrap;
+    position: relative;
+}
+
+.progressBar {
+	display: flex;
+	justify-Content: space-between;
+	margin: 0px;
+    align-Items: center;
+}
+
+.marks {
+    height: 100%;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    width: 100%;    
+  }
+
+.mark {
+    height: 100%;
+    position: absolute;
+    top: 0;
+    z-index: 1;
+  }
+
+.error-container {
+    background:#912f3c;
+    border-radius: 7px;
+    display: flex;
+    flex-flow: row wrap;
+    overflow: hidden;
+    padding: 5px;
+    position: relative;
+}
+
+.error-text-container {
+    align-items: center;
+    color:#ffffff;
+    display: flex;
+    flex-flow: row nowrap;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.75rem;
+    justify-content: space-between;
+    padding: 0.3em;
+    width: 100%;
+}
