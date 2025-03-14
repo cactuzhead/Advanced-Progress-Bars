@@ -1,7 +1,7 @@
 {
 	"id": "advanced-progress-bars",
 	"name": "Advanced Progress Bars",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"minAppVersion": "0.15.0",
 	"description": "Progress bars that can change color depending on completion value - fully customizable.",
 	"author": "cactuzhead",
