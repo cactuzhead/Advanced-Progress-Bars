@@ -32,11 +32,11 @@ This plugin extends obsidian to allow you to create custom progress bars by usi
 ## Usage Example Code Block
 To insert an `Advanced Progress Bar` into Obsidian, you use a fenced code block similar to the one below.
 ````
-```obsidian-apb
+```apb
 My Title: 57/100
 ```
 ````
-In the `obsidian-apb` code block, you define the attributes as `Title`: `Value` / `Total`.
+In the `apb` code block, you define the attributes as `Title`: `Value` / `Total`.
 
 ![Text Diagram](/docs/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
 
@@ -67,7 +67,7 @@ However, if a new progress bar is added to a note, it *will* display correctly, 
 ## Multiple Advanced Progress Bars
 You can also stack progress bars by adding additional bars within the same code block, see example below.
 ````
-```obsidian-apb
+```apb
 My Title: 57/100
 Smaller Total: 2/7
 Very Large Total: 2034/2345
