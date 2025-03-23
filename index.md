@@ -141,7 +141,8 @@ Toggling it `off` will change them to square ends.
 ### Section Marks
 ![Toggle](/docs/assets/Obsidian Advanced Progress Bars - Settings - Toggle.png)
 
-If the `Number of Colors` setting (located further down on the settings page) is set to a value greater than 1, you can turn this toggle `on`  to display evenly spaced markers along your progress bars.
+If this is toggled `on`, the progress bar will automaticlaly have equally spaced vertical markers along its length.
+The following table shows how many marks will be displayed depending on the `Number of Colors` setting (located further down on the settings page).
 
 | Number of Colors | Number of Marks |
 | ---------------- | --------------- |
@@ -150,6 +151,20 @@ If the `Number of Colors` setting (located further down on the settings page) is
 | 3                | 2               |
 | 4                | 3               |
 | 5                | 4               |
+
+> Note: if you have 1 color selected, you will by default, not see any markers.
+
+#### Automatically Assigned Marks
+If this is toggled `on`, the progress bar will automaticlaly have equally spaced vertical markers along its length - as described above.
+
+However, if you want to manually overide this behavior to choose the number of equally spaced marks along the progress bar then, toggle this setting `off`.
+
+If you do so, a new slider will apear underneath to allow you to set the number of marks you wish to be used.
+
+### Number of Marks
+If you have the `Automatically Assigned Marks` toggle in the `off` position (as described above), you can use this slider to pick exactly how many vertical marks you want evenly distributed along your progress bar.
+
+> Note: this overrides the automatically assigned system
 
 ### Section Mark Color
 This setting defines the color of the vertical section markers.
@@ -214,6 +229,15 @@ As the percentage increases, the entire bar will change to the color you've set 
 When your progress bar reaches 100%, it will change to the color specified in the `Completed Color` setting.
 In this example, you'll also see the `COMPLETED` text, which has been set using the text settings mentioned earlier.<br>
 > Note that your `Title` will not change once set - the titles in the above image where only manually changed to better explain what was happening.
+
+### Gradient
+If you set the `Number of colors` to 1 color, this new gradient option will become visible.
+
+When toggled on, two additional color settings will appear underneath.
+
+The `Primary Gradient` is used to set the left color of the gradient, whilst the `Secondary Gradient` is used to set the right color.
+
+Each has two default buttons for light and dark colors, or you can alternatively use the colorpicker to select any color you wish.
 
 ### Completed Color
 This color is what the progress bar will be when it has reached 100%.
