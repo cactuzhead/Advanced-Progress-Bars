@@ -237,7 +237,7 @@ When toggled on, two additional color settings will appear underneath.
 
 The `Primary Gradient` is used to set the left color of the gradient, whilst the `Secondary Gradient` is used to set the right color.
 
-Each has two default buttons for light and dark colors, or you can alternatively use the colorpicker to select any color you wish.
+Each has two default buttons for `Light` and `Dark` colors, or you can alternatively use the colorpicker to select any color you wish.
 
 ### Completed Color
 This color is what the progress bar will be when it has reached 100%.
