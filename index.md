@@ -241,7 +241,7 @@ Each has two default buttons for `Light` and `Dark` colors, or you can alternati
 
 ### Completed Color
 This color is what the progress bar will be when it has reached 100%.
-You can see in the image above, that the bottom completed progress bar is set to the default light blue-grey.
+You can see in the image above, that the bottom completed progress bar is using the default `Dark` option which is a light blue-grey color.
 
 ### Bar Background Color
 This is the color for the remaining portion of the progress bar.
