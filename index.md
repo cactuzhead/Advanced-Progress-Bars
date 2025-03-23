@@ -154,7 +154,7 @@ The following table shows how many marks will be displayed depending on the `Num
 
 > Note: if you have 1 color selected, you will by default, not see any markers.
 
-#### Automatically Assigned Marks
+### Automatically Assigned Marks
 If this is toggled `on`, the progress bar will automaticlaly have equally spaced vertical markers along its length - as described above.
 
 However, if you want to manually overide this behavior to choose the number of equally spaced marks along the progress bar then, toggle this setting `off`.
