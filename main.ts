@@ -1300,7 +1300,8 @@ createColorPickerSetting(
 	defaultDarkColor: string
 ) {
 	const match = setDesc.match(/(.*)%%(.*)%%(.*)/);
-    let before, middle, after;
+	let before: string, middle: string, after: string;
+
 
 	if (match && match.length === 4) {
         // Successfully found three parts
@@ -1342,7 +1343,8 @@ createToggleSetting(
 	settingKey: keyof ObsidianProgressBarsSettings
 ) {
 	const match = setDesc.match(/(.*)%%(.*)%%(.*)/);
-    let before, middle, after;
+	let before: string, middle: string, after: string;
+
 
 	if (match && match.length === 4) {
         // Successfully found three parts
