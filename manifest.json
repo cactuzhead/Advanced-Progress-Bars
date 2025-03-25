@@ -1,17 +1,11 @@
 {
 	"id": "advanced-progress-bars",
 	"name": "Advanced Progress Bars",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"minAppVersion": "0.15.0",
 	"description": "Progress bars that can change color depending on completion value - fully customizable.",
 	"author": "cactuzhead",
 	"authorUrl": "https://cactuzhead.com",
 	"fundingUrl": "https://ko-fi.com/cactuzhead",
-	"isDesktopOnly": false,
-	"commands": [
-    {
-      "id": "paste-code-block",
-      "name": "Paste Code Block"
-    }
-  ]
+	"isDesktopOnly": false	
 }

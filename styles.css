@@ -2,12 +2,18 @@
     color-scheme: light dark;
 }
 
-h3, .markdown-rendered h3 {
-    color: #a3be8c;
+.kofi-button {
+    flex: 1 0;
+    height: 22px;
+    margin: 0 10px;
+    width: 140px;
+    height: auto;	
 }
 
-h4, .markdown-rendered h4 {
+.header-highlight {
     color: #689DED;
+    font-size: large;
+    font-weight: bold;
 }
 
 .highlight-text {
@@ -38,7 +44,7 @@ h4, .markdown-rendered h4 {
     overflow: hidden;
     padding-left: 1em;
     white-space: wrap;
-    width: 160px;
+    /* width: 160px; */
 }
 
 .progressBar-container {
