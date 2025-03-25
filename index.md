@@ -58,11 +58,11 @@ To make it more convenient, you can add a hotkey that automatically inserts a pr
 Instead of manually typing the code block, or setting up a hotkey,  you can use the `Copy to Clipboard` button, found at the top of the `APB` settings page to quickly copy it for later pasting into Obsidian.
 
 ## Refreshing Notes After Changes
-To see the changes you've made in the settings, you may need to switch back and forth between notes or reload Obsidian to refresh the active note.
+To see the changes you've made in the settings reflected in your notes, you may need to switch back and forth between notes or alternatively, reload Obsidian to refresh the active note.
 
 However, if a new progress bar is added to a note, it *will* display correctly, even if the existing progress bars on the same page haven't been refreshed yet.
 
-> Note, This will only be a problem after you make changes to the settings.
+> Note, This will only be a problem directly after you make changes to the settings.
 
 ## Multiple Advanced Progress Bars
 You can also stack progress bars by adding additional bars within the same code block, see example below.
@@ -236,6 +236,8 @@ If you set the `Number of colors` to 1 color, this new gradient option will beco
 When toggled on, two additional color settings will appear underneath.
 
 The `Primary Gradient` is used to set the left color of the gradient, whilst the `Secondary Gradient` is used to set the right color.
+
+![Gradient](/docs/assets/Obsidian Advanced Progress Bars - Light and Dark Gradient.png)
 
 Each has two default buttons for `Light` and `Dark` colors, or you can alternatively use the colorpicker to select any color you wish.
 
