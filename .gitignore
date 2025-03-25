@@ -12,6 +12,11 @@ node_modules
 # They should be uploaded to GitHub releases instead.
 main.js
 
+# Exclude documentation and github page
+docs/
+assets/
+_layouts/
+
 # Exclude sourcemaps
 *.map
 
