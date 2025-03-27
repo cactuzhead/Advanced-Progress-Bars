@@ -59,6 +59,9 @@ interface ObsidianProgressBarsSettings {
 	APB_colorLightBarBackground: string;
 	/* Additional Settings */
 	APB_progressBarChange: boolean;
+	APB_overageToggle: boolean;
+	APB_overageColor: string;
+	APB_overageLightColor: string;
 }
 
 const DEFAULT_SETTINGS: Partial<ObsidianProgressBarsSettings> = {
@@ -119,6 +122,9 @@ const DEFAULT_SETTINGS: Partial<ObsidianProgressBarsSettings> = {
 	APB_colorLightBarBackground: '#d9dde2',
 	/* Additional Settings */
 	APB_progressBarChange: true,
+	APB_overageToggle: false,
+	APB_overageColor: '#38edef',
+	APB_overageLightColor: '#d33411',
 }
 // Loading and saving of settings
 export default class ObsidianProgressBars extends Plugin {
@@ -169,23 +175,25 @@ export default class ObsidianProgressBars extends Plugin {
 				const current = parseInt(match[2], 10);
 				const total = parseInt(match[3], 10);
 
-				// Check if current value is too large or total is not zero
-				if (current > total && total !== 0) {
-					// console.error('Invalid value for advanced progress bar block:', row);
+				if (!this.settings.APB_overageToggle) {
+					// Check if current value is too large or total is not zero
+					if (current > total && total !== 0) {
+						// console.error('Invalid value for advanced progress bar block:', row);
 
-					const APB_errorContainer = document.createElement('div');
-					APB_errorContainer.addClass('error-container');
+						const APB_errorContainer = document.createElement('div');
+						APB_errorContainer.addClass('error-container');
 
-					const APB_errorMessage = document.createElement('div');
-					APB_errorMessage.addClass('error-text-container');
-					APB_errorMessage.createEl('span', { text: 'APB_ Error: Value is too large' });
+						const APB_errorMessage = document.createElement('div');
+						APB_errorMessage.addClass('error-text-container');
+						APB_errorMessage.createEl('span', { text: 'APB_ Error: Value is too large' });
 
-					APB_errorContainer.appendChild(APB_errorMessage);
-					el.appendChild(APB_errorContainer);
+						APB_errorContainer.appendChild(APB_errorMessage);
+						el.appendChild(APB_errorContainer);
 
-					return;
+						return;
+					}
 				}
-	  
+		
 				// Check if parsing was successful and that total is zero
 				if (isNaN(current) || isNaN(total) || total === 0) {
 					// console.error('Invalid advanced progress bar values:', row);	
@@ -205,6 +213,7 @@ export default class ObsidianProgressBars extends Plugin {
 	  
 				// Calculate the width percentage of the progress bar
 				const percentage = (current / total) * 100;
+				const overage = Math.round(percentage - 100);
 		
 				// Ensure the width percentage is between 0 and 100
 				const clampedPercentage = Math.min(Math.max(Math.round(percentage), 0), 100);
@@ -245,8 +254,14 @@ export default class ObsidianProgressBars extends Plugin {
 				const APB_percentage = document.createElement('div');
 				APB_percentage.addClass('progressBar-percentage');
 				if (this.settings.APB_percentageToggle) {
-					APB_percentage.createEl('span', { text: clampedPercentage+'%' });
-					APB_percentage.style.color = this.settings.APB_percentageColor;
+					if(this.settings.APB_overageToggle && overage > 0) {
+						APB_percentage.createEl('span', { text: (overage+100)+'%' });
+						APB_percentage.style.color = this.settings.APB_overageColor;
+					} else {
+						APB_percentage.createEl('span', { text: clampedPercentage+'%' });
+						APB_percentage.style.color = this.settings.APB_percentageColor;
+					}
+					
 				}
 
 				// APB_Value
@@ -579,6 +594,7 @@ new Setting(containerEl)
 			this.plugin.settings.APB_colorBarCompleted = DEFAULT_SETTINGS.APB_colorLightBarCompleted as string;
 			this.plugin.settings.APB_colorBarBackground = DEFAULT_SETTINGS.APB_colorLightBarBackground as string;
 			this.plugin.settings.APB_completedColor = DEFAULT_SETTINGS.APB_completedLightColor as string;
+			this.plugin.settings.APB_overageColor = DEFAULT_SETTINGS.APB_overageLightColor as string;			
 
 			this.plugin.settings.APB_gradientPrimary = DEFAULT_SETTINGS.APB_gradientPrimaryLight as string;
 			this.plugin.settings.APB_gradientSecondary = DEFAULT_SETTINGS.APB_gradientSecondaryLight as string;
@@ -604,6 +620,7 @@ new Setting(containerEl)
 			this.plugin.settings.APB_colorBarCompleted = DEFAULT_SETTINGS.APB_colorBarCompleted as string;
 			this.plugin.settings.APB_colorBarBackground = DEFAULT_SETTINGS.APB_colorBarBackground as string;
 			this.plugin.settings.APB_completedColor = DEFAULT_SETTINGS.APB_completedColor as string;
+			this.plugin.settings.APB_overageColor = DEFAULT_SETTINGS.APB_overageColor as string;
 
 			this.plugin.settings.APB_gradientPrimary = DEFAULT_SETTINGS.APB_gradientPrimary as string;
 			this.plugin.settings.APB_gradientSecondary = DEFAULT_SETTINGS.APB_gradientSecondary as string;
@@ -1110,10 +1127,26 @@ new Setting(containerEl)
 	this.createColorPickerSetting(containerEl, 'Completed text color', 'Select the color of the %%Completed%% text.',
 		'APB_completedColor', DEFAULT_SETTINGS.APB_completedLightColor as string, DEFAULT_SETTINGS.APB_completedColor as string);
 
-	/************ SECTION Progress Bar Container *************/	
-	const setting7 = new Setting(containerEl).setName('Progress bar container').setHeading();
+	/************ SECTION Override Container *************/	
+	const setting7 = new Setting(containerEl).setName('Override error warning').setHeading();
 	const heading7 = setting7.settingEl.querySelector('.setting-item-name');
 	if (heading7) {heading7.addClass('header-highlight');}
+
+	/************ Overage Percentage *************/
+	this.createToggleSetting(containerEl, 'Override large value error',
+		'When toggled on, you will not get an error when the %%Value%% is greater than the Total',
+		'APB_overageToggle');
+	
+	if (this.plugin.settings.APB_overageToggle) {
+		/************ Overage Color *************/
+		this.createColorPickerSetting(containerEl, 'Overage percentage text color', 'Select the color of the %%Percentage%% text when it is greater than 100%.',
+			'APB_overageColor', DEFAULT_SETTINGS.APB_overageLightColor as string, DEFAULT_SETTINGS.APB_overageColor as string);
+	}
+
+	/************ SECTION Progress Bar Container *************/	
+	const setting8 = new Setting(containerEl).setName('Progress bar container').setHeading();
+	const heading8 = setting8.settingEl.querySelector('.setting-item-name');
+	if (heading8) {heading8.addClass('header-highlight');}
 
 	/************ Border *************/
 	this.createToggleSetting(containerEl, 'Border',
@@ -1134,9 +1167,9 @@ new Setting(containerEl)
 		'APB_colorBackground', DEFAULT_SETTINGS.APB_colorLightBackground as string, DEFAULT_SETTINGS.APB_colorBackground as string);
 		
 	/************ SECTION Progress Bar Color *************/
-	const setting8 = new Setting(containerEl).setName('Progress bar color').setHeading();
-	const heading8 = setting8.settingEl.querySelector('.setting-item-name');
-	if (heading8) {heading8.addClass('header-highlight');}
+	const setting9 = new Setting(containerEl).setName('Progress bar color').setHeading();
+	const heading9 = setting9.settingEl.querySelector('.setting-item-name');
+	if (heading9) {heading9.addClass('header-highlight');}
 
 	/************ Number of Colors Dropdown *************/
 	new Setting(this.containerEl)
