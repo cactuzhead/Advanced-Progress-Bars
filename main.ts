@@ -345,7 +345,7 @@ export default class ObsidianProgressBars extends Plugin {
 						APB.style.backgroundColor = String(this.settings[`APB_color${i}` as keyof ObsidianProgressBarsSettings]);
 
 						if (this.settings.APB_gradientToggle && clampedPercentage < 100) {
-							APB.style.backgroundImage = String('linear-gradient(to right,'+ this.settings.APB_gradientPrimary + ','+ this.settings.APB_gradientSecondary +')');
+							APB.style.backgroundImage = `linear-gradient(to right, ${this.settings.APB_gradientPrimary}, color-mix(in srgb, ${this.settings.APB_gradientPrimary} ${100-clampedPercentage}%, ${this.settings.APB_gradientSecondary} ${clampedPercentage}%))`;
 						}
 	
 						if (clampedPercentage == 100) {
