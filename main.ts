@@ -1,4 +1,4 @@
-import { App, Plugin, PluginSettingTab, Setting,  Notice, ButtonComponent, ColorComponent } from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting,  Notice, ButtonComponent, ColorComponent, TFile, MarkdownView } from 'obsidian';
 
 // Populate settings with values
 interface ObsidianProgressBarsSettings {
@@ -38,6 +38,7 @@ interface ObsidianProgressBarsSettings {
 	/* Progress Bar Color Settings */
 	APB_colornumber: string;
 	APB_gradientToggle: boolean;
+	APB_gradientTypeToggle: boolean;
 	APB_gradientPrimary: string;
 	APB_gradientPrimaryLight: string;
 	APB_gradientSecondary: string;
@@ -57,6 +58,17 @@ interface ObsidianProgressBarsSettings {
 	APB_colorLightBarCompleted: string;
 	APB_colorBarBackground: string;
 	APB_colorLightBarBackground: string;
+	/* Tasks */
+	APB_allowTasksToggle: boolean;
+	APB_colorTaskText: string;
+	APB_colorLightTaskText: string;
+	APB_colorTaskBackground: string;
+	APB_colorLightTaskBackground: string;
+	APB_allowSubTasksToggle: boolean;
+	APB_colorSubTaskText: string;
+	APB_colorLightSubTaskText: string;
+	APB_colorSubTaskCompletedText: string;
+	APB_colorLightSubTaskCompletedText: string;
 	/* Additional Settings */
 	APB_progressBarChange: boolean;
 	APB_overageToggle: boolean;
@@ -101,6 +113,7 @@ const DEFAULT_SETTINGS: Partial<ObsidianProgressBarsSettings> = {
 	/* Progress Bar Color Settings */
 	APB_colornumber: 'option5',
 	APB_gradientToggle: false,
+	APB_gradientTypeToggle: true,
 	APB_gradientPrimary: '#2978ef',
 	APB_gradientPrimaryLight: '#e60076',
 	APB_gradientSecondary: '#00bc7d',
@@ -120,12 +133,25 @@ const DEFAULT_SETTINGS: Partial<ObsidianProgressBarsSettings> = {
 	APB_colorLightBarCompleted: '#fcfcfd',
 	APB_colorBarBackground: '#3b4252',
 	APB_colorLightBarBackground: '#d9dde2',
+	/* Tasks */
+	APB_allowTasksToggle: false,
+	APB_colorTaskText: '#8fa0ba',
+	APB_colorLightTaskText: '#ffffff',
+	APB_colorTaskBackground: '#3b4252',
+	APB_colorLightTaskBackground: '#44546F',
+	APB_allowSubTasksToggle: false,
+	APB_colorSubTaskText: '#8fa0ba',
+	APB_colorLightSubTaskText: '#6c7a90',
+	APB_colorSubTaskCompletedText: '#6dd374',
+	APB_colorLightSubTaskCompletedText: '#349a16',
 	/* Additional Settings */
 	APB_progressBarChange: true,
 	APB_overageToggle: false,
 	APB_overageColor: '#38edef',
 	APB_overageLightColor: '#d33411',
 }
+
+
 // Loading and saving of settings
 export default class ObsidianProgressBars extends Plugin {
 	settings: ObsidianProgressBarsSettings;
@@ -140,19 +166,255 @@ export default class ObsidianProgressBars extends Plugin {
         this.addSettingTab(this.settingsTab);
 	
 		this.app.workspace.onLayoutReady(this.initializeProgressBars.bind(this));
+
+		this.registerEvent(
+			this.app.metadataCache.on('changed', debounce(async (file: TFile) => {
+				if (!this.settings.APB_allowTasksToggle) return;
+				const activeFile = this.app.workspace.getActiveFile();
+				if (!activeFile || file.path !== activeFile.path) return;
+				if (!(await hasApbWithTag(activeFile, this.app))) return;
+	
+				// Get the active editor and cursor position
+				const editorView = this.app.workspace.getActiveViewOfType(MarkdownView);
+				if (!editorView) return;
+				const editor = editorView.editor;
+				const cursorBefore = editor.getCursor(); // Capture cursor position
+	
+				// console.log('- CHANGED -');
+				await this.updateProgress();
+	
+				// Restore cursor position
+				editor.setCursor(cursorBefore);
+			}, 2000)) // default 2 second delay
+		);
+
+		let lastProcessedFile: TFile | null = null;
+		this.registerEvent(
+			this.app.workspace.on('file-open', debounce(async () => {
+				if (!this.settings.APB_allowTasksToggle) return;
+				const activeFile = this.app.workspace.getActiveFile();
+				if (!activeFile || activeFile === lastProcessedFile) return;
+				if (!(await hasApbWithTag(activeFile, this.app))) return;
+	
+				// console.log('- OPEN -');
+				lastProcessedFile = activeFile;
+				await this.updateProgress();
+			}, 500)) // default 1/2 second delay
+		);
 	}
-  
+
+	async updateProgress() {
+		const activeFile = this.app.workspace.getActiveFile();
+		if (!activeFile) return;
+		let tagMap = new Map();
+		
+		// Read the content of the updated file
+		const content = await this.app.vault.read(activeFile);		
+		const taskRegex = /(?:^|\n)([ \t]*)(?:-|\*|\d+\.) \[([ x])\] (.+)$/gm;
+
+		let match;
+		let currentTopTag = null; // Tracks the current top-level task's tag
+
+		while ((match = taskRegex.exec(content)) !== null) {
+			const [fullMatch, indent, status, fullDescription] = match;
+			const normalizedIndent = indent.replace(/\t/g, '    ');
+			const indentLevel = normalizedIndent.length;
+		
+			const tagMatch = fullDescription.match(/#(\w+)/);
+			const taskTag = tagMatch ? tagMatch[1] : null;
+		
+			if (indentLevel === 0) {
+				// Top-level task
+				currentTopTag = taskTag || null;
+				if (currentTopTag) {
+					if (!tagMap.has(currentTopTag)) {
+						tagMap.set(currentTopTag, { total: 0, completed: 0, subTotal: 0, subCompleted: 0 });
+					}
+					tagMap.get(currentTopTag).total++;
+					if (status.trim() === 'x') {
+						tagMap.get(currentTopTag).completed++;
+					}
+				}
+			} else if (currentTopTag) {
+				// Subtask: Count under currentTopTag, ignoring taskTag
+				tagMap.get(currentTopTag).subTotal++;
+				if (status.trim() === 'x') {
+					tagMap.get(currentTopTag).subCompleted++;
+				}
+			}
+		}
+
+		// Update progress bars for each tag
+		for (const [tag, { total, completed, subTotal, subCompleted }] of tagMap.entries()) {
+			// console.log(`Tag: ${tag}`, { total, completed, subTotal, subCompleted });
+			this.updateProgressBarInNote(tag, completed, total, subCompleted, subTotal);
+		}
+	}
+	
+	async calculateProgress(trackedTag: string): Promise<number> {
+		const activeFile = this.app.workspace.getActiveFile();
+		if (!activeFile) return 0;
+	
+		let tasks = [];
+		let completed = 0;
+		let match;	
+		const content = await this.app.vault.read(activeFile);
+		const taskRegex = /(?:^|\n)(?:-|\*|\d+\.) \[([ x])\] (.+?)#(\w+)/g;
+	
+		while ((match = taskRegex.exec(content)) !== null) {			
+		  const [task, status, description, taskTag] = match;
+		  
+			if (taskTag.trim() === trackedTag.slice(1).trim()) {
+				tasks.push(task);
+				if (status === 'x') completed++;
+			}		
+		}	
+		return tasks.length === 0 ? 0 : Math.floor((completed / tasks.length) * 100);
+	}
+
+	// Calculate the percentage of completed tasks for any tag in the note
+	async calculateProgressForTags(): Promise<string[]> {
+		const activeFile = this.app.workspace.getActiveFile();
+		if (!activeFile) return [];
+	
+		const content = await this.app.vault.read(activeFile);
+		const taskRegex = /(?:^|\n)(?:-|\*|\d+\.) \[([ x])\] (.+?)(#\w+)/g;	
+		const tagsInTasks = new Set<string>(); // Set to avoid duplicates
+		let match;
+	
+		// Extract tags from tasks
+		while ((match = taskRegex.exec(content)) !== null) {
+			if (match.length > 3) {
+				const [_task, _status, _description, taskTag] = match;
+				tagsInTasks.add(taskTag.slice(1)); // Add the task tag without '#'
+			}
+		}
+	
+		const matchingTags: string[] = [];
+	
+		// Now, check if there is any progress bar that matches the task tags
+		for (const tag of tagsInTasks) {
+		const hasMatchingProgressBar = await this.findMatchingProgressBars(tag);
+			if (hasMatchingProgressBar) {
+				matchingTags.push(tag); // Add the matching tag to the result list
+			}
+		}  
+		return matchingTags; // Return the list of matching tags
+  	}
+
+
+  	// Check if any progress bars have a tag matching one of the task tags
+ 	async findMatchingProgressBars(tag: string): Promise<boolean> {
+		const activeFile = this.app.workspace.getActiveFile();
+		if (!activeFile) return false;
+	
+		const content = await this.app.vault.read(activeFile);
+		const progressBarRegex = /```apb\n(.*?)#(\w+):\s*(\d+)\/(\d+)\n```/g;
+	
+		let match;
+		while ((match = progressBarRegex.exec(content)) !== null) {
+		const [progressBar, title, progressTag] = match;
+	
+			// Compare the progress bars tag with the task tag
+			if (progressTag === tag) {
+				return true; // Found a matching progress bar
+			}
+		}	
+		return false; // No matching progress bar found
+	}
+
+	async findMatchingTasks(tag: string): Promise<boolean> {
+		const activeFile = this.app.workspace.getActiveFile();
+		if (!activeFile) return false;
+	
+		const content = await this.app.vault.read(activeFile);
+		const taskRegex = /- \[.\] (.*?)#(\w+)/g; // Matches tasks like "- [ ] Task #tag"
+	
+		let match;
+		while ((match = taskRegex.exec(content)) !== null) {
+			const taskTag = match[2]; // The tag from the task (e.g. "todo")
+			if (taskTag === tag) {
+				return true; // Found a task with a matching tag
+			}
+		}
+		return false; // No matching task tag found
+	}
+
+	// change the CSS of the progress bars tag depending on whether it matches task tag
+	async updateTagSpan(tagSpan: HTMLSpanElement, extractedTag: string) {
+		if (extractedTag) {			
+			try {
+				if (this.settings.APB_allowTasksToggle) {
+					const hasMatchingProgressBar = await this.findMatchingTasks(extractedTag);
+					tagSpan.id = hasMatchingProgressBar ? 'APB_tag' : 'APB_notag';
+					if (tagSpan.id == 'APB_tag') {
+						tagSpan.style.color = this.settings.APB_colorTaskText;
+						tagSpan.style.background = this.settings.APB_colorTaskBackground;
+					}
+					tagSpan.textContent = hasMatchingProgressBar ? extractedTag : '#' + extractedTag + ' not found';	
+				} else {
+					tagSpan.id = 'APB_tasksDisabled';
+					tagSpan.textContent = 'tasks are disabled';
+				}
+			} catch (error) {
+				console.error('Error searching tasks for tag:', error);
+				tagSpan.textContent = '#' + extractedTag + ' not found';
+				tagSpan.id = 'APB_notag';
+			}
+		} else {
+			console.warn('No tag was found.');
+		}
+	}
+
+
+	updateProgressBarInNote(tag: string, value: number, total:number, subCompleted:number, subTotal:number) {
+		// Get the currently active Markdown view (text editor)
+		const editorView = this.app.workspace.getActiveViewOfType(MarkdownView);
+	
+		if (!editorView) return;
+	
+		// Get the entire content of the current file
+		const fileContent = editorView.editor.getValue();
+	
+		// Regular expression to find the fenced code block with the apb tag (e.g. ```apb My Title: 57/100```)
+		const regex = /```apb([\s\S]+?)\s*```/g; // Match everything inside the ```apb``` block
+	
+		const updatedContent = fileContent.replace(regex, (match, p1) => {			
+			// Match title with optional tag		  
+			const matchProgress = p1.match(/(.*?)\s*(#\w+)?\s*(~\w+\/\w+)?\s*:\s*(\d+)\/(\d+)/); // Capture "Mytitle", "#task" (optional), current value, and total
+
+			if (matchProgress) {
+				const title = matchProgress[1];  // My Title
+				const progressBarTag = matchProgress[2] ? matchProgress[2].slice(1) : "";  // #yourTag (or empty if no tag)	
+				const newValue = value;
+				const newTotal = total;
+			
+				// If code block tag equals task tag, return the updated code block; otherwise, return unchanged
+				if (tag == progressBarTag) {
+					return `\`\`\`apb\n${title}#${tag}~${subCompleted}/${subTotal}: ${newValue}/${newTotal}\n\`\`\``;
+				} else {					
+					return match;
+				}
+			}			
+			return match;
+		});
+
+		// Update the file with the new content
+		if (fileContent !== updatedContent) {
+		  	editorView.editor.setValue(updatedContent);
+		}
+	}
+
 	initializeProgressBars() {
 		this.registerMarkdownCodeBlockProcessor('apb', (source, el, ctx) => {
-
 			// Split the source string into rows
 			const rows = source.trim().split('\n');
 			el.empty(); // Clear the default rendering
 
 			// Loop through each line
 			rows.forEach((row, index) => {
-				// Use regex to extract the label and progress (Value/Total)
-				const match = row.match(/^(.+):\s*(\d+)\/(\d+)$/);		
+				// Use regex to extract the label and progress (Value/Total)		
+				const match = row.match(/^(.+?)(?:~(\d+)\/(\d+))?:\s*(\d+)\/(\d+)$/);
 
 				if (!match) {
 					// console.error('Invalid format for advanced progress bar block:', row);
@@ -170,10 +432,11 @@ export default class ObsidianProgressBars extends Plugin {
 					return;
 				}
 
-				// Extract label, current value, and total value from the match
 				const label = match[1];
-				const current = parseInt(match[2], 10);
-				const total = parseInt(match[3], 10);
+				const subvalue = match[2] ? parseInt(match[2], 10) : null;
+				const subtotal = match[3] ? parseInt(match[3], 10) : null;
+				const current = parseInt(match[4], 10);
+				const total = parseInt(match[5], 10);
 
 				if (!this.settings.APB_overageToggle) {
 					// Check if current value is too large or total is not zero
@@ -246,10 +509,58 @@ export default class ObsidianProgressBars extends Plugin {
 				const APB_title = document.createElement('div');
 				APB_title.addClass('progressBar-title');
 				if (this.settings.APB_titleToggle) {
-					APB_title.createEl('span', { text: label });
+
+					// Split the titleWithSubtasks into title, tag, and optional subtasks
+					const subtaskSplit = label.split('~');
+					const titleTagPart = subtaskSplit[0];  // e.g. "tite#tag"
+					const subtaskPart = subtaskSplit[1];   // e.g. "1/2" or undefined
+
+					// Extract title and tag
+					const titleParts = titleTagPart.split('#');
+					const extractedLabel = titleParts[0] || '';  // title
+					const extractedTag = titleParts[1] ? titleParts[1] : '';  // tag
+					// Extract subvalue and subtotal if present
+					let subvalue = null;
+					let subtotal = null;
+					
+					if (subtaskPart) {
+						const subtaskMatch = subtaskPart.match(/(\d+)\/(\d+)/);
+						if (subtaskMatch) {
+							subvalue = parseInt(subtaskMatch[1], 10);  // e.g. 1
+							subtotal = parseInt(subtaskMatch[2], 10);  // e.g. 2
+						}
+					}
+					
+					if (extractedTag) {
+						const editorView = this.app.workspace.getActiveViewOfType(MarkdownView);
+						if (editorView) {
+							 const tagSpan = APB_title.createEl('span', { text: extractedTag });
+							 this.updateTagSpan(tagSpan, extractedTag);
+						}
+					} else {
+						// console.warn("No tag was found in APB_title.");
+					}
+
+					APB_title.createEl('span', { text: extractedLabel });
 					APB_title.style.color = this.settings.APB_titleColor;
 				}
+				const APB_subtask = document.createElement('div');
 
+				// Sub Tasks
+				if (this.settings.APB_allowTasksToggle && this.settings.APB_allowSubTasksToggle) {
+					if (subtotal !== null && subtotal !==0) {
+						if (subvalue == subtotal) {
+							APB_subtask.addClass('progressBar-subtask-completed');							
+							APB_subtask.style.color = this.settings.APB_colorSubTaskCompletedText;							
+							APB_subtask.createEl('span', { text: 'Sub Tasks - ' + subvalue + '/' + subtotal + ' completed'});	
+						} else {
+							APB_subtask.addClass('progressBar-subtask');
+							APB_subtask.style.color = this.settings.APB_colorSubTaskText;	
+							APB_subtask.createEl('span', { text: 'Sub Tasks - ' + subvalue + '/' + subtotal });
+						}
+					}
+				}
+				
 				// APB_Percentage
 				const APB_percentage = document.createElement('div');
 				APB_percentage.addClass('progressBar-percentage');
@@ -261,7 +572,7 @@ export default class ObsidianProgressBars extends Plugin {
 						APB_percentage.createEl('span', { text: clampedPercentage+'%' });
 						APB_percentage.style.color = this.settings.APB_percentageColor;
 					}
-					
+
 				}
 
 				// APB_Value
@@ -345,7 +656,11 @@ export default class ObsidianProgressBars extends Plugin {
 						APB.style.backgroundColor = String(this.settings[`APB_color${i}` as keyof ObsidianProgressBarsSettings]);
 
 						if (this.settings.APB_gradientToggle && clampedPercentage < 100) {
-							APB.style.backgroundImage = String('linear-gradient(to right,'+ this.settings.APB_gradientPrimary + ','+ this.settings.APB_gradientSecondary +')');
+							if (!this.settings.APB_gradientTypeToggle) {
+								APB.style.backgroundImage = `linear-gradient(to right, ${this.settings.APB_gradientPrimary}, ${this.settings.APB_gradientSecondary})`;					
+							} else {
+								APB.style.backgroundImage = `linear-gradient(to right, ${this.settings.APB_gradientPrimary}, color-mix(in srgb, ${this.settings.APB_gradientPrimary} ${100-clampedPercentage}%, ${this.settings.APB_gradientSecondary} ${clampedPercentage}%))`;
+							}						
 						}
 	
 						if (clampedPercentage == 100) {
@@ -353,7 +668,6 @@ export default class ObsidianProgressBars extends Plugin {
 							if (this.settings.APB_completedToggle) {
 								APB_completed.addClass('progressBar-completed');
 								APB_completed.style.color = this.settings.APB_completedColor;
-
 								APB_completed.textContent ='COMPLETED';
 							}
 						}
@@ -375,10 +689,11 @@ export default class ObsidianProgressBars extends Plugin {
 						APB_textContainer.appendChild(APB_value);
 					}
 
-				APB_container.appendChild(APB_background);
-
-				el.appendChild(APB_container);
-		  });
+					APB_container.appendChild(APB_background);
+					APB_container.appendChild(APB_subtask);
+					
+					el.appendChild(APB_container);
+		  	});
 		});
 
 		// Register a custom command to paste text
@@ -604,14 +919,18 @@ new Setting(containerEl)
 			this.plugin.settings.APB_color4 = DEFAULT_SETTINGS.APB_color4Light as string;
 			this.plugin.settings.APB_color5 = DEFAULT_SETTINGS.APB_color5Light as string;
 
+			this.plugin.settings.APB_colorTaskText = DEFAULT_SETTINGS.APB_colorLightTaskText as string;
+			this.plugin.settings.APB_colorTaskBackground = DEFAULT_SETTINGS.APB_colorLightTaskBackground as string;
+			this.plugin.settings.APB_colorSubTaskText = DEFAULT_SETTINGS.APB_colorLightSubTaskText as string;
+			this.plugin.settings.APB_colorSubTaskCompletedText = DEFAULT_SETTINGS.APB_colorLightSubTaskCompletedText as string;
+
 			await this.plugin.saveSettings();
 			this.display();
 		}))
 	.addButton((button) =>
 		button.setIcon('moon').setTooltip('Reset to dark default')
 		.onClick(async() => {
-			this.plugin.settings.APB_marksColor = DEFAULT_SETTINGS.APB_marksColor as string;
-			this.plugin.settings.APB_colorBorder = DEFAULT_SETTINGS.APB_colorBorder as string;
+			this.plugin.settings.APB_marksColor = DEFAULT_SETTINGS.APB_marksColor as string;			
 			this.plugin.settings.APB_titleColor = DEFAULT_SETTINGS.APB_titleColor as string;
 			this.plugin.settings.APB_percentageColor = DEFAULT_SETTINGS.APB_percentageColor as string;
 			this.plugin.settings.APB_fractionColor = DEFAULT_SETTINGS.APB_fractionColor as string;
@@ -629,6 +948,11 @@ new Setting(containerEl)
 			this.plugin.settings.APB_color3 = DEFAULT_SETTINGS.APB_color3 as string;
 			this.plugin.settings.APB_color4 = DEFAULT_SETTINGS.APB_color4 as string;
 			this.plugin.settings.APB_color5 = DEFAULT_SETTINGS.APB_color5 as string;
+
+			this.plugin.settings.APB_colorTaskText = DEFAULT_SETTINGS.APB_colorTaskText as string;
+			this.plugin.settings.APB_colorTaskBackground = DEFAULT_SETTINGS.APB_colorTaskBackground as string;
+			this.plugin.settings.APB_colorSubTaskText = DEFAULT_SETTINGS.APB_colorSubTaskText as string;
+			this.plugin.settings.APB_colorSubTaskCompletedText = DEFAULT_SETTINGS.APB_colorSubTaskCompletedText as string;			
 
 			await this.plugin.saveSettings();
 			this.display();
@@ -776,7 +1100,11 @@ new Setting(containerEl)
 			progressbar.style.backgroundColor = String(this.plugin.settings[`APB_color${i}` as keyof ObsidianProgressBarsSettings]);
 			
 			if (this.plugin.settings.APB_gradientToggle && progressBarPercentage < 100) {
-				progressbar.style.backgroundImage = String('linear-gradient(to right,'+ this.plugin.settings.APB_gradientPrimary + ','+ this.plugin.settings.APB_gradientSecondary +')');
+				if (!this.plugin.settings.APB_gradientTypeToggle) {
+					progressbar.style.backgroundImage = `linear-gradient(to right, ${this.plugin.settings.APB_gradientPrimary}, ${this.plugin.settings.APB_gradientSecondary})`;					
+				} else {
+					progressbar.style.backgroundImage = `linear-gradient(to right, ${this.plugin.settings.APB_gradientPrimary}, color-mix(in srgb, ${this.plugin.settings.APB_gradientPrimary} ${100-clampedPercentage}%, ${this.plugin.settings.APB_gradientSecondary} ${clampedPercentage}%))`;
+				}
 			}
 			
 			if (progressBarPercentage == 100) {
@@ -1128,7 +1456,7 @@ new Setting(containerEl)
 		'APB_completedColor', DEFAULT_SETTINGS.APB_completedLightColor as string, DEFAULT_SETTINGS.APB_completedColor as string);
 
 	/************ SECTION Override Container *************/	
-	const setting7 = new Setting(containerEl).setName('Override error warning').setHeading();
+	const setting7 = new Setting(containerEl).setName('Override error').setHeading();
 	const heading7 = setting7.settingEl.querySelector('.setting-item-name');
 	if (heading7) {heading7.addClass('header-highlight');}
 
@@ -1215,6 +1543,10 @@ new Setting(containerEl)
 			'APB_gradientToggle');
 
 		if (this.plugin.settings.APB_gradientToggle) {
+			this.createToggleSetting(containerEl, 'Gradient type',
+				'When toggled on, the progress bar will display a color-mixed linear gradient, and when toggled off, it will show a simple linear gradient.',
+				'APB_gradientTypeToggle');
+				
 			this.createColorPickerSetting(containerEl, 'Primary gradient color', 'This color will be used for the left side of the gradient.',
 				'APB_gradientPrimary', DEFAULT_SETTINGS.APB_gradientPrimaryLight as string, DEFAULT_SETTINGS.APB_gradientPrimary as string);
 
@@ -1260,6 +1592,42 @@ new Setting(containerEl)
 	/************ Bar Background Color *************/
 	this.createColorPickerSetting(containerEl, 'Bar background color', 'This color will be used for the progress bar\'s background, representing the remaining percentage.',
 		'APB_colorBarBackground', DEFAULT_SETTINGS.APB_colorLightBarBackground as string, DEFAULT_SETTINGS.APB_colorBarBackground as string);
+
+	/************ SECTION Tasks *************/	
+	const setting10 = new Setting(containerEl).setName('Tasks').setHeading();
+	const heading10 = setting10.settingEl.querySelector('.setting-item-name');
+	if (heading10) {heading10.addClass('header-highlight');}
+
+	/************ Allow Tasks *************/
+	this.createToggleSetting(containerEl, 'Enable task linking',
+		'When toggled on, you will be able to automatically update progress bars by using matching tags in the progress bar\'s title and tasks.  See documentation for full details.',
+		'APB_allowTasksToggle');
+
+	if (this.plugin.settings.APB_allowTasksToggle) {
+		/************ Task Text Color *************/
+		this.createColorPickerSetting(containerEl, 'Task text color', 'Choose the %%text%% color for task badges.',
+			'APB_colorTaskText', DEFAULT_SETTINGS.APB_colorLightTaskText as string, DEFAULT_SETTINGS.APB_colorTaskText as string);
+
+		/************ Task Background Color *************/
+		this.createColorPickerSetting(containerEl, 'Task background color', 'Choose the %%background%% color for task badges.',
+			'APB_colorTaskBackground', DEFAULT_SETTINGS.APB_colorLightTaskBackground as string, DEFAULT_SETTINGS.APB_colorTaskBackground as string);
+
+
+		/************ Allow Sub Tasks *************/
+		this.createToggleSetting(containerEl, 'Enable sub-task linking',
+			'When toggled on, you will be able to automatically see your subtask status under the progerss bar.  See documentation for full details.',
+			'APB_allowSubTasksToggle');
+
+		if (this.plugin.settings.APB_allowSubTasksToggle) {
+			/************ Sub Task Color *************/
+			this.createColorPickerSetting(containerEl, 'Sub task color', 'Choose the %%text%% color for the sub task shown under your progress bar.',
+				'APB_colorSubTaskText', DEFAULT_SETTINGS.APB_colorLightSubTaskText as string, DEFAULT_SETTINGS.APB_colorSubTaskText as string);
+
+			/************ Sub Task Completed Color *************/
+			this.createColorPickerSetting(containerEl, 'Sub task completed color', 'Choose the %%completed text%% color for the sub task shown under your progress bar.',
+				'APB_colorSubTaskCompletedText', DEFAULT_SETTINGS.APB_colorLightSubTaskCompletedText as string, DEFAULT_SETTINGS.APB_colorSubTaskCompletedText as string);		
+		}
+	}
 
 	return;
 
@@ -1418,6 +1786,20 @@ createToggleSetting(
 	);
 }
 
+}
 
+// Debounce function to limit frequent calls
+function debounce(func: (...args: any[]) => void, wait: number) {
+	let timeout: NodeJS.Timeout;
+	return (...args: any[]) => {
+		clearTimeout(timeout);
+		timeout = setTimeout(() => func.apply(this, args), wait);
+	};
+}
 
+// Check for apb code blocks with tags
+async function hasApbWithTag(file: TFile, app: App): Promise<boolean> {
+	const content = await app.vault.read(file);
+	const apbTagRegex = /```apb\b[\s\S]*?#(\w+)[\s\S]*?\n```/g; // Matches apb with #tag
+	return apbTagRegex.test(content);
 }
