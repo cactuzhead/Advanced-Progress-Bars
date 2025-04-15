@@ -406,7 +406,7 @@ For performance and user experience reasons, it will only update 2 seconds after
 
 ## Using in Dashboard++
 Dashboard++ (aka DashboardPlusPlus) is a CSS snippet that provides a homepage for organizing and navigating notes.
-You can find it at https://github.com/TfTHacker/DashboardPlusPlus
+You can find it at <a href="https://github.com/TfTHacker/DashboardPlusPlus" target="_blank">[ko-fi](https://github.com/TfTHacker/DashboardPlusPlus)</a> 
 
 If you want to incude progress bars into the columns of your Dashboard++ page, you can not use a standard APB code block.
 However, there is a workaround detailed below.
@@ -429,7 +429,7 @@ As shown in the example above, the code block omits the closing backticks and be
 
 > Note: tag linking for tasks and sub-tasks do not work on Dashboard++ pages only simple manually edited progress bars work.
 
-In earlier versions, this workaround worked, but starting with release 1.0.8, I have refined it to hide the list bullet for progress bars, resulting in a cleaner, more polished look (see image below).
+In earlier versions, this workaround worked, but starting with release `1.0.8`, I have refined it to hide the list bullet for progress bars, resulting in a cleaner, more polished look (see image below).
 
 ![dashboardplusplus](/docs/assets/Obsidian Advanced Progress Bars - DashboardPlusPlus.png)
 
