@@ -167,20 +167,34 @@ export default class ObsidianProgressBars extends Plugin {
 	
 		this.app.workspace.onLayoutReady(this.initializeProgressBars.bind(this));
 
+		// Helper to check if the active view is a dashboard page
+		const isDashboardPage = (view: MarkdownView | null): boolean => {
+			if (!view) return false;
+			const container = view.contentEl;
+			return container.querySelector('.dashboard') !== null;
+		};
+	
+		// Helper to check if file has apb block or is a dashboard page
+		const shouldUpdateProgress = async (file: TFile, app: App): Promise<boolean> => {
+			const view = app.workspace.getActiveViewOfType(MarkdownView);
+			if (await hasApbWithTag(file, app)) return true;
+			return isDashboardPage(view);
+		};
+
 		this.registerEvent(
 			this.app.metadataCache.on('changed', debounce(async (file: TFile) => {
 				if (!this.settings.APB_allowTasksToggle) return;
 				const activeFile = this.app.workspace.getActiveFile();
 				if (!activeFile || file.path !== activeFile.path) return;
-				if (!(await hasApbWithTag(activeFile, this.app))) return;
+				// if (!(await hasApbWithTag(activeFile, this.app))) return;
+				if (!(await shouldUpdateProgress(activeFile, this.app))) return;
 	
 				// Get the active editor and cursor position
-				const editorView = this.app.workspace.getActiveViewOfType(MarkdownView);
+				const editorView = this.app.workspace.getActiveViewOfType(MarkdownView);					
 				if (!editorView) return;
 				const editor = editorView.editor;
 				const cursorBefore = editor.getCursor(); // Capture cursor position
-	
-				// console.log('- CHANGED -');
+				console.log('- CHANGED - Dashboard or APB detected');
 				await this.updateProgress();
 	
 				// Restore cursor position
@@ -194,9 +208,9 @@ export default class ObsidianProgressBars extends Plugin {
 				if (!this.settings.APB_allowTasksToggle) return;
 				const activeFile = this.app.workspace.getActiveFile();
 				if (!activeFile || activeFile === lastProcessedFile) return;
-				if (!(await hasApbWithTag(activeFile, this.app))) return;
-	
-				// console.log('- OPEN -');
+				// if (!(await hasApbWithTag(activeFile, this.app))) return;
+				if (!(await shouldUpdateProgress(activeFile, this.app))) return;
+				console.log('- OPEN - Dashboard or APB detected');
 				lastProcessedFile = activeFile;
 				await this.updateProgress();
 			}, 500)) // default 1/2 second delay
@@ -418,7 +432,6 @@ export default class ObsidianProgressBars extends Plugin {
 
 				if (!match) {
 					// console.error('Invalid format for advanced progress bar block:', row);
-
 					const APB_errorContainer = document.createElement('div');
 					APB_errorContainer.addClass('error-container');
 					
@@ -442,7 +455,6 @@ export default class ObsidianProgressBars extends Plugin {
 					// Check if current value is too large or total is not zero
 					if (current > total && total !== 0) {
 						// console.error('Invalid value for advanced progress bar block:', row);
-
 						const APB_errorContainer = document.createElement('div');
 						APB_errorContainer.addClass('error-container');
 
@@ -512,7 +524,7 @@ export default class ObsidianProgressBars extends Plugin {
 
 					// Split the titleWithSubtasks into title, tag, and optional subtasks
 					const subtaskSplit = label.split('~');
-					const titleTagPart = subtaskSplit[0];  // e.g. "tite#tag"
+					const titleTagPart = subtaskSplit[0];  // e.g. "My Title#tag"
 					const subtaskPart = subtaskSplit[1];   // e.g. "1/2" or undefined
 
 					// Extract title and tag
@@ -679,20 +691,32 @@ export default class ObsidianProgressBars extends Plugin {
 				this.settings.APB_progressBarChange = true;
 
 				APB_container.appendChild(APB_textContainer);
-					if (this.settings.APB_titleToggle) {
-						APB_textContainer.appendChild(APB_title);
-					}
-					if (this.settings.APB_percentageToggle) {
-						APB_textContainer.appendChild(APB_percentage);
-					}
-					if (this.settings.APB_fractionToggle) {
-						APB_textContainer.appendChild(APB_value);
-					}
+				
+				if (this.settings.APB_titleToggle) {
+					APB_textContainer.appendChild(APB_title);
+				}
+				if (this.settings.APB_percentageToggle) {
+					APB_textContainer.appendChild(APB_percentage);
+				}
+				if (this.settings.APB_fractionToggle) {
+					APB_textContainer.appendChild(APB_value);
+				}
 
-					APB_container.appendChild(APB_background);
-					APB_container.appendChild(APB_subtask);
-					
-					el.appendChild(APB_container);
+				APB_container.appendChild(APB_background);
+				APB_container.appendChild(APB_subtask);
+				
+				el.appendChild(APB_container);
+
+				// Check if in dashboard and hide bullet
+				const editorView = this.app.workspace.getActiveViewOfType(MarkdownView);
+				if (editorView) {
+					const container = editorView.contentEl;
+					const isDashboard = container.querySelector('.dashboard') !== null;
+					const listItem = el.closest('li') as HTMLLIElement | null;
+					if (listItem && isDashboard && !listItem.classList.contains('apb-list-item')) {
+						listItem.classList.add('apb-list-item');
+					}
+				}
 		  	});
 		});
 

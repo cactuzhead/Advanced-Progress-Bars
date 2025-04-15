@@ -5,9 +5,9 @@
 .kofi-button {
     flex: 1 0;
     height: 22px;
+    height: auto;	
     margin: 0 10px;
     width: 140px;
-    height: auto;	
 }
 
 .header-highlight {
@@ -51,6 +51,7 @@
     border-radius: 7px;
     display: flex;
     flex-flow: row wrap;    
+    justify-content: center;
     margin-top: 7px;   
     overflow: hidden;
     padding: 5px;
@@ -108,6 +109,28 @@
     width: 100%;
 }
 
+.progressBar-subtask {
+    align-items: center;
+    flex: 0 1 auto;
+    font-size: 0.6em;
+    font-weight: 500;
+    justify-content: center;
+    margin: 0.3em 0.3em 0 0;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.progressBar-subtask-completed {
+    align-items: center;
+    flex: 0 1 auto;
+    font-size: 0.6em;
+    font-weight: 700;
+    justify-content: center;
+    margin: 0.3em 0.3em 0 0;
+    text-align: center;
+    text-transform: uppercase;
+}
+
 .progressBar-background {
     display: flex;
     flex-flow: row nowrap;
@@ -157,4 +180,38 @@
     justify-content: space-between;
     padding: 0.3em;
     width: 100%;
+}
+
+#APB_tag {
+    border-radius: 3px;
+    margin-right: 5px;
+    overflow: hidden;
+    padding: 0 5px;
+    font-size: 0.7rem;
+}
+
+#APB_notag {
+    border-radius: 3px;
+    border: 1px solid #912f3c;
+    color: #ffffff;
+    margin-right: 5px;
+    overflow: hidden;
+    padding: 0 5px;
+    font-size: 0.7rem;
+    background: #912f3c;
+}
+
+#APB_tasksDisabled {
+    border-radius: 3px;
+    border: 1px solid #912f3c;
+    color: #ffffff;
+    margin-right: 5px;
+    overflow: hidden;
+    padding: 0 5px;
+    font-size: 0.7rem;
+    background: #912f3c;
+}
+
+li.apb-list-item .list-bullet {
+    display: none !important;
 }
