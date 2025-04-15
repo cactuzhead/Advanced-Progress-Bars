@@ -406,7 +406,7 @@ For performance and user experience reasons, it will only update 2 seconds after
 
 ## Using in Dashboard++
 Dashboard++ (aka DashboardPlusPlus) is a CSS snippet that provides a homepage for organizing and navigating notes.
-You can find it at <a href="https://github.com/TfTHacker/DashboardPlusPlus" target="_blank">[ko-fi](https://github.com/TfTHacker/DashboardPlusPlus)</a> 
+You can find it at <a href="https://github.com/TfTHacker/DashboardPlusPlus" target="_blank">https://github.com/TfTHacker/DashboardPlusPlus</a> 
 
 If you want to incude progress bars into the columns of your Dashboard++ page, you can not use a standard APB code block.
 However, there is a workaround detailed below.
