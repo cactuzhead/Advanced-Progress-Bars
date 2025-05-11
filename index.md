@@ -2,6 +2,8 @@
 title: Home
 layout: home
 has_toc: false
+back_to_top: true
+back_to_top_text: "Back to top"
 ---
 # Advanced-Progress-Bars
 ![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Hero Banner.png)
