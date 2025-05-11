@@ -1,5 +1,5 @@
 ---
-title: Home
+title: Install
 layout: home
 ---
 
