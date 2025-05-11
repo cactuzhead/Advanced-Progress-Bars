@@ -412,7 +412,7 @@ For performance and user experience reasons, it will only update 2 seconds after
 NEW 1.0.8
 {: .label .label-green }
 
-## Using in Dashboard++ {: .label .label-green .inline } NEW 1.0.8
+## Using in Dashboard++ <span class="label label-green">NEW 1.0.8</span>
 
 Dashboard++ (aka DashboardPlusPlus) is a CSS snippet that provides a homepage for organizing and navigating notes.
 You can find it at <a href="https://github.com/TfTHacker/DashboardPlusPlus" target="_blank">https://github.com/TfTHacker/DashboardPlusPlus</a> 
