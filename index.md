@@ -413,7 +413,8 @@ NEW 1.0.8
 {: .label .label-green }
 
 ## Heading {#heading-id}
-NEW 1.0.8{: .label .label-green}
+NEW 1.0.8
+{: .label .label-green}
 
 Dashboard++ (aka DashboardPlusPlus) is a CSS snippet that provides a homepage for organizing and navigating notes.
 You can find it at <a href="https://github.com/TfTHacker/DashboardPlusPlus" target="_blank">https://github.com/TfTHacker/DashboardPlusPlus</a> 
