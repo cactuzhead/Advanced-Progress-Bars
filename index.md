@@ -1,6 +1,7 @@
 ---
 title: Home
 layout: home
+has_toc: false
 ---
 # Advanced-Progress-Bars
 ![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Hero Banner.png)
