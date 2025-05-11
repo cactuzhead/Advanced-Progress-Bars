@@ -408,7 +408,7 @@ For performance and user experience reasons, it will only update 2 seconds after
 
 > Note: if you are not going to be using tags to keep track of your task progress, then it is **highly** advised to turn `off` the `Enable Task Linking` for a smoother and efficient experience.
 
-## Using in Dashboard++
+## Using in Dashboard++ 1.0.8 {1.0.8: .label .label-green }
 Dashboard++ (aka DashboardPlusPlus) is a CSS snippet that provides a homepage for organizing and navigating notes.
 You can find it at <a href="https://github.com/TfTHacker/DashboardPlusPlus" target="_blank">https://github.com/TfTHacker/DashboardPlusPlus</a> 
 
