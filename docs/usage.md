@@ -13,7 +13,7 @@ My Title: 57/100
 ````
 In the `apb` code block, you define the attributes as `Title`: `Value` / `Total`.
 
-![Text Diagram](/docs/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
+![Text Diagram](../docs/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
 
 The `percentage` will be automatically calculated based on your `Value` and `Total`.
 > Note: the text within the code block example on the settings page will automatically be updated to reflect the changes you make in the other settings.
