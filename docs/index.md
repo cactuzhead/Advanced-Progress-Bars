@@ -12,7 +12,7 @@ This plugin extends obsidian to allow you to create custom progress bars by usi
 
 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px;">
   <div style="flex: 0 0 auto; padding-right: 20px; display: flex; align-items: center;">
-    <img src="/Advanced-Progress-Bars/docs/assets/ko-fi.png" alt="ko-fi" style="width: 100px; height: auto;">
+    <img src="/assets/ko-fi.png" alt="ko-fi" style="width: 100px; height: auto;">
   </div>
   <div style="flex: 1; display: flex; align-items: center;">
     <p style="margin: 0px">
