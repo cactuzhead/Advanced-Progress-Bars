@@ -13,7 +13,7 @@ My Title: 57/100
 ````
 In the `apb` code block, you define the attributes as `Title`: `Value` / `Total`.
 
-![Text Diagram](../docs/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
+![Text Diagram](/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
 
 The `percentage` will be automatically calculated based on your `Value` and `Total`.
 > Note: the text within the code block example on the settings page will automatically be updated to reflect the changes you make in the other settings.
@@ -24,10 +24,10 @@ To make it more convenient, you can add a hotkey that automatically inserts a pr
 1. Open Obsidian and go to the **Settings** by clicking the gear icon in the bottom left corner.
 2. From the **Settings** menu, go to the **Hotkeys** section on the left sidebar.
 3. In the filter search bar found at the top of the Hotkeys section, start typing **"Advanced Progress Bars"** to find the `Advanced Progress Bars: Paste code block` action.
-![Hotkey Search](../docs/assets/Obsidian Advanced Progress Bars - Hotkey Search.png)
+![Hotkey Search](/assets/Obsidian Advanced Progress Bars - Hotkey Search.png)
 
 5. Click on the round plus button next to the found action, and assign the desired hotkey combination (e.g., `Ctrl + Shift + B` or any other combo that suits you).
-![Hotkey](../docs/assets/Obsidian Advanced Progress Bars - Hotkey.png)
+![Hotkey](/assets/Obsidian Advanced Progress Bars - Hotkey.png)
   
 ## Copy to Clipboard
 Instead of manually typing the code block, or setting up a hotkey,  you can use the `Copy to Clipboard` button, found at the top of the `APB` settings page to quickly copy it for later pasting into Obsidian.
@@ -50,6 +50,6 @@ Very Large Total: 2034/2345
 ````
 The above stacked bars example would be rendered like this (using default dark colors & settings)
 
-![Stacked Bars](../docs/assets/Obsidian Advanced Progress Bars - Settings - Stacked Bars.png)
+![Stacked Bars](/assets/Obsidian Advanced Progress Bars - Settings - Stacked Bars.png)
 
 > Note: The code block example on the settings page will only include one progress bar. You will need to manually add any additional progress bars once pasted into Obsidian.
