@@ -1,4 +1,3 @@
-# Advanced-Progress-Bars
 <img src="docs/assets/Obsidian Advanced Progress Bars - Hero Banner.png" alt="Advanced Progress Bars" style="width: 500px; height: auto;">
 This plugin extends obsidian to allow you to create custom progress bars by using a simple markdown code block.
 <br><br>
