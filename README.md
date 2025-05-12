@@ -1,6 +1,3 @@
----
-nav_exclude: true
----
 # Advanced-Progress-Bars
 <img src="docs/assets/Obsidian Advanced Progress Bars - Hero Banner.png" alt="Advanced Progress Bars" style="width: 500px; height: auto;">
 This plugin extends obsidian to allow you to create custom progress bars by using a simple markdown code block.
@@ -32,4 +29,4 @@ My Title: 57/100
 In the `apb` code block, you define the attributes as `Title`: `Value` / `Total`.
 
 ## Documentation
-For full documentation, please visit our <a href="https://cactuzhead.github.io/Advanced-Progress-Bars/" target="_blank">github page</a>
+For full documentation, please visit our <a href="https://cactuzhead.github.io/Advanced-Progress-Bars/docs/" target="_blank">github page</a>
