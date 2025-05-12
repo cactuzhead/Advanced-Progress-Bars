@@ -419,7 +419,7 @@ You can find it at <a href="https://github.com/TfTHacker/DashboardPlusPlus" targ
 If you want to incude progress bars into the columns of your Dashboard++ page, you can not use a standard APB code block.
 However, there is a workaround detailed below.
 
-### Progress Bar in Columns <span class="label grey-lt">NEW 1.0.8</span>
+### Progress Bar in Columns <span class="label label-grey">NEW 1.0.8</span>
 You normally insert a progress bar by pasting in  the standard APB code block which may look something like this:-
 ````
 ```apb
