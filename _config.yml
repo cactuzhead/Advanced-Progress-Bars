@@ -6,3 +6,9 @@ url: https://cactuzhead.github.io/Advanced-Progress-Bars/
 
 aux_links:
   APB Repository: https://github.com/cactuzhead/Advanced-Progress-Bars
+
+just_the_docs:
+  label:
+    grey:
+      title: Grey Label
+      color: grey
