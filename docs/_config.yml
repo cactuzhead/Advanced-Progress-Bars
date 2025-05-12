@@ -1,6 +1,13 @@
 title: cactuzhead
 description: the spiky headed one
-remote_theme: just-the-docs/just-the-docs
+remote_theme: just-the-docs/just-the-docs@v0.8.2
+plugins:
+  - jekyll-remote-theme
+  - jekyll-github-metadata
+exclude:
+  - ../README.md
+  - ../Gemfile
+  - ../Gemfile.lock
 
 url: https://cactuzhead.github.io/Advanced-Progress-Bars/docs/
 
