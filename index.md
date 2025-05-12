@@ -203,7 +203,7 @@ Using the accompanying color settings will allow you to pick your desired custom
 
 Alternatively, you could use one of the `Light` or `Dark` defaults by pressing the appropriate buttons.
 
-## Override Error Warning <span class="label label-grey">v 1.0.6</span>
+## Override Error Warning <span class="label label-grey lowercase">v 1.0.6</span>
 Typically, when your `Value` exceeds the `Total`, this error will appear to help you identify and correct any mistakes while editing the Value.
 
 ![Error](/docs/assets/Obsidian Advanced Progress Bars - Error.png)
@@ -254,7 +254,7 @@ When your progress bar reaches 100%, it will change to the color specified in th
 In this example, you'll also see the `COMPLETED` text, which has been set using the text settings mentioned earlier.<br>
 > Note that your `Title` will not change once set - the titles in the above image where only manually changed to better explain what was happening.
 
-### Gradient <span class="label label-grey">v 1.0.5</span>
+### Gradient <span class="label label-grey lowercase">v 1.0.5</span>
 If you set the `Number of colors` to 1 color, this new gradient option will become visible.
 
 When toggled `on`, you will see one toggle and two additional color settings appear underneath.
@@ -285,7 +285,7 @@ In this example it is a mid blue-grey color.
 
 ![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Bar Diagram.png)
 
-## Tasks Settings <span class="label label-grey">v 1.0.7</span>
+## Tasks Settings <span class="label label-grey lowercase">v 1.0.7</span>
 Here, you will find all the available options for customizing the progress bar when using tags to link to tasks.
 
 ### Enable Task Linking
