@@ -46,7 +46,7 @@ My Title: 57/100
 ````
 In the `apb` code block, you define the attributes as `Title`: `Value` / `Total`.
 
-![Text Diagram](/docs/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
+![Text Diagram](/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
 
 The `percentage` will be automatically calculated based on your `Value` and `Total`.
 > Note: the text within the code block example on the settings page will automatically be updated to reflect the changes you make in the other settings.
@@ -57,10 +57,10 @@ To make it more convenient, you can add a hotkey that automatically inserts a pr
 1. Open Obsidian and go to the **Settings** by clicking the gear icon in the bottom left corner.
 2. From the **Settings** menu, go to the **Hotkeys** section on the left sidebar.
 3. In the filter search bar found at the top of the Hotkeys section, start typing **"Advanced Progress Bars"** to find the `Advanced Progress Bars: Paste code block` action.
-![Hotkey Search](/docs/assets/Obsidian Advanced Progress Bars - Hotkey Search.png)
+![Hotkey Search](s/assets/Obsidian Advanced Progress Bars - Hotkey Search.png)
 
 5. Click on the round plus button next to the found action, and assign the desired hotkey combination (e.g., `Ctrl + Shift + B` or any other combo that suits you).
-![Hotkey](/docs/assets/Obsidian Advanced Progress Bars - Hotkey.png)
+![Hotkey](/assets/Obsidian Advanced Progress Bars - Hotkey.png)
   
 ## Copy to Clipboard
 Instead of manually typing the code block, or setting up a hotkey,  you can use the `Copy to Clipboard` button, found at the top of the `APB` settings page to quickly copy it for later pasting into Obsidian.
@@ -83,13 +83,13 @@ Very Large Total: 2034/2345
 ````
 The above stacked bars example would be rendered like this (using default dark colors & settings)
 
-![Stacked Bars](/docs/assets/Obsidian Advanced Progress Bars - Settings - Stacked Bars.png)
+![Stacked Bars](/assets/Obsidian Advanced Progress Bars - Settings - Stacked Bars.png)
 
 > Note: The code block example on the settings page will only include one progress bar. You will need to manually add any additional progress bars once pasted into Obsidian.
 
 
 ## Light & Dark Settings
-![Light and Dark](/docs/assets/Obsidian Advanced Progress Bars - Settings - Light and Dark.png)
+![Light and Dark](/assets/Obsidian Advanced Progress Bars - Settings - Light and Dark.png)
 
 These two buttons (`Light` & `Dark`) will change **ALL** the color settings to their respective defaults.
 All other settings will remain unchanged.<br>
@@ -97,7 +97,7 @@ All other settings will remain unchanged.<br>
 
 ## Progress Bar Settings
 ### Default Title
-![Title](/docs/assets/Obsidian Advanced Progress Bars - Settings - Title.png)
+![Title](/assets/Obsidian Advanced Progress Bars - Settings - Title.png)
 
 You can use this to setup your default progress bar title.
 By clicking the `Reset to Default` button this will change the title back to `Progress`.
@@ -107,10 +107,10 @@ If you change this, the `Title` will be automatically changed in the example cod
 This setting is used to set the `total` you want for your default progress bar.
 This is does not need to be set to `100` (as in percentage). For example, you could set it to `7` if you are tracking seven subtasks.
 
-![Smaller Total](/docs/assets/Obsidian Advanced Progress Bars - Smaller Total.png)
+![Smaller Total](/assets/Obsidian Advanced Progress Bars - Smaller Total.png)
 
 ### Progress Percentage
-![Slider](/docs/assets/Obsidian Advanced Progress Bars - Settings - Slider.png)
+![Slider](/assets/Obsidian Advanced Progress Bars - Settings - Slider.png)
 
 This slider is used to change the percentage of the demonstration progress bar found near the top of the settings.
 It is meant as an aid so you can see how your progress bar will look with different settings.
@@ -122,7 +122,7 @@ If you want to use the example code block's `Copy to Clipboard` feature or a hot
 It is recommended that you do this *after* you are happy with all the other settings and no longer need to see the demonstration progress bar.
 
 ### Full Width
-![Toggle](/docs/assets/Obsidian Advanced Progress Bars - Settings - Toggle.png)
+![Toggle](/assets/Obsidian Advanced Progress Bars - Settings - Toggle.png)
 
 If this is toggled `on`, then the entire progress bar will expand to fill the width of its container.
 
@@ -133,7 +133,7 @@ The new `Width` setting will allow you to enter in a number to fix the width of 
 This is particularly useful when displaying a progress bar on a full-screen note, as a flexible width without a fixed limit can cause the progress bar to stretch excessively.
 
 ### Height
-![Slider](/docs/assets/Obsidian Advanced Progress Bars - Settings - Slider.png)
+![Slider](/assets/Obsidian Advanced Progress Bars - Settings - Slider.png)
 
 This slider allows you to set the height of the progress bar from a range of 1 to 15 pixels.
 
@@ -143,11 +143,11 @@ Pressing the `Reset to Default` button changes this value back to 8 pixels tall.
 If this is toggled `on`, then the progress bar (and its background) will have rounded ends.
 Toggling it `off` will change them to square ends.
 
-![End Caps](/docs/assets/Obsidian Advanced Progress Bars - Settings - End Caps.png)
+![End Caps](/assets/Obsidian Advanced Progress Bars - Settings - End Caps.png)
 
 ## Section Mark Settings
 ### Section Marks
-![Toggle](/docs/assets/Obsidian Advanced Progress Bars - Settings - Toggle.png)
+![Toggle](/assets/Obsidian Advanced Progress Bars - Settings - Toggle.png)
 
 If this is toggled `on`, the progress bar will automaticlaly have equally spaced vertical markers along its length.
 The following table shows how many marks will be displayed depending on the `Number of Colors` setting (located further down on the settings page).
@@ -188,17 +188,17 @@ Pressing the `Reset to Default` button changes this value back to 3 pixels wide.
 ## Text Settings
 There are four pairs of settings which relate to `Title`, `Percentage`, `Fraction` (value/total) and `Completed Text`.
 
-![Text Diagram](/docs/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
+![Text Diagram](/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
 
 If you toggle each text item `on`, it will display that particular text on your progress bar (see image above).
 
 The `completed` text will be displayed over the top of the progress bar, and will only be shown when it reaches 100%.
 
-![Completed](/docs/assets/Obsidian Advanced Progress Bars - Settings - Completed.png)
+![Completed](/assets/Obsidian Advanced Progress Bars - Settings - Completed.png)
 
 (as always, you can see what it will look like by viewing the demo progress bar near the top of the settings.).
 
-![Color Picker](/docs/assets/Obsidian Advanced Progress Bars - Settings - Color Picker.png)
+![Color Picker](/assets/Obsidian Advanced Progress Bars - Settings - Color Picker.png)
 
 Using the accompanying color settings will allow you to pick your desired custom color for each of the four text items.
 
@@ -207,7 +207,7 @@ Alternatively, you could use one of the `Light` or `Dark` defaults by pressing t
 ## Override Error Warning <span class="label label-grey lowercase">v 1.0.6</span>
 Typically, when your `Value` exceeds the `Total`, this error will appear to help you identify and correct any mistakes while editing the Value.
 
-![Error](/docs/assets/Obsidian Advanced Progress Bars - Error.png)
+![Error](/assets/Obsidian Advanced Progress Bars - Error.png)
 
 However, there may be instances where you would prefer the ability to exceed 100%, and this is where this setting proves useful.
 
@@ -217,14 +217,14 @@ Additionally, a second setting will appear, allowing you to customize the color 
 
 As usual, there are two defaults `Light` and `Dark` or select a custom color using the colorpicker.
 
-![Error](/docs/assets/Obsidian Advanced Progress Bars - Error Override.png)
+![Error](/assets/Obsidian Advanced Progress Bars - Error Override.png)
 
 As shown in the image above, the percentage text changes color and now displays values exceeding 100%.
 
 ## Container Settings
 Similar to the text settings above, this section includes two pairs of options for customizing the Border and Background of the container.
 
-![Container](/docs/assets/Obsidian Advanced Progress Bars - Settings - Container.png)
+![Container](/assets/Obsidian Advanced Progress Bars - Settings - Container.png)
 
 ## Progress Bar Color Settings
 Here, you will find all the available color options for customizing the progress bar.
@@ -249,7 +249,7 @@ In the image below, you'll see another example showcasing how this works with th
 
 As the percentage increases, the entire bar will change to the color you've set for each of the 5 color settings, updating every 20% increment.
 
-![Colors](/docs/assets/Obsidian Advanced Progress Bars - Settings - Colors.png)
+![Colors](/assets/Obsidian Advanced Progress Bars - Settings - Colors.png)
 
 When your progress bar reaches 100%, it will change to the color specified in the `Completed Color` setting.
 In this example, you'll also see the `COMPLETED` text, which has been set using the text settings mentioned earlier.<br>
@@ -266,13 +266,13 @@ The `color-mixed linear gradient` smoothly transitions between two colors (setti
 
 In contrast, the `simple linear gradient` always applys the full gradient of colors, but will stretch and squash it depending on the completion percentage of the progress bar.
 
-![Gradient Types](/docs/assets/Obsidian Advanced Progress Bars - Gradient Types.png)
+![Gradient Types](/assets/Obsidian Advanced Progress Bars - Gradient Types.png)
 
 In the above image examples, the left gradients are the `color-mixed linear gradient` and the right ones are the `simple linear gradient`.
 
 The `Primary Gradient` is used to set the left color of the gradient, whilst the `Secondary Gradient` is used to set the right color.
 
-![Gradient](/docs/assets/Obsidian Advanced Progress Bars - Light and Dark Gradient.png)
+![Gradient](/assets/Obsidian Advanced Progress Bars - Light and Dark Gradient.png)
 
 Each has two default buttons for `Light` and `Dark` colors, or you can alternatively use the colorpicker to select any color you wish.
 
@@ -284,7 +284,7 @@ You can see in the image above, that the bottom completed progress bar is using 
 This is the color for the remaining portion of the progress bar.
 In this example it is a mid blue-grey color.
 
-![Advanced Progress Bars](/docs/assets/Obsidian Advanced Progress Bars - Bar Diagram.png)
+![Advanced Progress Bars](/assets/Obsidian Advanced Progress Bars - Bar Diagram.png)
 
 ## Tasks Settings <span class="label label-grey lowercase">v 1.0.7</span>
 Here, you will find all the available options for customizing the progress bar when using tags to link to tasks.
@@ -305,7 +305,7 @@ My Title#orange: 57/100
 ```
 ````
 As you can see in the image below, the tag will be displayed as a badge to the left of your `Title`.
-![Tasks](/docs/assets/Obsidian Advanced Progress Bars - Tasks.png)
+![Tasks](/assets/Obsidian Advanced Progress Bars - Tasks.png)
 
 > Note: If there is at least one matching tag in your tasks, APB will automatically find them, and change your `Value/Total` in the code block.  You do not need to manually edit the code block once setup.
 
@@ -335,7 +335,7 @@ The `#orange` progress bar would see 2 linked top level tasks (task 1 and task 3
 
 If you add a tag to your progress bar and it does not match any task tags, you will see an error saying (in this example) `#orange not found`.
 
-![tag not found](/docs/assets/Obsidian Advanced Progress Bars - Tag Not Found.png)
+![tag not found](/assets/Obsidian Advanced Progress Bars - Tag Not Found.png)
 
 > Note: if you see this error, the progress bar's data may be incorrect and will not update as it is not correctly linked.
 
@@ -348,7 +348,7 @@ In the `Add Tags to Tasks` example above, you will notice there are 3 top tasks,
 This `#banana` tag was ignored by the progress bar which was looking for `#orange` tags.
 You can however (if you desire) add a second progress bar, and give it the `#banana` tag so it will track all `#banana` top tasks.
 
-![multi tags](/docs/assets/Obsidian Advanced Progress Bars - Multi Tags.png)
+![multi tags](/assets/Obsidian Advanced Progress Bars - Multi Tags.png)
 
 In the image above, both `#orange` and `#banana` are being tracked automatically.
 
@@ -382,11 +382,11 @@ If you activate the sub task toggle, APB will keep a count of all subtasks of yo
 ```
 So for the tasks example above, you will see a sub task count for `#banana` that will be 1/3 as there are a total of three sub tasks (or sub-subtasks), one of which is completed.
 
-![multi tags](/docs/assets/Obsidian Advanced Progress Bars - Sub Tasks.png)
+![multi tags](/assets/Obsidian Advanced Progress Bars - Sub Tasks.png)
 
 As you can see in the image below, if you complete all sub tasks for the specified tag, your text will change color and add the word `COMPLETED` after it.
 
-![multi tags](/docs/assets/Obsidian Advanced Progress Bars - Sub Tasks Completed.png)
+![multi tags](/assets/Obsidian Advanced Progress Bars - Sub Tasks Completed.png)
 
 > Note: subtasks **do not** require tags themselves, they will be counted according to their top tasks tag.
 If you do add tags to subtasks, they will be totally ignored by APB.
@@ -440,6 +440,6 @@ As shown in the example above, the code block omits the closing backticks and be
 
 In earlier versions, this workaround worked, but starting with release `1.0.8`, I have refined it to hide the list bullet for progress bars, resulting in a cleaner, more polished look (see image below).
 
-![dashboardplusplus](/docs/assets/Obsidian Advanced Progress Bars - DashboardPlusPlus.png)
+![dashboardplusplus](/assets/Obsidian Advanced Progress Bars - DashboardPlusPlus.png)
 
 Now, you can effortlessly place simple progress bars anywhere in column lists without a list bullet on the left, enhancing visual clarity.
