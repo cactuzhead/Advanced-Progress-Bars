@@ -1,8 +1,14 @@
-title: Just the Docs Template
-description: A starter template for a Jeykll site using the Just the Docs theme!
-theme: just-the-docs
+title: cactuzhead
+description: the spiky headed one
+remote_theme: just-the-docs/just-the-docs
 
-url: https://just-the-docs.github.io
+url: https://cactuzhead.github.io/Advanced-Progress-Bars/docs/
 
 aux_links:
-  Template Repository: https://github.com/just-the-docs/just-the-docs-template
+  APB Repository: https://github.com/cactuzhead/Advanced-Progress-Bars
+
+just_the_docs:
+  label:
+    grey:
+      title: Grey Label
+      color: grey
