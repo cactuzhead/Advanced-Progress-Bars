@@ -411,7 +411,7 @@ For performance and user experience reasons, it will only update 2 seconds after
 
 > Note: if you are not going to be using tags to keep track of your task progress, then it is **highly** advised to turn `off` the `Enable Task Linking` for a smoother and efficient experience.
 
-## Using in Dashboard++ <span class="label label-green">NEW 1.0.8</span>
+## Using in Dashboard++ <span class="label label-grey">v1.0.8</span>
 
 Dashboard++ (aka DashboardPlusPlus) is a CSS snippet that provides a homepage for organizing and navigating notes.
 You can find it at <a href="https://github.com/TfTHacker/DashboardPlusPlus" target="_blank">https://github.com/TfTHacker/DashboardPlusPlus</a> 
@@ -419,7 +419,7 @@ You can find it at <a href="https://github.com/TfTHacker/DashboardPlusPlus" targ
 If you want to incude progress bars into the columns of your Dashboard++ page, you can not use a standard APB code block.
 However, there is a workaround detailed below.
 
-### Progress Bar in Columns <span class="label label-grey">NEW 1.0.8</span>
+### Progress Bar in Columns
 You normally insert a progress bar by pasting in  the standard APB code block which may look something like this:-
 ````
 ```apb
