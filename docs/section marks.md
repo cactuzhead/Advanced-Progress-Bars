@@ -11,7 +11,7 @@ nav_order: 5
 ![Toggle](/assets/Obsidian Advanced Progress Bars - Settings - Toggle.png)
 
 If this is toggled `on`, the progress bar will automaticlaly have equally spaced vertical markers along its length.
-The following table shows how many marks will be displayed depending on the `Number of Colors` setting (located further down on the settings page).
+The following table shows how many marks will be displayed depending on the `Number of marks` setting (located further down on the settings page).
 
 | Number of Colors | Number of Marks |
 | ---------------- | --------------- |
