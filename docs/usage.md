@@ -21,6 +21,9 @@ The `percentage` will be automatically calculated based on your `Value` and `Tot
 > [!NOTE]
 > the text within the code block example on the settings page will automatically be updated to reflect the changes you make in the other settings.
 
+{: .note }
+A paragraph
+
 ## Hotkey Setup
 To make it more convenient, you can add a hotkey that automatically inserts a progress bar code block into Obsidian. Simply follow these steps:
 
