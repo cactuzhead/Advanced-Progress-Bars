@@ -1,10 +1,10 @@
 ---
-title: Home
+title: Advanced Progress Bars
 layout: home
-nav_order: 1
 has_toc: false
 back_to_top: true
 back_to_top_text: "Back to top"
+nav_order: 1
 ---
 # Advanced-Progress-Bars
 ![Advanced Progress Bars](/assets/Obsidian Advanced Progress Bars - Hero Banner.png)
