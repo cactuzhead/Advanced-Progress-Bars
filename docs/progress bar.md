@@ -16,7 +16,7 @@ If you change this, the `Title` will be automatically changed in the example cod
 
 ### Default Total
 This setting is used to set the `total` you want for your default progress bar.
-This is does not need to be set to `100` (as in percentage). For example, you could set it to `7` if you are tracking seven subtasks.
+This is does not need to be set to `100` (as in percentage). For example, you could set it to `7` if you are tracking books read in a particular series.
 
 ![Smaller Total](/assets/Obsidian Advanced Progress Bars - Smaller Total.png)
 
@@ -28,8 +28,9 @@ It is meant as an aid so you can see how your progress bar will look with differ
 
 Additionally, it is also changes the `Value` in the `Example Code` found at the top of the settings.
 
+{: .note }
 If you want to use the example code block's `Copy to Clipboard` feature or a hotkey to later paste into obsidian, then you would probably want this to be set to 0.
-
+>
 It is recommended that you do this *after* you are happy with all the other settings and no longer need to see the demonstration progress bar.
 
 ### Full Width
