@@ -17,7 +17,8 @@ In the `apb` code block, you define the attributes as `Title`: `Value` / `Total`
 ![Text Diagram](/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
 
 The `percentage` will be automatically calculated based on your `Value` and `Total`.
-> Note: the text within the code block example on the settings page will automatically be updated to reflect the changes you make in the other settings.
+{: .note }
+> the text within the code block example on the settings page will automatically be updated to reflect the changes you make in the other settings.
 
 ## Hotkey Setup
 To make it more convenient, you can add a hotkey that automatically inserts a progress bar code block into Obsidian. Simply follow these steps:
@@ -38,7 +39,8 @@ To see the changes you've made in the settings reflected in your notes, you may 
 
 However, if a new progress bar is added to a note, it *will* display correctly, even if the existing progress bars on the same page haven't been refreshed yet.
 
-> Note, This will only be a problem directly after you make changes to the settings.
+{: .note }
+> This will only be a problem directly after you make changes to the settings.
 
 ## Multiple Advanced Progress Bars
 You can also stack progress bars by adding additional bars within the same code block, see example below.
@@ -53,4 +55,5 @@ The above stacked bars example would be rendered like this (using default dark c
 
 ![Stacked Bars](/assets/Obsidian Advanced Progress Bars - Settings - Stacked Bars.png)
 
-> Note: The code block example on the settings page will only include one progress bar. You will need to manually add any additional progress bars once pasted into Obsidian.
+{: .note }
+> The code block example on the settings page will only include one progress bar. You will need to manually add any additional progress bars once pasted into Obsidian.
