@@ -7,7 +7,10 @@ exclude:
   - ../README.md
   - ../Gemfile
   - ../Gemfile.lock
-
+sass:
+  sass_dir: _sass
+  style: compressed
+  
 url: https://cactuzhead.github.io/Advanced-Progress-Bars/docs/
 
 aux_links:
