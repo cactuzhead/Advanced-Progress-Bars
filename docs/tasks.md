@@ -27,7 +27,8 @@ My Title#orange: 57/100
 As you can see in the image below, the tag will be displayed as a badge to the left of your `Title`.
 ![Tasks](/assets/Obsidian Advanced Progress Bars - Tasks.png)
 
-> Note: If there is at least one matching tag in your tasks, APB will automatically find them, and change your `Value/Total` in the code block.  You do not need to manually edit the code block once setup.
+{: .note }
+If there is at least one matching tag in your tasks, APB will automatically find them, and change your `Value/Total` in the code block.  You do not need to manually edit the code block once setup.
 
 So the previous code block example above, will now automatically be changed to somthing like this:-
 ````
@@ -51,13 +52,15 @@ In the example above, there are a total of 3 top tasks and 3 subtasks (1 of whic
 
 The `#orange` progress bar would see 2 linked top level tasks (task 1 and task 3) and it would see that one of those was completed, so your progress bar would therefore be set to 50% (1/2).
 
-> Note: your tags are case sensative so you need to exactly match your tags for APB to link them. You can use any case and even numbers if you wish.
+{: .note }
+Your tags are case sensative so you need to exactly match your tags for APB to link them. You can use any case and even numbers if you wish.
 
 If you add a tag to your progress bar and it does not match any task tags, you will see an error saying (in this example) `#orange not found`.
 
 ![tag not found](/assets/Obsidian Advanced Progress Bars - Tag Not Found.png)
 
-> Note: if you see this error, the progress bar's data may be incorrect and will not update as it is not correctly linked.
+{: .note }
+If you see this error, the progress bar's data may be incorrect and will not update as it is not correctly linked.
 
 ### Other tags
 If you add tags to your subtasks (or sub-subtasks, etc) they will be ignored by APB.
@@ -108,7 +111,8 @@ As you can see in the image below, if you complete all sub tasks for the specifi
 
 ![multi tags](/assets/Obsidian Advanced Progress Bars - Sub Tasks Completed.png)
 
-> Note: subtasks **do not** require tags themselves, they will be counted according to their top tasks tag.
+{: .note }
+Subtasks **do not** require tags themselves, they will be counted according to their top tasks tag.
 If you do add tags to subtasks, they will be totally ignored by APB.
 
 ### Subtask Code Block
@@ -121,7 +125,8 @@ My Title#banana~2/4: 0/2
 As you can see in the example above, there is a `~2/4` placed directly after the `#banana` tag.
 This is simply the `Value/Total` for subtasks of your progress bars tag, and is automatically added by APB.
 
-> Note: For task linked progress bars - it is not recommended that you make any changes manually to the code block apart from the `Title` or `#tag` as it will be overwritten when APB refreshes the data.
+{: .note }
+For task linked progress bars - it is not recommended that you make any changes manually to the code block apart from the `Title` or `#tag` as it will be overwritten when APB refreshes the data.
 
 ## Refreshing
 If you have `Enable Task Linking` turned `on` the progress bars will update when you change between notes.
@@ -130,4 +135,5 @@ This can be used to "manually" make sure that notes are refreshed and up-to-date
 Additionally, APB will refresh automatically after you make changes to either the liniked progress bar code block or the tasks themselves.
 For performance and user experience reasons, it will only update 2 seconds after it detects a change.
 
-> Note: if you are not going to be using tags to keep track of your task progress, then it is **highly** advised to turn `off` the `Enable Task Linking` for a smoother and efficient experience.
+{: .note }
+If you are not going to be using tags to keep track of your task progress, then it is **highly** advised to turn `off` the `Enable Task Linking` for a smoother and efficient experience.
