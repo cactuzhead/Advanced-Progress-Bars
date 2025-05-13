@@ -13,4 +13,4 @@ These two buttons (`Light` & `Dark`) will change **ALL** the color settings to t
 All other settings will remain unchanged.
 
 {: .note }
-once selected, all previous colors will be lost forever and can *not* be retrieved.
+Once selected, all previous colors will be lost forever and can *not* be retrieved.
