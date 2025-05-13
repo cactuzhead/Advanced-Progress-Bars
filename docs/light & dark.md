@@ -10,5 +10,7 @@ nav_order: 3
 ![Light and Dark](/assets/Obsidian Advanced Progress Bars - Settings - Light and Dark.png)
 
 These two buttons (`Light` & `Dark`) will change **ALL** the color settings to their respective defaults.
-All other settings will remain unchanged.<br>
-**Note:** once selected, all previous colors will be lost forever and can *not* be retrieved.
+All other settings will remain unchanged.
+
+{: .note }
+once selected, all previous colors will be lost forever and can *not* be retrieved.
