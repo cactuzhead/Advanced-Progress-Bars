@@ -1,6 +1,7 @@
 title: cactuzhead
 description: the spiky headed one
 remote_theme: just-the-docs/just-the-docs@v0.8.2
+markdown: kramdown
 plugins:
   - jekyll-remote-theme
 exclude:
