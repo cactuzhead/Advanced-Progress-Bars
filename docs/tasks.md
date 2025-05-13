@@ -5,7 +5,7 @@ back_to_top: true
 back_to_top_text: "Back to top"
 nav_order: 11
 ---
-
+{:toc}
 ## Tasks Settings
 Here, you will find all the available options for customizing the progress bar when using tags to link to tasks.
 
