@@ -17,7 +17,7 @@ In the `apb` code block, you define the attributes as `Title`: `Value` / `Total`
 ![Text Diagram](/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
 
 The `percentage` will be automatically calculated based on your `Value` and `Total`.
-{: .note }
+> [!NOTE]
 > the text within the code block example on the settings page will automatically be updated to reflect the changes you make in the other settings.
 
 ## Hotkey Setup
