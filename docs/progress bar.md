@@ -30,7 +30,6 @@ Additionally, it is also changes the `Value` in the `Example Code` found at the 
 
 {: .note }
 If you want to use the example code block's `Copy to Clipboard` feature or a hotkey to later paste into obsidian, then you would probably want this to be set to 0.
->
 It is recommended that you do this *after* you are happy with all the other settings and no longer need to see the demonstration progress bar.
 
 ### Full Width
