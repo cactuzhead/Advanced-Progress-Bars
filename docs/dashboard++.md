@@ -29,7 +29,8 @@ My Title: 57/100
 ````
 As shown in the example above, the code block omits the closing backticks and begins with a hyphen and space to format it as a list item.
 
-> Note: tag linking for tasks and sub-tasks do not work on Dashboard++ pages only simple manually edited progress bars work.
+{: .note }
+Tag linking for tasks and sub-tasks do not work on Dashboard++ pages only simple manually edited progress bars work.
 
 In earlier versions, this workaround worked, but starting with release `1.0.8`, I have refined it to hide the list bullet for progress bars, resulting in a cleaner, more polished look (see image below).
 
