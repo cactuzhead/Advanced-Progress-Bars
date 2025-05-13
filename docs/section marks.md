@@ -21,7 +21,8 @@ The following table shows how many marks will be displayed depending on the `Num
 | 4                | 3               |
 | 5                | 4               |
 
-> Note: if you have 1 color selected, you will by default, not see any markers.
+{: .note }
+If you have 1 color selected, you will by default, not see any markers.
 
 ### Automatically Assigned Marks
 If this is toggled `on`, the progress bar will automaticlaly have equally spaced vertical markers along its length - as described above.
@@ -33,14 +34,16 @@ If you do so, a new slider will apear underneath to allow you to set the number 
 ### Number of Marks
 If you have the `Automatically Assigned Marks` toggle in the `off` position (as described above), you can use this slider to pick exactly how many vertical marks you want evenly distributed along your progress bar.
 
-> Note: this overrides the automatically assigned system
+{: .note }
+This overrides the automatically assigned system
 
 ### Section Mark Color
 This setting defines the color of the vertical section markers.
 
 Use the colorpicker to select a custom color or alternatively, use one of the `Light` or `Dark` defaults by pressing the appropriate buttons.
 
-> Note: the color selected will automatically be set to 50% transparency, allowing the progress bar's color to blend and influence the final appearance.
+{: .note }
+The color selected will automatically be set to 50% transparency, allowing the progress bar's color to blend and influence the final appearance.
 
 ### Section Mark Width
 This is a slider to set the width of each marker from a range of 1 to 5 pixels.
