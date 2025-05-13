@@ -41,7 +41,7 @@ To see the changes you've made in the settings reflected in your notes, you may 
 However, if a new progress bar is added to a note, it *will* display correctly, even if the existing progress bars on the same page haven't been refreshed yet.
 
 {: .note }
-> This will only be a problem directly after you make changes to the settings.
+This will only be a problem directly after you make changes to the settings.
 
 ## Multiple Advanced Progress Bars
 You can also stack progress bars by adding additional bars within the same code block, see example below.
@@ -57,4 +57,4 @@ The above stacked bars example would be rendered like this (using default dark c
 ![Stacked Bars](/assets/Obsidian Advanced Progress Bars - Settings - Stacked Bars.png)
 
 {: .note }
-> The code block example on the settings page will only include one progress bar. You will need to manually add any additional progress bars once pasted into Obsidian.
+The code block example on the settings page will only include one progress bar. You will need to manually add any additional progress bars once pasted into Obsidian.
