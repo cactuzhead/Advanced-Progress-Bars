@@ -14,7 +14,7 @@ This color is what the progress bar will be when it has reached 100%.
 
 ![Error](/assets/Obsidian Advanced Progress Bars - Error Override.png)
 
-You can see in the image above, that the bottom completed progress bar is using the default `Dark` option which is a light blue-grey color.
+You can see in the image above, that the completed progress bar is using the default `Dark` option which is a light blue-grey color.
 
 ### Bar Background Color
 This is the color for the remaining portion of the progress bar.
