@@ -46,11 +46,5 @@ Updated plugin with 3 new files:
 
 ## Release v1.0.1 <span class="label label-grey">NEW</span>
 Update index.md
-TEST
-{: .label .label-grey }
-Stable
-{: .label .label-green }
-## Heading
-NEW {:.label .label-grey}
 
 
