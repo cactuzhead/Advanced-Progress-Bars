@@ -8,7 +8,7 @@ nav_order: 99
 
 # Changelog
 
-## Release v1.0.8  <span class="label label-grey">NEW</span>
+## Release v1.0.8  <span class="label label-green">NEW</span>
 1. Added removal of the list bullets, to the left of progress bars, within columns on a Dashboard++ page, enhancing visual clarity.
 
 ## Release v1.0.7
