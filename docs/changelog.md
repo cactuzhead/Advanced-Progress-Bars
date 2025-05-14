@@ -8,10 +8,10 @@ nav_order: 99
 
 # Changelog
 
-## Release v1.0.8 {NEW: .label .label-green }
+## Release v1.0.8
 1. Added removal of the list bullets, to the left of progress bars, within columns on a Dashboard++ page, enhancing visual clarity.
 
-## Release v1.0.7 {TEST: .label .label-grey }
+## Release v1.0.7
 1. Added a new toggle in the Progress Bar Color section called `Gradient Type`. This setting allows you to select either a color-mixed linear gradient or a simple linear gradient for your gradients.
 2. Added a new section called `Tasks` with 6 settings.
 This will allow you to track the completion of tasks (and sub tasks) and for these to be reflected automatically in your progress bar.
@@ -44,5 +44,5 @@ Updated plugin with 3 new files:
 - manifest.json
 - styles.css
 
-## Release v1.0.1
-Update index.md
+## Release v1.0.1 {NEW: .label .label-green }
+Update index.md  {TEST: .label .label-grey }
