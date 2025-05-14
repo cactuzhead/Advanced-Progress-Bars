@@ -45,6 +45,8 @@ Updated plugin with 3 new files:
 - styles.css
 
 ## Release v1.0.1 {NEW: .label .label-green }
-Update index.md  TEST{: .label .label-grey }
+Update index.md
+TEST
+{: .label .label-grey }
 Stable
 {: .label .label-green }
