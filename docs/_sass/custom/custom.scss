@@ -23,3 +23,17 @@ p.note::before, blockquote.note::before {
     font-size: 0.75em;
     padding-bottom: 0.125rem;
 }
+
+// .label {
+//   display: inline-block;
+//   padding: 2px 6px;
+//   border-radius: 3px;
+//   font-size: 0.8em;
+//   margin-left: 5px;
+//   vertical-align: middle;
+// }
+
+.label-grey {
+  background-color: #6c757d; /* Bootstrap-style grey */
+  color: white;
+}
