@@ -50,3 +50,5 @@ TEST
 {: .label .label-grey }
 Stable
 {: .label .label-green }
+## Heading
+NEW {:.label .label-grey}
