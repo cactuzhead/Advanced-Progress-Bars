@@ -44,7 +44,7 @@ Updated plugin with 3 new files:
 - manifest.json
 - styles.css
 
-## Release v1.0.1 {NEW: .label .label-green }
+## Release v1.0.1 <span>{NEW: .label .label-green }</span>
 Update index.md
 TEST
 {: .label .label-grey }
