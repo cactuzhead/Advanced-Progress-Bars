@@ -1,0 +1,10 @@
+<div class="site-header">
+  {% if site.logo %}
+    <a class="site-logo" href="{{ "/" | relative_url }}">
+      <img src="{{ site.logo | relative_url }}" alt="{{ site.title }}" />
+    </a>
+  {% endif %}
+  {% if site.title %}
+    <a class="site-title" href="{{ "/" | relative_url }}">{{ site.title }}</a>
+  {% endif %}
+</div>
