@@ -17,7 +17,8 @@ exclude:
 sass:
   sass_dir: _sass
   style: compressed
-  
+
+baseurl: /Advanced-Progress-Bars
 url: https://cactuzhead.github.io/Advanced-Progress-Bars/docs/
 
 aux_links:
