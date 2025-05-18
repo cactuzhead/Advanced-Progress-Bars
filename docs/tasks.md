@@ -5,7 +5,7 @@ back_to_top: true
 back_to_top_text: "Back to top"
 nav_order: 11
 ---
-TABLE OF CONTENTS
+
 - TOC
 {:toc}
 ## Tasks Settings
