@@ -6,7 +6,7 @@ back_to_top_text: "Back to top"
 nav_order: 12
 ---
 
-## Templates  <span class="label label-green">NEW v1.1.0</span>
+## Templates  <span class="label label-green badge">NEW v1.1.0</span>
 Starting in release `1.1.0`, you now have the ability to assign a custom template to each individual progress bar.
 
 This update removed a lot of the color and gradient settings from the `Progress Bar Color` section and instead, moved them to a simplified default template.
