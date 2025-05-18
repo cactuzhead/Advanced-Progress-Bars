@@ -8,7 +8,24 @@ nav_order: 99
 
 # Changelog
 
-## Release v1.0.8  <span class="label label-green">NEW</span>
+## Release v1.1.0 <span class="label label-green">NEW</span>
+### New Features
+- **New Template System:** Default and custom templates support assignable colors (up to 5), gradients, and gradient types for richer visual styling.
+- **Individual Progress Bar Styling:** Assign custom templates to specific progress bars to create unique styles, independent of the default color configuration.
+
+- <span class="label label-red">REMOVED</span> **Removed Legacy Color and Gradient Settings:** Eliminated previous settings that applied uniform colors and gradients to **all** progress bars, enabling more flexible and targeted styling.
+
+- **Added Box Shadow Feature:** Introduced global support for glow or drop shadows on progress bars, with customizable options for shadow color, blur, and inset.
+
+- **Codebase Refactoring:** Streamlined and optimized the code for enhanced clarity, efficiency, and maintainability.
+
+### Documentation
+- **New Theme:** Changed from `Minimal` jekyll theme to the `Just-The-Docs` jekyll theme.  This provides a multi-page system with side menu for easier, less cluttered documentation.
+
+- **New Pages:** Added documentation pages for both of the new features - Templates and Box Shadows.
+
+
+## Release v1.0.8
 - Added removal of the list bullets, to the left of progress bars, within columns on a Dashboard++ page, enhancing visual clarity.
 
 ## Release v1.0.7
@@ -46,5 +63,3 @@ Updated plugin with 3 new files:
 
 ## Release v1.0.1
 Update index.md
-
-
