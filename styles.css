@@ -44,13 +44,13 @@
     overflow: hidden;
     padding-left: 1em;
     white-space: wrap;
-    /* width: 160px; */
 }
 
 .progressBar-container {
     border-radius: 7px;
     display: flex;
-    flex-flow: row wrap;    
+    flex-flow: row wrap;
+flex-direction: column;   
     justify-content: center;
     margin-top: 7px;   
     overflow: hidden;
@@ -101,12 +101,18 @@
     color: #c1d7f9;
     font-size: 0.75em;
     font-weight: 500;
-    overflow: hidden;
     padding: 0 0 0 0.3em;    
     text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;               
     width: 100%;
+    position: absolute;    
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    line-height: normal; /* Prevent line-height from affecting centering */
+    z-index: 1; /* Ensure text is below the mask but above the background */
 }
 
 .progressBar-subtask {
@@ -132,12 +138,22 @@
 }
 
 .progressBar-background {
-    display: flex;
-    flex-flow: row nowrap;
     position: relative;
+    width: 100%;
+    overflow: visible;
+    display: flex;
 }
 
 .progressBar {
+	display: flex;
+	justify-Content: space-between;
+	margin: 0px;
+    align-Items: center;
+    position: relative;
+    margin-left: auto;
+}
+
+.demo-progressBar {
 	display: flex;
 	justify-Content: space-between;
 	margin: 0px;
@@ -215,3 +231,112 @@
 li.apb-list-item .list-bullet {
     display: none !important;
 }
+
+.template-setting-row .setting-item-info  {  
+    display: flex;
+    flex: 0 1 auto !important;
+}
+
+.template-setting-row .setting-item-info .setting-item-name {
+    color:#666666;
+}
+
+.settings-row-container {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
+}
+
+.settings-row-headers {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color:#666666;
+}
+
+.settings-row-header {
+    flex: 0 0 auto;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 0 5px;
+    line-height: 1.2;
+    display: flex;
+    align-items: flex-end;
+}
+.settings-row-header.gradient-header {
+    white-space: normal;
+    max-width: 80px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 20px;
+    background: #f0f0f0; /* Unfilled part = light gray */
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+
+.APB {
+    position: relative;
+    overflow: visible; /* Allow mask to render outside bounds */
+}
+
+.progressBar-filled {
+    position: relative;    
+}
+
+.progressBar-mask, .progressBar-mask * {
+    background-color: transparent !important;
+}
+
+.block-language-apb {
+    box-sizing: border-box;
+}
+
+
+.template-setting-row .subtle-button {
+    width: 20px;
+    height: 20px;
+    padding: 2px;
+    opacity: 0.5; /* Lower opacity to make less noticeable */
+    filter: grayscale(50%); /* Muted color effect */
+    background-color: transparent; /* Remove default background */
+    border: none; /* Remove border */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .template-setting-row .subtle-button svg {
+    width: 20px; /* Smaller icon size */
+    height: 20px;
+  }
+  
+  .template-setting-row .subtle-button:hover {
+    opacity: 1; /* Full opacity on hover for usability */
+    filter: none; /* Remove grayscale on hover */
+  }
+  
+  .template-setting-row .subtle-button:disabled {
+    opacity: 0.3; /* Even fainter when disabled */
+    cursor: not-allowed;
+  }
+
+  .default-setting-row .spacer-button {
+    width: 84px;
+    height: 10px;   
+    opacity: 0; /* Completely invisible */
+    background-color: transparent;
+    border: none;
+    pointer-events: none; /* Prevent interaction */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .default-setting-row .spacer-button svg {
+    width: 20px; /* Smaller icon size */
+    height: 20px;
+  }
