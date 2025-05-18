@@ -6,7 +6,7 @@ back_to_top_text: "Back to top"
 nav_order: 9
 ---
 
-# Box-Shadow <span class="label label-green">NEW v1.1.0</span>
+# Box-Shadow <span class="label label-green lowercase">NEW v1.1.0</span>
 Starting in release `1.1.0`, You can now add a box shadow to your progress bars.
 
 Toggling the box-shadow `on` will reveal a further 4 options:-
