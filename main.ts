@@ -244,7 +244,7 @@ export default class ObsidianProgressBars extends Plugin {
 
                 if (this.isUpdating || now - this.lastChangeTime < this.MIN_CHANGE_INTERVAL) {
                     // console.log('Skipping self-triggered or rapid change:', { isUpdating: this.isUpdating, timeSinceLast: now - this.lastChangeTime });
-                    return;
+					return;
                 }
                 if (!this.settings.APB_allowTasksToggle) return;
                 const activeFile = this.app.workspace.getActiveFile();
@@ -256,14 +256,22 @@ export default class ObsidianProgressBars extends Plugin {
                 const editor = editorView.editor;
                 const cursorBefore = editor.getCursor();
                 // console.log('- CHANGED - Dashboard or APB detected');
+				new Notice('Processing Task Update ...', 2000);
+				// Add 2-second delay before starting the update
+				// await new Promise(resolve => setTimeout(resolve, 2000));
 
                 try {
                     this.isUpdating = true;
                     this.lastChangeTime = now;
 					this.lastProcessedFileTime.set(file.path, now)
                     this.lastProcessedFile = activeFile;
+					
                     await this.updateProgress();
-                } finally {
+					new Notice('Task Update Completed', 2000);	
+                } catch (error) {
+					// Show error notice if update fails
+					new Notice('Task Update Failed: ' + error.message, 2000);
+				} finally {
                     // Delay reset to ensure async events are caught
                     setTimeout(() => {
                         this.isUpdating = false;
@@ -322,9 +330,11 @@ export default class ObsidianProgressBars extends Plugin {
 			const normalizedIndent = indent.replace(/\t/g, '    ');
 			const indentLevel = normalizedIndent.length;
 		
-			const tagMatch = fullDescription.match(/#(\w+)/);
-			const taskTag = tagMatch ? tagMatch[1] : null;
-		
+			const tagMatch = fullDescription.match(/#([\p{L}\p{N}\p{Emoji}_-]+)/u);
+			const taskTag = tagMatch ? tagMatch[1].normalize('NFC') : null;
+			// console.log("tagMatch: " + taskTag);
+
+
 			if (indentLevel === 0) {
 				// Top-level task
 				currentTopTag = taskTag || null;
@@ -349,7 +359,7 @@ export default class ObsidianProgressBars extends Plugin {
 		// Update progress bars for each tag
 		for (const [tag, { total, completed, subTotal, subCompleted }] of tagMap.entries()) {
 			// console.log(`Tag: ${tag}`, { total, completed, subTotal, subCompleted });
-			this.updateProgressBarInNote(tag, completed, total, subCompleted, subTotal);
+			this.updateProgressBarInNote(tag.normalize('NFC'), completed, total, subCompleted, subTotal);
 		}
 	}
 	
@@ -358,12 +368,14 @@ export default class ObsidianProgressBars extends Plugin {
 		if (!activeFile) return false;
 	
 		const content = await this.app.vault.read(activeFile);
-		const taskRegex = /- \[.\] (.*?)#(\w+)/g; // Matches tasks like "- [ ] Task #tag"
+		const taskRegex = /- \[.\] (.*?)#([\p{L}\p{N}\p{Emoji}_-]+)/gu;
 	
 		let match;
 		while ((match = taskRegex.exec(content)) !== null) {
-			const taskTag = match[2]; // The tag from the task (e.g. "todo")
-			if (taskTag === tag) {
+			// const taskTag = match[2]; // The tag from the task (e.g. "todo")
+			const taskTag = match[2].normalize('NFC');
+			// if (taskTag === tag) {
+			if (taskTag === tag.normalize('NFC')) {
 				return true; // Found a task with a matching tag
 			}
 		}
@@ -405,22 +417,21 @@ export default class ObsidianProgressBars extends Plugin {
 	
 		const fileContent = editorView.editor.getValue();
 		const regex = /```apb\n([\s\S]+?)\n```/g;
-	
+
 		const updatedContent = fileContent.replace(regex, (match: string, p1: string) => {
 			const lines = p1.trim().split('\n');
 			let updatedLines = lines.map((line: string) => {
-				const matchProgress = line.match(/^(.+?)(?:#(\w+))?(?:~(\d+)\/(\d+))?(?::\s*(\d+)\/(\d+))(?:{(\w+)})?$/);
-				// console.log("Processing line:", line, "Match:", matchProgress);
+			
+			const matchProgress = line.match(/^(.+?)\s*(?:#([\p{L}\p{N}\p{Emoji}_-]+))?(?:\s*~(\d+)\/(\d+))?\s*:\s*(\d+)\/(\d+)(?:\{([^}]+)\})?(?:\s*(?:\[.*?\])?)?$/u);
 	
 				if (matchProgress) {
-					const title = matchProgress[1] || '';
+					const title = matchProgress[1].trim() || '';
 					const progressBarTag = matchProgress[2] || '';
 					const subCurrent = matchProgress[3] ? parseInt(matchProgress[3], 10) : null;
 					const subMax = matchProgress[4] ? parseInt(matchProgress[4], 10) : null;
 					const templateName = matchProgress[7] || '';	
-					// console.log("updateProgressBarInNote - TEST", { title, progressBarTag, tag });
 	
-					if (tag === progressBarTag) {
+					if (tag.normalize('NFC') === progressBarTag.normalize('NFC')) {
 						const templatePart = templateName ? `{${templateName}}` : '';
 						return `${title}#${tag}~${subCompleted}/${subTotal}: ${value}/${total}${templatePart}`;
 					}
@@ -459,9 +470,8 @@ export default class ObsidianProgressBars extends Plugin {
 			// Loop through each line
 			rows.forEach((row, index) => {
 				// Use regex to extract the label and progress (Value/Total)
-				const match = row.match(/^(.+?)(?:#(\w+))?(?:~(\d+)\/(\d+))?(?::\s*(\d+)\/(\d+))(?:{([^}]+)})?$/);
-
-
+				const match = row.match(/^(.+?)(?:#([\p{L}\p{N}\p{Emoji}_-]+))?(?:~(\d+)\/(\d+))?(?::\s*(\d+)\/(\d+))(?:\{([^}]+)\})?(?:\s.*)?$/u);
+				
 				if (!match) {
 					displayAPBError(el, `APB_Error: Invalid block format`);
     			return;
@@ -891,7 +901,7 @@ class ObsidianProgressBarsSettingTab extends PluginSettingTab {
 	constructor(app: App, plugin: ObsidianProgressBars) {
 		super(app, plugin);
 		this.plugin = plugin;
-		this.display(); 
+		this.display();
 	}
 
 	display(): void {
