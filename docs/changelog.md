@@ -8,7 +8,14 @@ nav_order: 99
 
 # Changelog
 
-## Release v1.1.0 <span class="label label-green badge">NEW</span>
+## Release v1.1.1 <span class="label label-green badge">NEW</span>
+### New Features
+- Added Unicode support which fixed tag tracking not working with non-English languages that use letters like é, ñ, ü, ç or indeed, any characters in Latin, Greek, Cyrillic, Hebrew, Arabic, Hindi, Japanese, Chinese, and many more including emoji.
+
+### Documentation
+- Updated `Tasks` page to explain introduction of unicode tags to support most languages.
+
+## Release v1.1.0
 ### New Features
 - **New Template System:** Default and custom templates support assignable colors (up to 5), gradients, and gradient types for richer visual styling.
 - **Individual Progress Bar Styling:** Assign custom templates to specific progress bars to create unique styles, independent of the default color configuration.
