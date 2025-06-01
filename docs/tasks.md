@@ -11,6 +11,9 @@ nav_order: 11
 ## Tasks Settings
 Here, you will find all the available options for customizing the progress bar when using tags to link to tasks.
 
+### Unicode <span class="label label-green badge">NEW v1.1.1</span>
+Added Unicode support which fixed tag tracking not working with non-English languages that use letters like é, ñ, ü, ç or indeed, any characters in Latin, Greek, Cyrillic, Hebrew, Arabic, Hindi, Japanese, Chinese, and many more including emoji.
+
 ### Enable Task Linking
 When toggled on, progress bars can use tags to link to matching tags in your tasks.  This results in your progress bar automatically tracking tags to display your current task completion.
 
