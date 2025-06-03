@@ -14,6 +14,3 @@ Similar to the text settings above, this section includes two pairs of options f
 - use the toggles to turn them `on` or `off`
 - use the color picker to set a custom color
 - or use the `Light` and `Dark` color defaults
-
-{: .warning }
-Test
