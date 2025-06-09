@@ -61,6 +61,7 @@ interface ObsidianProgressBarsSettings {
 	APB_backgroundToggle: boolean;
 	APB_colorBackground: string;
 	APB_colorLightBackground: string;
+	APB_TopMarginToggle: boolean;
 	/* Box-shadow Settings */
 	APB_boxShadowToggle: boolean;
 	APB_boxShadowTypeToggle: boolean;
@@ -77,6 +78,7 @@ interface ObsidianProgressBarsSettings {
 	APB_colorLightBarBackground: string;	
 	/* Task Settings */
 	APB_allowTasksToggle: boolean;
+	APB_autoTasksToggle: boolean;
 	APB_colorTaskText: string;
 	APB_colorLightTaskText: string;
 	APB_colorTaskBackground: string;
@@ -139,6 +141,7 @@ const DEFAULT_SETTINGS: Partial<ObsidianProgressBarsSettings> = {
 	APB_backgroundToggle: true,
 	APB_colorBackground: '#242a35',
 	APB_colorLightBackground: '#f1f2f4',
+	APB_TopMarginToggle: false,
 	/* Box-shadow Settings */
 	APB_boxShadowToggle: false,
 	APB_boxShadowTypeToggle: false,
@@ -155,6 +158,7 @@ const DEFAULT_SETTINGS: Partial<ObsidianProgressBarsSettings> = {
 	APB_colorLightBarBackground: '#d9dde2',
 	/* Task Settings */
 	APB_allowTasksToggle: false,
+	APB_autoTasksToggle: false,
 	APB_colorTaskText: '#8fa0ba',
 	APB_colorLightTaskText: '#ffffff',
 	APB_colorTaskBackground: '#3b4252',
@@ -237,50 +241,52 @@ export default class ObsidianProgressBars extends Plugin {
 	}
 
 	private registerEvents() {
-        this.registerEvent(
-            this.app.metadataCache.on('changed', debounce(async (file: TFile) => {
-                const now = Date.now();
-				const lastTime = this.lastProcessedFileTime.get(file.path) || 0;
+		if (this.settings.APB_allowTasksToggle && this.settings.APB_autoTasksToggle) {
+			this.registerEvent(
+				this.app.metadataCache.on('changed', debounce(async (file: TFile) => {
+					const now = Date.now();
+					const lastTime = this.lastProcessedFileTime.get(file.path) || 0;
 
-                if (this.isUpdating || now - this.lastChangeTime < this.MIN_CHANGE_INTERVAL) {
-                    // console.log('Skipping self-triggered or rapid change:', { isUpdating: this.isUpdating, timeSinceLast: now - this.lastChangeTime });
-					return;
-                }
-                if (!this.settings.APB_allowTasksToggle) return;
-                const activeFile = this.app.workspace.getActiveFile();
-                if (!activeFile || file.path !== activeFile.path) return;
-                if (!(await this.shouldUpdateProgress(activeFile, this.app))) return;
+					if (this.isUpdating || now - this.lastChangeTime < this.MIN_CHANGE_INTERVAL) {
+						// console.log('Skipping self-triggered or rapid change:', { isUpdating: this.isUpdating, timeSinceLast: now - this.lastChangeTime });
+						return;
+					}
+					if (!this.settings.APB_allowTasksToggle) return;
+					const activeFile = this.app.workspace.getActiveFile();
+					if (!activeFile || file.path !== activeFile.path) return;
+					if (!(await this.shouldUpdateProgress(activeFile, this.app))) return;
 
-                const editorView = this.app.workspace.getActiveViewOfType(MarkdownView);
-                if (!editorView) return;
-                const editor = editorView.editor;
-                const cursorBefore = editor.getCursor();
-                // console.log('- CHANGED - Dashboard or APB detected');
-				new Notice('Processing Task Update ...', 2000);
-				// Add 2-second delay before starting the update
-				// await new Promise(resolve => setTimeout(resolve, 2000));
+					const editorView = this.app.workspace.getActiveViewOfType(MarkdownView);
+					if (!editorView) return;
+					const editor = editorView.editor;
+					const cursorBefore = editor.getCursor();
+					// console.log('- CHANGED - Dashboard or APB detected');
+					new Notice('Processing Task Update ...', 2000);
+					// Add 2-second delay before starting the update
+					// await new Promise(resolve => setTimeout(resolve, 2000));
 
-                try {
-                    this.isUpdating = true;
-                    this.lastChangeTime = now;
-					this.lastProcessedFileTime.set(file.path, now)
-                    this.lastProcessedFile = activeFile;
-					
-                    await this.updateProgress();
-					new Notice('Task Update Completed', 2000);	
-                } catch (error) {
-					// Show error notice if update fails
-					new Notice('Task Update Failed: ' + error.message, 2000);
-				} finally {
-                    // Delay reset to ensure async events are caught
-                    setTimeout(() => {
-                        this.isUpdating = false;
-                    }, 2000);
-                }
+					try {
+						this.isUpdating = true;
+						this.lastChangeTime = now;
+						this.lastProcessedFileTime.set(file.path, now)
+						this.lastProcessedFile = activeFile;
+						
+						await this.updateProgress();
+						new Notice('Task Update Completed', 2000);	
+					} catch (error) {
+						// Show error notice if update fails
+						new Notice('Task Update Failed: ' + error.message, 2000);
+					} finally {
+						// Delay reset to ensure async events are caught
+						setTimeout(() => {
+							this.isUpdating = false;
+						}, 2000);
+					}
 
-                editor.setCursor(cursorBefore);
-            }, 2000))
-        );
+					editor.setCursor(cursorBefore);
+				}, 2000))
+			);
+		}
 
 	// Register file-open event
 	this.registerEvent(
@@ -371,10 +377,8 @@ export default class ObsidianProgressBars extends Plugin {
 		const taskRegex = /- \[.\] (.*?)#([\p{L}\p{N}\p{Emoji}_-]+)/gu;
 	
 		let match;
-		while ((match = taskRegex.exec(content)) !== null) {
-			// const taskTag = match[2]; // The tag from the task (e.g. "todo")
-			const taskTag = match[2].normalize('NFC');
-			// if (taskTag === tag) {
+		while ((match = taskRegex.exec(content)) !== null) {			
+			const taskTag = match[2].normalize('NFC');			
 			if (taskTag === tag.normalize('NFC')) {
 				return true; // Found a task with a matching tag
 			}
@@ -507,6 +511,12 @@ export default class ObsidianProgressBars extends Plugin {
 				const clampedPercentage = Math.min(Math.max(Math.round(percentage), 0), 100);		
 				const APB_container = document.createElement('div');
 				APB_container.addClass('progressBar-container');
+
+				if (index === 0 && this.settings.APB_TopMarginToggle) {
+					APB_container.style.marginTop = '25px';
+				} else {
+					APB_container.style.marginTop = '7px';
+				}
 
 				if (this.settings.APB_borderToggle) {
 					APB_container.style.border = '1px solid'+ this.settings.APB_colorBorder;
@@ -749,8 +759,7 @@ export default class ObsidianProgressBars extends Plugin {
 						</defs>
 						<rect x="0" y="-1" width="${(this.settings.APB_height + 10.5) / 2}" height="${this.settings.APB_height +3}" fill="${this.settings.APB_colorBarBackground}" mask="url(#${uniqueId})"/>
 						`;
-						filledBar.appendChild(mask);
-						// console.log(mask.outerHTML)
+						filledBar.appendChild(mask);						
 				}
 						
 				APB_background.appendChild(APB);
@@ -868,7 +877,41 @@ export default class ObsidianProgressBars extends Plugin {
 				}, 0); // Zero-delay timeout ensures this runs after DOM updates
 			},
 			});
-		}
+
+			// Register a custom command to manually refresh
+        this.addCommand({
+            id: 'task-manual-refresh',
+            name: 'Task manual refresh',
+
+			callback: async () => {
+				if (this.isUpdating || !this.settings.APB_allowTasksToggle) return;
+				if (this.settings.APB_autoTasksToggle) return;
+
+				new Notice('Processing Task Update ...', 2000);
+
+				try {
+					this.isUpdating = true;					
+					await this.updateProgress();
+					new Notice('Task Update Completed', 2000);	
+				} catch (error) {
+					// Show error notice if update fails
+					new Notice('Task Update Failed: ' + error.message, 2000);
+				} finally {
+					// Delay reset to ensure async events are caught
+					setTimeout(() => {
+						this.isUpdating = false;
+					}, 2000);
+				}
+
+            const activeFile = this.app.workspace.getActiveFile();
+            if (!activeFile) {
+                new Notice('No active file to refresh', 2000);
+                return;
+            }
+            // await this.processTaskUpdate(activeFile);
+        }
+   		 });
+	}
 
 	async loadSettings() {
 	  	this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
@@ -1621,6 +1664,12 @@ new Setting(containerEl)
 	this.createColorPickerSetting(containerEl, 'Background color', 'Select the background color of the progress bar container.',
 		'APB_colorBackground', DEFAULT_SETTINGS.APB_colorLightBackground as string, DEFAULT_SETTINGS.APB_colorBackground as string);
 
+	/************ Top Margin *************/
+	this.createToggleSetting(containerEl, 'Top margin',
+		'When toggled on, the progress bar container will have a larger margin at the top to avoid text being obscured by the %%</>%% in the top right of the code block when you mouse over.',
+		'APB_TopMarginToggle');
+
+
 
 
 	/************ SECTION Box Shadow *************/	
@@ -1681,7 +1730,7 @@ new Setting(containerEl)
 
 
 
-	/************ SECTION Tasks *************/	
+	/************ SECTION Tasks *************/
 	const setting11 = new Setting(containerEl).setName('Tasks').setHeading();
 	const heading11 = setting11.settingEl.querySelector('.setting-item-name');
 	if (heading11) {heading11.addClass('header-highlight');}
@@ -1692,6 +1741,11 @@ new Setting(containerEl)
 		'APB_allowTasksToggle');
 
 	if (this.plugin.settings.APB_allowTasksToggle) {
+		/************ Auto Tasks *************/
+		this.createToggleSetting(containerEl, 'Auto tasks',
+			'When %%toggled on%%, tasks are automatically updated when it detects editing on the current page.  It is %%highly recommended%% that this is turned %%off%% and you use manually triggered updates instead using page switching or hotkey.  See documentation for full details.',
+			'APB_autoTasksToggle');
+
 		/************ Task Text Color *************/
 		this.createColorPickerSetting(containerEl, 'Task text color', 'Choose the %%text%% color for task badges.',
 			'APB_colorTaskText', DEFAULT_SETTINGS.APB_colorLightTaskText as string, DEFAULT_SETTINGS.APB_colorTaskText as string);
