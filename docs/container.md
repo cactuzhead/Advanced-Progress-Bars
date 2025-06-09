@@ -19,3 +19,6 @@ When this is toggled `on`, the progress bar will have a larger margin at the top
 ![Container](/assets/Obsidian Advanced Progress Bars - Top Margin Before and After.png)
 
 If it is turned off then it behaves as before to save vertical screen space for those who don't mind the hover over </> obscuring the top right text.
+
+{: .note }
+This extra spacing only happens once for each code block, so if you have multiple progress bars in one code block the spacing between progress bars will remain the same.
