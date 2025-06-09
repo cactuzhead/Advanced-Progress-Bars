@@ -82,6 +82,40 @@ In the image above, both `#orange` and `#banana` are being tracked automatically
 
 And you can track as many tags as you wish by simply adding additonal progress bars with a new tag for each.
 
+### Auto Tasks <span class="label label-green badge">NEW v1.1.2</span>
+When toggled `on`, tasks are automatically updated when it detects editing on the current page.
+
+{: .note }
+However, it is **highly recommended** that this is turned `off` and you use manually triggered updates instead.
+
+This is due to the fact that it updates after *any* edits on the page and can sometimes be frustrating if it tries to update whilst you are still editing.
+
+Please see the `refreshing` section below to see how to manually trigger a refresh of the tasks.
+
+{: .warning }
+When you toggle this `on` or `off` you will need to restart Obsidian for your setting to work correctly.
+
+## Refreshing
+If you have `Enable Task Linking` turned `on` the progress bars will update when you change between notes.
+This can be used to manually make sure that notes are refreshed and up-to-date.
+
+{: .note }
+You have to change to another page, and stay on it for at least 2 seconds before returning to your current page for the tasks to refresh.
+
+### Hotkey Setup <span class="label label-green badge">NEW v1.1.2</span>
+If you want to manually trigger a task update without switching between notes, you can now configure a hotkey for quick access.  Simply follow these steps:
+
+1. Open Obsidian and go to the **Settings** by clicking the gear icon in the bottom left corner.
+2. From the **Settings** menu, go to the **Hotkeys** section on the left sidebar.
+3. In the filter search bar found at the top of the Hotkeys section, start typing **"Advanced Progress Bars"** to find the `Advanced Progress Bars: Task manual refresh` action.
+![Hotkey Search](/assets/Obsidian Advanced Progress Bars - Manual Refresh Search.png)
+
+4. Click on the round plus button next to the found action, and assign the desired hotkey combination (e.g., `Ctrl + Shift + R` or any other combo that suits you).
+![Hotkey](/assets/Obsidian Advanced Progress Bars - Manual Refresh Hotkey.png)
+
+{: .note }
+If you are not going to be using tags to keep track of your task progress, then it is **highly** advised to turn `off` the `Enable Task Linking` for a smoother and efficient experience.
+
 ### Tag Badge Colors
 Once you toggle the task linking setting to `on`, two additional color settings will appear underneath.
 
@@ -132,13 +166,3 @@ This is simply the `Value/Total` for subtasks of your progress bars tag, and is 
 
 {: .note }
 For task linked progress bars - it is not recommended that you make any changes manually to the code block apart from the `Title` or `#tag` as it will be overwritten when APB refreshes the data.
-
-## Refreshing
-If you have `Enable Task Linking` turned `on` the progress bars will update when you change between notes.
-This can be used to "manually" make sure that notes are refreshed and up-to-date.
-
-Additionally, APB will refresh automatically after you make changes to either the liniked progress bar code block or the tasks themselves.
-For performance and user experience reasons, it will only update 2 seconds after it detects a change.
-
-{: .note }
-If you are not going to be using tags to keep track of your task progress, then it is **highly** advised to turn `off` the `Enable Task Linking` for a smoother and efficient experience.
