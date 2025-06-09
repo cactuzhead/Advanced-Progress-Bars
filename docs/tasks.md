@@ -86,7 +86,7 @@ And you can track as many tags as you wish by simply adding additonal progress b
 When toggled `on`, tasks are automatically updated when it detects editing on the current page.
 
 {: .note }
-However, it is **highly recommended** that this is turned `off` and you use manually triggered updates instead.
+It is **highly recommended** that this is turned `off` and you use manually triggered updates instead.
 
 This is due to the fact that it updates after *any* edits on the page and can sometimes be frustrating if it tries to update whilst you are still editing.
 
