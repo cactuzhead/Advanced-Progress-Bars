@@ -8,12 +8,22 @@ nav_order: 99
 
 # Changelog
 
-## Release v1.1.1 <span class="label label-green badge">NEW</span>
+## Release v1.1.2 <span class="label label-green badge">NEW</span>
+### New Features
+- Added a new toggle in the `Progress bar container` section of the settings called `Top margin`.  This will allow you to choose to set a larger margin at the top of the code block so that the </> is now above the progress bars container when you hover over it.
+- Added a new toggle in the `tasks` section of the settings called `Auto tasks`.  This will allow you to turn `on` automatic task refreshing or `off` for manual refreshing.  It is **highly recommended** that you have this turned `off` and use a manual refresh hotkey or page switching.
+- Added a new hotkey called `Task manual refresh` which you can use to quickly refresh all linked tasks on your current note.
+
+### Documentation
+- Updated `Container` page to include `Top margin` toggle explanation.
+- Updated `Tasks` page to include `Auto tasks` toggle explanation, refreshing and hotkey information.
+
+## Release v1.1.1
 ### New Features
 - Added Unicode support which fixed tag tracking not working with non-English languages that use letters like é, ñ, ü, ç or indeed, any characters in Latin, Greek, Cyrillic, Hebrew, Arabic, Hindi, Japanese, Chinese, and many more including emoji.
 
 ### Documentation
-- Updated `Tasks` page to explain introduction of unicode tags to support most languages.
+- Updated `Tasks` page to explain introduction of Unicode tags to support most languages.
 
 ## Release v1.1.0
 ### New Features
