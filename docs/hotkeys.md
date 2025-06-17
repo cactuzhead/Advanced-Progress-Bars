@@ -1,4 +1,5 @@
----Hotkeys
+---
+title: Hotkeys
 has_toc: false
 back_to_top: true
 back_to_top_text: "Back to top"
