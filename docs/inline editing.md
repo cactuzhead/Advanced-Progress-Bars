@@ -7,7 +7,7 @@ nav_order: 65
 ---
 
 ## Inline Edit Toggle
-When toggled on, you will now see a gear icon appear to the right of the progress bar\'s text which will allow you to edit the progress bar'\s value without manually editing the code block itself.
+When toggled on, you will now see a gear icon appear to the right of the progress bar's text which will allow you to edit the progress bar's value without manually editing the code block itself.
 
 ![Slider](/assets/Obsidian Advanced Progress Bars - Gear.png)
 
