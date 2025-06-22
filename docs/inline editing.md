@@ -29,7 +29,7 @@ If your screen width is limited, the popup panel may adjust, with buttons arrang
 
 
 ## Gear Icon Colors
-You can change the color of the gear icon using the two colorpicker settings or select one of the Light & dark presets.
+You can change the color of the gear icon using the two colorpicker settings or select one of the light & dark presets.
 
 ## Step Size
 This is where you set the value you want to add or subtract when pressing the `+` and `-` buttons in every inline edit panel.
