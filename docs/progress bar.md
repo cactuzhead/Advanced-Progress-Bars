@@ -3,7 +3,7 @@ title: Progress Bar
 has_toc: false
 back_to_top: true
 back_to_top_text: "Back to top"
-nav_order: 4
+nav_order: 40
 ---
 
 ## Progress Bar Settings

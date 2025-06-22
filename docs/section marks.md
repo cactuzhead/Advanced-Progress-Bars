@@ -3,7 +3,7 @@ title: Section Marks
 has_toc: false
 back_to_top: true
 back_to_top_text: "Back to top"
-nav_order: 5
+nav_order: 50
 ---
 
 ## Section Mark Settings

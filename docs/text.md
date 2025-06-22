@@ -3,7 +3,7 @@ title: Text
 has_toc: false
 back_to_top: true
 back_to_top_text: "Back to top"
-nav_order: 6
+nav_order: 60
 ---
 
 ## Text Settings

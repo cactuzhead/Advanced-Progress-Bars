@@ -3,7 +3,7 @@ title: Dashboard++
 has_toc: false
 back_to_top: true
 back_to_top_text: "Back to top"
-nav_order: 13
+nav_order: 130
 ---
 
 ## Using in Dashboard++

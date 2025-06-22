@@ -3,7 +3,7 @@ title: Templates
 has_toc: false
 back_to_top: true
 back_to_top_text: "Back to top"
-nav_order: 12
+nav_order: 120
 ---
 
 ## Templates  <span class="label label-green badge">NEW v1.1.0</span>

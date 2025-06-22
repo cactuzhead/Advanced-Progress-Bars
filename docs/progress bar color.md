@@ -3,7 +3,7 @@ title: Progress Bar Color
 has_toc: false
 back_to_top: true
 back_to_top_text: "Back to top"
-nav_order: 10
+nav_order: 100
 ---
 
 ## Progress Bar Color Settings
