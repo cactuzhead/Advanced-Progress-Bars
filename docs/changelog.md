@@ -8,7 +8,18 @@ nav_order: 999
 
 # Changelog
 
-## Release v1.1.2 <span class="label label-green badge">NEW</span>
+## Release v1.1.3 <span class="label label-green badge">NEW</span>
+### New Features
+- Inline editing for swift adjustments to the value of a standard progress bar (without a tag).
+
+### Bug Fixes
+- Hotkeys are now enabled immediately upon plugin activation, allowing seamless interaction without needing to render a progress bar first.
+
+### Documentation
+- Added `Inline Edit` page to explain the 4 new settings.
+- Added `Hotkeys` page for quick access to hotkey setup information.
+
+## Release v1.1.2
 ### New Features
 - Added a new toggle in the `Progress bar container` section of the settings called `Top margin`.  This will allow you to choose to set a larger margin at the top of the code block so that the </> is now above the progress bars container when you hover over it.
 - Added a new toggle in the `tasks` section of the settings called `Auto tasks`.  This will allow you to turn `on` automatic task refreshing or `off` for manual refreshing.  It is **highly recommended** that you have this turned `off` and use a manual refresh hotkey or page switching.
