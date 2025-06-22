@@ -148,7 +148,7 @@ const DEFAULT_SETTINGS: Partial<ObsidianProgressBarsSettings> = {
 	APB_gearHoverColor: '#3db9d1',
 	APB_gearHoverLightColor: '#bb3574',
 	APB_inlinePanelColor: '#5e67ed',
-	APB_inlineButtonColor: '#ff00ff',
+	APB_inlineButtonColor: '#ffffff',
 	APB_inlineTextColor: '#3f46b0',
 	/* Override Error Settings */
 	APB_overageToggle: false,
@@ -1971,7 +1971,7 @@ new Setting(containerEl)
 		'When toggled on, the progress bar container will have a larger margin at the top to avoid text being obscured by the %%</>%% in the top right of the code block when you mouse over.',
 		'APB_TopMarginToggle');
 
-		
+
 	/************ SECTION Box Shadow *************/	
 	const setting9 = new Setting(containerEl).setName('Box shadow').setHeading();
 	const heading9 = setting9.settingEl.querySelector('.setting-item-name');
