@@ -46,7 +46,7 @@ If the desired value isn't reachable with the current step size, you can modify 
 If you have the `Override large value error` toggle in the `Override error` section turned on, then you can continue to increase the value past the total.  As always, this overage will be highlighted with the percentage value changing color.
 
 ## Automatic Top Margin
-If the first Advanced Progress Bar in your code block has a gear icon, then the top margin will automtically be enlarged so that the code block's `</>` is not obscuring the gear icon.
+If the first Advanced Progress Bar in your code block has a gear icon, then the top margin will automatically be enlarged so that the code block's `</>` is not obscuring the gear icon.
 
 {: .note }
 This will happen regardless of whether you have the `Top margin` toggle turned `on` in the `Progress bar container` section of the settings.
