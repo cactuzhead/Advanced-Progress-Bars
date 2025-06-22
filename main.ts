@@ -50,6 +50,16 @@ interface ObsidianProgressBarsSettings {
 	APB_completedToggle: boolean;
 	APB_completedColor: string;
 	APB_completedLightColor: string;
+	/* Inline Edit Gear Settings */
+	APB_inlineEditToggle: boolean;
+	APB_inlineEditStepSize: number;
+	APB_gearColor: string;
+	APB_gearLightColor: string;
+	APB_gearHoverColor: string;
+	APB_gearHoverLightColor: string;
+	APB_inlinePanelColor: string;
+	APB_inlineButtonColor: string;
+	APB_inlineTextColor: string;
 	/* Override Error Settings */
 	APB_overageToggle: boolean;
 	APB_overageColor: string;
@@ -130,6 +140,16 @@ const DEFAULT_SETTINGS: Partial<ObsidianProgressBarsSettings> = {
 	APB_completedToggle: true,
 	APB_completedColor: '#c1d7f9',
 	APB_completedLightColor: '#44546f',
+	/* Inline Edit Gear Settings */
+	APB_inlineEditToggle: false,
+	APB_inlineEditStepSize: 1,
+	APB_gearColor: '#24647f',
+	APB_gearLightColor: '#796c72',
+	APB_gearHoverColor: '#3db9d1',
+	APB_gearHoverLightColor: '#bb3574',
+	APB_inlinePanelColor: '#5e67ed',
+	APB_inlineButtonColor: '#ff00ff',
+	APB_inlineTextColor: '#3f46b0',
 	/* Override Error Settings */
 	APB_overageToggle: false,
 	APB_overageColor: '#38edef',
@@ -212,6 +232,79 @@ export default class ObsidianProgressBars extends Plugin {
             this.registerEvents();
             this.hasRegisteredEvents = true;
         }
+
+		// Register a custom command to paste text
+		this.addCommand({
+			id: 'paste-code-block',
+			name: 'Paste code block',
+
+			editorCallback: async (editor, view) => {
+				editor.focus();
+				// Ensure editor is valid
+				if (!editor) {
+					new Notice("No active editor found!");
+					return;
+				}
+
+				// Construct the code block text
+				const valueFromPercentageOfTotal = Math.floor((this.settings.APB_total/100) * this.settings.APB_progressBarPercentage);
+				const codeBlockText = `\`\`\`apb\n${this.settings.APB_title}: ${valueFromPercentageOfTotal}/${this.settings.APB_total}\n\`\`\``;
+
+				// Get the current cursor position
+				const cursor = editor.getCursor();
+
+				// Insert the code block text at the cursor position
+				editor.replaceRange(codeBlockText, cursor);
+
+				// Calculate the new cursor position
+				const lines = codeBlockText.split('\n');
+				const newCursor = {
+					line: cursor.line + lines.length - 1,
+					ch: lines[lines.length - 1].length // Length of the last line
+				};
+
+				// Ensure the cursor moves after the insertion
+				setTimeout(() => {
+					editor.setCursor(newCursor);
+					editor.refresh();
+				}, 0); // Zero-delay timeout ensures this runs after DOM updates
+			},
+		});
+
+		// Register a custom command to manually refresh
+		this.addCommand({
+			id: 'task-manual-refresh',
+			name: 'Task manual refresh',
+
+			callback: async () => {
+				if (this.isUpdating || !this.settings.APB_allowTasksToggle) return;
+				if (this.settings.APB_autoTasksToggle) return;
+
+				new Notice('Processing Task Update ...', 2000);
+
+				try {
+					this.isUpdating = true;					
+					await this.updateProgress();
+					new Notice('Task Update Completed', 2000);	
+				} catch (error) {
+					// Show error notice if update fails
+					new Notice('Task Update Failed: ' + error.message, 2000);
+				} finally {
+					// Delay reset to ensure async events are caught
+					setTimeout(() => {
+						this.isUpdating = false;
+					}, 2000);
+				}
+
+				const activeFile = this.app.workspace.getActiveFile();
+				if (!activeFile) {
+					new Notice('No active file to refresh', 2000);
+					return;
+				}
+				// await this.processTaskUpdate(activeFile);
+			}
+		});
+
 	}
 
 	// Check for apb code blocks with tags
@@ -824,6 +917,168 @@ export default class ObsidianProgressBars extends Plugin {
 
 				APB_container.appendChild(APB_background);
 				APB_container.appendChild(APB_subtask);
+
+				// Progress bar has NO tag 
+				if (!extractedTag && this.settings.APB_inlineEditToggle) {
+
+					// top margin if 1st progress bar in APB block has gear icon
+					if(index == 0) {
+						APB_container.style.marginTop = '25px';
+					} else {
+						APB_container.style.marginTop = '7px';
+					}
+
+					// Settings gear button
+					const settingsButton = document.createElement('button');
+					settingsButton.className = 'progressBar-settings-button';
+					settingsButton.innerHTML = `
+					<svg class="settings-icon" width="16" height="16" viewBox="0 0 24 24" fill="`+this.settings.APB_gearColor+`" xmlns="http://www.w3.org/2000/svg">
+						<path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97s-.03-.66-.07-.97l2.03-1.63a.5.5 0 0 0 .11-.64l-2-3.46a.5.5 0 0 0-.61-.22l-2.39.96c-.51-.38-1.06-.7-1.65-.97l-.36-2.55a.5.5 0 0 0-.5-.41h-4a.5.5 0 0 0-.5.41l-.36 2.55c-.59.27-1.14.59-1.65.97l-2.39-.96a.5.5 0 0 0-.61.22l-2 3.46a.5.5 0 0 0 .11.64l2.03 1.63c-.04.31-.07.65-.07.97s.03.66.07.97l-2.03 1.63a.5.5 0 0 0-.11.64l2 3.46a.5.5 0 0 0 .61.22l2.39-.96c.51.38 1.06.7 1.65.97l.36 2.55a.5.5 0 0 0 .5.41h4a.5.5 0 0 0 .5-.41l.36-2.55c.59-.27 1.14-.59 1.65-.97l2.39.96a.5.5 0 0 0 .61-.22l2-3.46a.5.5 0 0 0-.11-.64l-2.03-1.63z"/>
+					</svg>
+					`;
+					settingsButton.style.backgroundColor = this.settings.APB_colorBackground;
+					settingsButton.style.border = '1px solid ' + this.settings.APB_colorBackground;
+					settingsButton.style.display = 'inline-flex';
+					settingsButton.style.alignItems = 'center';
+					settingsButton.style.justifyContent = 'center';
+					settingsButton.style.boxShadow = 'none';
+
+					// Programmatically set hover color
+					const hoverColor = this.settings.APB_gearHoverColor || '#666666';
+					const style = document.createElement('style');
+					style.setAttribute('data-plugin', 'SvgIconPlugin');
+					style.textContent = `
+						.progressBar-settings-button:hover .settings-icon {
+							fill: ${hoverColor};
+						}
+					`;
+					document.head.appendChild(style);
+
+					// Pop-up panel
+					const panel = document.createElement('div');
+					panel.className = 'progressBar-settings-panel';   
+					panel.style.backgroundColor = this.settings.APB_inlinePanelColor;
+
+					const input = document.createElement('input');
+					input.type = 'number';
+					input.value = current.toString();
+					input.style.width = '60px';
+					input.style.marginRight = '5px';
+					input.style.border = 'none';
+					input.style.boxShadow = 'none';
+
+					const buttonContainer = document.createElement('div');
+					buttonContainer.style.display = 'flex';
+					buttonContainer.style.flexWrap = 'wrap';
+					buttonContainer.style.gap = '5px';
+					buttonContainer.style.margin = '3px';
+
+					const incrementButton = document.createElement('button');
+					incrementButton.textContent = '+' + this.settings.APB_inlineEditStepSize;
+					incrementButton.style.backgroundColor = this.settings.APB_inlineButtonColor;
+					incrementButton.style.color = this.settings.APB_inlineTextColor;
+
+					const decrementButton = document.createElement('button');
+					decrementButton.textContent = '−' + this.settings.APB_inlineEditStepSize;
+					decrementButton.style.backgroundColor = this.settings.APB_inlineButtonColor;
+					decrementButton.style.color = this.settings.APB_inlineTextColor;
+
+					const applyButton = document.createElement('button');
+					applyButton.textContent = 'Apply';
+					applyButton.style.backgroundColor = this.settings.APB_inlineButtonColor;
+					applyButton.style.color = this.settings.APB_inlineTextColor;
+
+					const cancelButton = document.createElement('button');
+					cancelButton.textContent = 'Cancel';
+					cancelButton.style.backgroundColor = this.settings.APB_inlineButtonColor;
+					cancelButton.style.color = this.settings.APB_inlineTextColor;
+
+					incrementButton.addEventListener('click', (e) => {
+						e.stopPropagation();
+						const currentValue = parseInt(input.value);
+						if (isNaN(currentValue)) {
+							new Notice("Invalid progress value", 2000);
+							return;
+						}
+						let newValue = currentValue + this.settings.APB_inlineEditStepSize;
+						if (!this.settings.APB_overageToggle) {
+							newValue = Math.min(Math.max(newValue, 0), total);
+						}
+						input.value = newValue.toString();
+					});
+
+					decrementButton.addEventListener('click', (e) => {
+						e.stopPropagation();
+						const currentValue = parseInt(input.value);
+						if (isNaN(currentValue)) {
+							new Notice("Invalid progress value", 2000);
+							return;
+						}
+						const stepSize = this.settings.APB_inlineEditStepSize || 1;
+						let newValue = currentValue - stepSize;
+						newValue = Math.max(newValue, 0); // Prevent going below 0
+						input.value = newValue.toString();
+					});
+
+					applyButton.addEventListener('click', async (e) => {
+						e.stopPropagation();
+						if (!this.settings.APB_allowTasksToggle) {
+							new Notice('Task updates are disabled', 2000);
+							return;
+						}
+						const activeFile = this.app.workspace.getActiveFile();
+						if (!activeFile) {
+							new Notice('No active file', 2000);
+							return;
+						}
+						const newCurrent = parseInt(input.value);
+						if (isNaN(newCurrent)) {
+							new Notice('Invalid number', 2000);
+							return;
+						}
+						await this.updateProgressValue(activeFile, index, newCurrent, total, row);
+						panel.style.display = 'none';
+					});
+
+					cancelButton.addEventListener('click', (e) => {
+						e.stopPropagation();
+						panel.style.display = 'none';
+					});
+
+					// outside click handler
+					const outsideClickHandler = (e: MouseEvent) => {
+						const target = e.target as Node;
+						if (!panel.contains(target) && !settingsButton.contains(target)) {
+							panel.style.display = 'none';
+						}
+					};
+
+					settingsButton.addEventListener('click', (e) => {
+						e.stopPropagation();
+						e.preventDefault();
+						const isVisible = panel.style.display === 'flex';
+						panel.style.display = isVisible ? 'none' : 'flex';
+						if (!isVisible) {
+							input.value = current.toString(); // Reset input on open
+							input.focus();
+							document.addEventListener('click', outsideClickHandler, { capture: true });
+						} else {
+							document.removeEventListener('click', outsideClickHandler, { capture: true });
+						}
+					});
+
+					buttonContainer.appendChild(input);
+					buttonContainer.appendChild(decrementButton);
+					buttonContainer.appendChild(incrementButton);
+					buttonContainer.appendChild(applyButton);
+					buttonContainer.appendChild(cancelButton);
+					
+					panel.appendChild(buttonContainer);
+
+					APB_textContainer.appendChild(settingsButton);
+					APB_textContainer.appendChild(panel);
+
+				}
 				
 				el.appendChild(APB_container);
 
@@ -839,79 +1094,96 @@ export default class ObsidianProgressBars extends Plugin {
 				}
 		  	});
 		};
+	}
 
-		// Register a custom command to paste text
-        this.addCommand({
-            id: 'paste-code-block',
-            name: 'Paste code block',
 
-			editorCallback: async (editor, view) => {
-				editor.focus();
-				// Ensure editor is valid
-				if (!editor) {
-				  new Notice("No active editor found!");
-				  return;
-				}
 
-				// Construct the code block text
-				const valueFromPercentageOfTotal = Math.floor((this.settings.APB_total/100) * this.settings.APB_progressBarPercentage);
-				const codeBlockText = `\`\`\`apb\n${this.settings.APB_title}: ${valueFromPercentageOfTotal}/${this.settings.APB_total}\n\`\`\``;
+async updateProgressValue(file: TFile, rowIndex: number, newCurrent: number, total: number, originalRow: string) {
+	// if (this.settings.APB_autoTasksToggle) return;
 
-				// Get the current cursor position
-				const cursor = editor.getCursor();
+	// Clamp newCurrent
+	let clampedCurrent = newCurrent;
+	if (!this.settings.APB_overageToggle) {
+		clampedCurrent = Math.min(Math.max(newCurrent, 0), total);
+	} else {
+		clampedCurrent = Math.max(newCurrent, 0);
+	}
 
-				// Insert the code block text at the cursor position
-				editor.replaceRange(codeBlockText, cursor);
+	// Read file content
+	const content = await this.app.vault.read(file);
+	const rows = content.split('\n');
 
-				// Calculate the new cursor position
-				const lines = codeBlockText.split('\n');
-				const newCursor = {
-					line: cursor.line + lines.length - 1,
-					ch: lines[lines.length - 1].length // Length of the last line
-				};
+	// Find the row matching originalRow
+    let targetRowIndex = -1;
+    for (let i = 0; i < rows.length; i++) {
+        if (rows[i].trim() === originalRow.trim()) {
+            targetRowIndex = i;
+            break;
+        }
+    }
 
-				// Ensure the cursor moves after the insertion
-				setTimeout(() => {
-					editor.setCursor(newCursor);
-					editor.refresh();
-				}, 0); // Zero-delay timeout ensures this runs after DOM updates
-			},
-			});
+	if (targetRowIndex === -1) {
+        console.error("Could not find row matching originalRow:", originalRow);
+        new Notice("Failed to update: Progress bar row not found", 2000);
+        return;
+    }
 
-			// Register a custom command to manually refresh
-        this.addCommand({
-            id: 'task-manual-refresh',
-            name: 'Task manual refresh',
+   	// Parse and update the row
+    const rowToUpdate = rows[targetRowIndex];
+	// Update the specific row
+	if (rowIndex < rows.length) {
+		// console.log("rowIndex:", rowIndex, "rows.length:", rows.length);
+		const match = rowToUpdate.match(/^(.+?)(?:#([\p{L}\p{N}\p{Emoji}_-]+))?(?:~(\d+)\/(\d+))?(?::\s*(\d+)\/(\d+))(?:\{([^}]+)\})?(?:\s.*)?$/u);
+		if (match) {
+			const label = match[1] || '';
+			const tag = match[2] ? `#${match[2]}` : '';
+			const subvalue = match[3] || '';
+			const subtotal = match[4] || '';
+			const subtasks = subvalue && subtotal ? `~${subvalue}/${subtotal}` : '';
+			const template = match[7] ? `{${match[7]}}` : '';
+			const trailing = rowToUpdate.match(/(?:\s.*)?$/)?.[0] || '';
+			const newRow = `${label}${tag}${subtasks}: ${clampedCurrent}/${total}${template}`;
 
-			callback: async () => {
-				if (this.isUpdating || !this.settings.APB_allowTasksToggle) return;
-				if (this.settings.APB_autoTasksToggle) return;
+			rows[targetRowIndex] = newRow;
 
-				new Notice('Processing Task Update ...', 2000);
+			// Write updated content
+			const newContent = rows.join('\n');
+			await this.app.vault.modify(file, newContent);
+			
+			try {
+				await this.app.vault.modify(file, newContent);
+				// console.log("File modified successfully");
+				const updatedContent = await this.app.vault.read(file);
+				// console.log("Updated file content:", updatedContent);
+			} catch (error) {
+				console.error("File write failed:", error);
+				new Notice("Failed to write to file: " + error.message, 2000);
+				return;
+			}
+
+
+		new Notice('APB Data Update ...', 2000);
 
 				try {
 					this.isUpdating = true;					
 					await this.updateProgress();
-					new Notice('Task Update Completed', 2000);	
+					
+					new Notice('APB Data Update Completed', 2000);	
 				} catch (error) {
 					// Show error notice if update fails
-					new Notice('Task Update Failed: ' + error.message, 2000);
+					new Notice('APB Data Update Failed: ' + error.message, 2000);
 				} finally {
 					// Delay reset to ensure async events are caught
 					setTimeout(() => {
 						this.isUpdating = false;
 					}, 2000);
 				}
-
-            const activeFile = this.app.workspace.getActiveFile();
-            if (!activeFile) {
-                new Notice('No active file to refresh', 2000);
-                return;
-            }
-            // await this.processTaskUpdate(activeFile);
-        }
-   		 });
-	}
+				} else {
+        console.error("Regex failed to match row:", rowToUpdate);
+        new Notice("Failed to update: Invalid row format", 2000);
+    }
+  }
+}
 
 	async loadSettings() {
 	  	this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
@@ -1086,6 +1358,9 @@ new Setting(containerEl)
 		this.plugin.settings.APB_completedColor = DEFAULT_SETTINGS.APB_completedLightColor as string;
 		this.plugin.settings.APB_overageColor = DEFAULT_SETTINGS.APB_overageLightColor as string;
 
+		this.plugin.settings.APB_gearColor = DEFAULT_SETTINGS.APB_gearLightColor as string;
+		this.plugin.settings.APB_gearHoverColor = DEFAULT_SETTINGS.APB_gearHoverLightColor as string;		
+
 		this.plugin.settings.APB_colorBoxShadow = DEFAULT_SETTINGS.APB_colorLightBoxShadow as string;			
 		this.plugin.settings.APB_colorTaskText = DEFAULT_SETTINGS.APB_colorLightTaskText as string;
 		this.plugin.settings.APB_colorTaskBackground = DEFAULT_SETTINGS.APB_colorLightTaskBackground as string;
@@ -1108,6 +1383,9 @@ new Setting(containerEl)
 			this.plugin.settings.APB_colorBarBackground = DEFAULT_SETTINGS.APB_colorBarBackground as string;
 			this.plugin.settings.APB_completedColor = DEFAULT_SETTINGS.APB_completedColor as string;
 			this.plugin.settings.APB_overageColor = DEFAULT_SETTINGS.APB_overageColor as string;
+
+			this.plugin.settings.APB_gearColor = DEFAULT_SETTINGS.APB_gearColor as string;
+			this.plugin.settings.APB_gearHoverColor = DEFAULT_SETTINGS.APB_gearHoverColor as string;	
 
 			this.plugin.settings.APB_colorBoxShadow = DEFAULT_SETTINGS.APB_colorBoxShadow as string;
 			this.plugin.settings.APB_colorTaskText = DEFAULT_SETTINGS.APB_colorTaskText as string;
@@ -1625,6 +1903,30 @@ new Setting(containerEl)
 	this.createColorPickerSetting(containerEl, 'Completed text color', 'Select the color of the %%Completed%% text.',
 		'APB_completedColor', DEFAULT_SETTINGS.APB_completedLightColor as string, DEFAULT_SETTINGS.APB_completedColor as string);
 
+	/************ SECTION Inline Edit *************/
+	const setting6 = new Setting(containerEl).setName('Inline edit').setHeading();
+	const heading6 = setting6.settingEl.querySelector('.setting-item-name');
+	if (heading6) {heading6.addClass('header-highlight');}
+
+	/************ Inline Edit *************/
+	this.createToggleSetting(containerEl, 'Inline edit',
+		'When toggled on, you will see a gear icon to the right of the progress bar\'s text which allows you to edit the value without editing the code block.<br>(See documentation for full details)',
+		'APB_inlineEditToggle');
+
+	if (this.plugin.settings.APB_inlineEditToggle) {
+		/************ Gear Icon Color *************/
+		this.createColorPickerSetting(containerEl, 'Gear icon color', 'Choose the color of the %%gear icon%%.',
+			'APB_gearColor', DEFAULT_SETTINGS.APB_gearLightColor as string, DEFAULT_SETTINGS.APB_gearColor as string);
+
+		/************ Gear Icon Hover Color *************/
+		this.createColorPickerSetting(containerEl, 'Gear icon hover color', 'Choose the color for the %%gear icon\'s%% mouse hover effect.',
+			'APB_gearHoverColor', DEFAULT_SETTINGS.APB_gearHoverLightColor as string, DEFAULT_SETTINGS.APB_gearHoverColor as string);
+																			
+		/************ Step Size *************/
+		this.createSliderSetting(containerEl, 'Step size', 'Set the step size for the increment and decrement buttons on the inline edit panel.<br>(See documentation for full details)',
+			'APB_inlineEditStepSize', 1, 100, 1 );
+	}
+
 	/************ SECTION Override Container *************/	
 	const setting7 = new Setting(containerEl).setName('Override error').setHeading();
 	const heading7 = setting7.settingEl.querySelector('.setting-item-name');
@@ -1669,9 +1971,7 @@ new Setting(containerEl)
 		'When toggled on, the progress bar container will have a larger margin at the top to avoid text being obscured by the %%</>%% in the top right of the code block when you mouse over.',
 		'APB_TopMarginToggle');
 
-
-
-
+		
 	/************ SECTION Box Shadow *************/	
 	const setting9 = new Setting(containerEl).setName('Box shadow').setHeading();
 	const heading9 = setting9.settingEl.querySelector('.setting-item-name');

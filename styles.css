@@ -26,7 +26,7 @@
 
 .custom-container {
 	align-Items: center;
-	border-Radius: 7px;
+	border-radius: 7px;
 	border: 1px solid #689ded;		
 	display: flex;
 	justify-Content: space-between;
@@ -50,13 +50,18 @@
     border-radius: 7px;
     display: flex;
     flex-flow: row wrap;
-flex-direction: column;   
+    flex-direction: column;   
     justify-content: center;
     margin-top: 7px;   
     overflow: hidden;
     padding: 5px;
     position: relative;
     width: 100%;
+
+
+    min-height: 20px; /* Adjust based on progress bar height */
+    overflow: visible; /* Prevent clipping */
+    display: block; /* Ensure block-level behavior */
 }
 
 .progressBar-text-container {
@@ -293,6 +298,7 @@ li.apb-list-item .list-bullet {
 
 .block-language-apb {
     box-sizing: border-box;
+    overflow: auto;
 }
 
 
@@ -309,34 +315,86 @@ li.apb-list-item .list-bullet {
     justify-content: center;
   }
   
-  .template-setting-row .subtle-button svg {
-    width: 20px; /* Smaller icon size */
+.template-setting-row .subtle-button svg {
+    width: 20px;
     height: 20px;
-  }
+}
   
-  .template-setting-row .subtle-button:hover {
+.template-setting-row .subtle-button:hover {
     opacity: 1; /* Full opacity on hover for usability */
     filter: none; /* Remove grayscale on hover */
-  }
+}
   
-  .template-setting-row .subtle-button:disabled {
+.template-setting-row .subtle-button:disabled {
     opacity: 0.3; /* Even fainter when disabled */
     cursor: not-allowed;
-  }
+}
 
-  .default-setting-row .spacer-button {
+.default-setting-row .spacer-button {
     width: 84px;
     height: 10px;   
-    opacity: 0; /* Completely invisible */
+    opacity: 0;
     background-color: transparent;
     border: none;
     pointer-events: none; /* Prevent interaction */
     display: flex;
     align-items: center;
     justify-content: center;
-  }
+}
 
-  .default-setting-row .spacer-button svg {
-    width: 20px; /* Smaller icon size */
+.default-setting-row .spacer-button svg {
+    width: 20px;
     height: 20px;
-  }
+}
+
+.progressBar-settings-button {
+    background-color: transparent;
+    border-radius: 4px;
+    padding: 3px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: fit-content;
+}
+
+.progressBar-settings-button:hover {
+    fill: #b4b4b4;
+}
+
+.progressBar-settings-panel {
+    display: none;
+    position: absolute;
+    z-index: 10000;
+    right: 0;
+    top: 0;
+    border-radius: 7px;
+    padding: 5px 10px;
+    box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.8);
+    min-width: 100px;
+    max-width: 300px;
+    box-sizing: border-box;
+}
+
+.progressBar-settings-panel input {
+    width: 60px;
+    padding: 5px;
+    border-radius: 4px;
+    margin-right: 5px;
+    flex: 0 0 auto;
+}
+
+.progressBar-settings-panel button {
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    flex: 0 0 auto;
+}
+
+.progressBar-settings-panel button:hover {
+    filter: brightness(90%);
+}
+
+.progressBar-settings-panel button:active {
+    filter: brightness(90%);
+}
