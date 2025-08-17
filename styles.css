@@ -158,13 +158,6 @@
     margin-left: auto;
 }
 
-.demo-progressBar {
-	display: flex;
-	justify-Content: space-between;
-	margin: 0px;
-    align-Items: center;
-}
-
 .marks {
     height: 100%;
     left: 0;
@@ -274,15 +267,6 @@ li.apb-list-item .list-bullet {
     max-width: 80px;
 }
 
-.progress-bar-container {
-    width: 100%;
-    height: 20px;
-    background: #f0f0f0; /* Unfilled part = light gray */
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-  }
-
 .APB {
     position: relative;
     overflow: visible; /* Allow mask to render outside bounds */
@@ -295,12 +279,6 @@ li.apb-list-item .list-bullet {
 .progressBar-mask, .progressBar-mask * {
     background-color: transparent !important;
 }
-
-.block-language-apb {
-    box-sizing: border-box;
-    overflow: auto;
-}
-
 
 .template-setting-row .subtle-button {
     width: 20px;
@@ -397,4 +375,34 @@ li.apb-list-item .list-bullet {
 
 .progressBar-settings-panel button:active {
     filter: brightness(90%);
+}
+
+.container-color-picker-panel {
+    padding: 10px;
+    border: 2px solid light-dark(#4b52be, #5e67ed);
+    background-color: var(--background-secondary);
+    margin-top: 10px;
+    margin-left: 20px;
+    border-radius: 7px;    
+}
+
+.default-container-color-picker-panel {
+    padding: 10px;
+    border: 2px solid light-dark(#45ba69, #5eed89); /* var(--background-modifier-border); */
+    background-color: var(--background-secondary);
+    margin-top: 10px;
+    margin-left: 20px;
+    border-radius: 7px;    
+}
+
+.active-default-gear {
+    border: 2px solid light-dark(#45ba69, #5eed89);
+}
+
+.active-template-gear {
+    border: 2px solid light-dark(#4b52be, #5e67ed);
+}
+
+.inactive-gear  {
+    border: 2px solid var(--background-modifier-border); 
 }
