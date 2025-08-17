@@ -6,17 +6,21 @@ back_to_top_text: "Back to top"
 nav_order: 100
 ---
 
-## Progress Bar Color Settings
+## Progress Bar Color Settings <span class="label label-red badge">REMOVED v1.1.4</span>
+
+{: .removed }
+These settings were removed in version 1.1.4 as most of the colors are now handled with the expanded template system.
+
 Here, you will find all the available color options for customizing the progress bar.
 
-### Completed Color
+### Completed Color <span class="label label-red badge">REMOVED v1.1.4</span>
 This color is what the progress bar will be when it has reached 100%.
 
 ![Error](/assets/Obsidian Advanced Progress Bars - Error Override.png)
 
 You can see in the image above, that the completed progress bar is using the default `Dark` option which is a light blue-grey color.
 
-### Bar Background Color
+### Bar Background Color <span class="label label-red badge">REMOVED v1.1.4</span>
 This is the color for the remaining portion of the progress bar.
 In this example it is a mid blue-grey color.
 
