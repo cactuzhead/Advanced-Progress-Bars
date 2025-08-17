@@ -6,7 +6,7 @@ back_to_top_text: "Back to top"
 nav_order: 120
 ---
 
-## Templates  <span class="label label-green badge">NEW v1.1.0</span>
+## Templates  <span class="label label-grey badge">NEW v1.1.0</span>
 Starting in release `1.1.0`, you now have the ability to assign a custom template to each individual progress bar.
 
 This update removed a lot of the color and gradient settings from the `Progress Bar Color` section and instead, moved them to a simplified default template.
@@ -17,6 +17,10 @@ The default template will automatically be applied to all progress bars that hav
 **All** progress bars will still use all the other defaults set outwith the templating feature.  These include, but are not limited to marks, text and tasks.
 
 With the introduction of templates, you can now have gradients with up to 5 equally spaced color stops for greater customisation.
+
+<span class="label label-green badge">NEW v1.1.4</span>
+{: .note }
+With the introduction of version 1.1.4 most of the default color settings have now been moved into the template system for greater customisability. Please visit our `Templates Extended` page for full details.
 
 ## Add Template
 To add a new template, press the `Add Template` button and a new template row will be added to the bottom of the template list.
