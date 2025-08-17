@@ -7,6 +7,7 @@ nav_order: 60
 ---
 
 ## Text Settings <span class="label label-grey badge">REMOVED v1.1.4</span>
+
 {: .removed }
 The text settings were removed in version 1.1.4 as these are now handled with the expanded template system.
 
