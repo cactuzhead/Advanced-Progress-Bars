@@ -129,8 +129,6 @@ Once you toggle the task linking setting to `on`, two additional color settings 
 ## Sub Tasks
 In addition to the color settings mentioned above, you should also see a new toggle option called `Enable Sub-Task Linking`.
 
-<span class="label label-grey badge">REMOVED v1.1.4</span>
-
 {: .removed }
 The sub task color settings were removed in version 1.1.4 as these are now handled with the expanded template system.
 
