@@ -5,6 +5,18 @@ interface Template {
 	gradient: boolean;
 	gradientType: boolean;
 	colors: string[]; // Array of up to 5 colors
+	isColorPanelVisible: boolean;
+	borderColor: string;
+	backgroundColor: string;
+	titleTextColor: string;
+	percentageTextColor: string;
+	fractionTextColor: string;
+	completedTextColor: string;
+	completedColor: string;
+	barBackgroundColor: string;
+	colorSubTaskCompletedText: string;
+	colorSubTaskText: string;
+	[key: string]: string | string[] | boolean;
 }
 
 interface TextSegment {
@@ -100,7 +112,8 @@ interface ObsidianProgressBarsSettings {
 	APB_colorLightSubTaskCompletedText: string;
 	/* Additional Settings */
 	APB_progressBarChange: boolean;
-	APB_fallbackColor: string;	
+	APB_fallbackColor: string;
+	APB_pureBlack: string;
 	/* Default Color Palettes */
 	defaultLightColors: string[];
   	defaultDarkColors: string[];
@@ -109,6 +122,8 @@ interface ObsidianProgressBarsSettings {
 	defaultTemplate: Template;	
 	/* Templates */	
 	templates: Template[];
+	APB_isColorPanelVisible: boolean;
+	[key: string]: string | string[] | Template | Template[] | number | boolean; // Added index signature
 }
 
 const DEFAULT_SETTINGS: Partial<ObsidianProgressBarsSettings> = {
@@ -191,6 +206,7 @@ const DEFAULT_SETTINGS: Partial<ObsidianProgressBarsSettings> = {
 	/* Additional Settings */
 	APB_progressBarChange: true,
 	APB_fallbackColor: '#2978ef',
+	APB_pureBlack: '#000000',
 	/* Default Color Palettes */
 	defaultLightColors: ['#278378', '#2baab9', '#4a32e2', '#7c328e', '#c11e49'], // old APB_color1Light to APB_color5Light
   	defaultDarkColors: ['#2978ef', '#8ec822', '#dfaa22', '#c84922', '#dd4a86'], // old APB_color1 to APB_color5
@@ -200,10 +216,21 @@ const DEFAULT_SETTINGS: Partial<ObsidianProgressBarsSettings> = {
 		name: 'Default',
 		gradient: true,
 		gradientType: false,
-		colors: ['#2978ef', '#8ec822', '#dfaa22', '#c84922', '#dd4a86'] // Match old APB_color1 to APB_color5
-	  },
+		colors: ['#2978ef', '#8ec822', '#dfaa22', '#c84922', '#dd4a86'], // Match old APB_color1 to APB_color5
+		isColorPanelVisible: false,
+		borderColor: '#474f62',
+		backgroundColor: '#242a35',
+		titleTextColor: '#8fa0ba',
+		percentageTextColor: '#c1d7f9',
+		fractionTextColor: '#8fa0ba',
+		completedTextColor: '#c1d7f9',
+		completedColor: '#576178',
+		barBackgroundColor: '#3b4252',
+		colorSubTaskText: '#8fa0ba',
+		colorSubTaskCompletedText: '#6dd374'
+	},
 	/* Array of templates */
-	  templates: []
+	  templates: []	
 	}
 
 
@@ -487,8 +514,8 @@ export default class ObsidianProgressBars extends Plugin {
 					const hasMatchingProgressBar = await this.findMatchingTasks(extractedTag);
 					tagSpan.id = hasMatchingProgressBar ? 'APB_tag' : 'APB_notag';
 					if (tagSpan.id == 'APB_tag') {
-						tagSpan.style.color = this.settings.APB_colorTaskText;
-						tagSpan.style.background = this.settings.APB_colorTaskBackground;
+						tagSpan.style.color = 'rgba(255, 255, 255, 0.8)';
+						tagSpan.style.background ='rgba(0, 0, 0, 0.4)';
 					}
 					tagSpan.textContent = hasMatchingProgressBar ? extractedTag : '#' + extractedTag + ' not found';	
 				} else {
@@ -559,6 +586,24 @@ export default class ObsidianProgressBars extends Plugin {
 		});
 	  }
 
+// Helper to find template index by name
+getTemplateIndexByName(name: string): number {
+	return this.settings.templates.findIndex(template => template.name === name);
+}
+ 
+// Helper to apply container styles
+private applyContainerStyle(
+    container: HTMLElement,
+    property: 'border' | 'background', // Restrict to valid properties
+    color: string,
+    defaultValue: string,
+    pureBlack: string
+): void {
+    container.style[property] = color !== pureBlack 
+        ? (property === 'border' ? `1px solid ${color}` : color)
+        : defaultValue;
+}
+
 	renderProgressBar(source: string, el: HTMLElement) { {	
 			// Split the source string into rows
 			const rows = source.trim().split('\n');
@@ -611,17 +656,16 @@ export default class ObsidianProgressBars extends Plugin {
 					APB_container.style.marginTop = '7px';
 				}
 
-				if (this.settings.APB_borderToggle) {
-					APB_container.style.border = '1px solid'+ this.settings.APB_colorBorder;
-				} else {
-					APB_container.style.border = '0px';
-				}
 
-				if (this.settings.APB_backgroundToggle) {
-					APB_container.style.background = this.settings.APB_colorBackground;
-				} else {
-					APB_container.style.background = 'transparent';
-				}			
+				// Set newTemplateName to be either defaultTemplate or templates[templateIndex]
+				const templateIndex = this.getTemplateIndexByName(templateName);
+				const newTemplateName = (!templateName.trim() || templateIndex === -1)
+					? this.settings.defaultTemplate
+					: this.settings.templates[templateIndex];
+
+				this.applyContainerStyle(APB_container, 'border', newTemplateName.borderColor, '0px', this.settings.APB_pureBlack);
+				this.applyContainerStyle(APB_container, 'background', newTemplateName.backgroundColor, 'transparent', this.settings.APB_pureBlack);
+				
 
 				const boxShadowInset = this.settings.APB_boxShadowInsetToggle ? ' inset ' : '';
 
@@ -653,7 +697,8 @@ export default class ObsidianProgressBars extends Plugin {
 				// APB_Title
 				const APB_title = document.createElement('div');
 				APB_title.addClass('progressBar-title');
-				if (this.settings.APB_titleToggle) {
+				// if (this.settings.defaultTemplate.titleTextColor !== this.settings.APB_pureBlack) {	
+				if (newTemplateName.titleTextColor !== this.settings.APB_pureBlack) {				
 
 					// Split the titleWithSubtasks into title, tag, and optional subtasks
 					const subtaskSplit = label.split('~');
@@ -682,35 +727,43 @@ export default class ObsidianProgressBars extends Plugin {
 					}
 
 					APB_title.createEl('span', { text: label });
-					APB_title.style.color = this.settings.APB_titleColor;
+					APB_title.style.color = newTemplateName.titleTextColor;
 				}
 				const APB_subtask = document.createElement('div');
 
 				// Sub Tasks
-				if (this.settings.APB_allowTasksToggle && this.settings.APB_allowSubTasksToggle) {
+				if (this.settings.APB_allowTasksToggle && this.settings.APB_allowSubTasksToggle) {					
 					if (subtotal !== null && subtotal !==0) {
 						if (subvalue == subtotal) {
-							APB_subtask.addClass('progressBar-subtask-completed');							
-							APB_subtask.style.color = this.settings.APB_colorSubTaskCompletedText;							
-							APB_subtask.createEl('span', { text: 'Sub Tasks - ' + subvalue + '/' + subtotal + ' completed'});	
+							APB_subtask.addClass('progressBar-subtask-completed');
+							if (newTemplateName.colorSubTaskCompletedText && newTemplateName.colorSubTaskCompletedText !== this.settings.APB_pureBlack) {					
+								APB_subtask.style.color = newTemplateName.colorSubTaskCompletedText as string;							
+								APB_subtask.createEl('span', { text: 'Sub Tasks - ' + subvalue + '/' + subtotal + ' completed'});
+							} else {
+								newTemplateName.colorSubTaskCompletedText = this.settings.APB_pureBlack;
+							}
 						} else {
 							APB_subtask.addClass('progressBar-subtask');
-							APB_subtask.style.color = this.settings.APB_colorSubTaskText;	
-							APB_subtask.createEl('span', { text: 'Sub Tasks - ' + subvalue + '/' + subtotal });
+							if (newTemplateName.colorSubTaskText && newTemplateName.colorSubTaskText !== this.settings.APB_pureBlack) {
+								APB_subtask.style.color = newTemplateName.colorSubTaskText as string;
+								APB_subtask.createEl('span', { text: 'Sub Tasks - ' + subvalue + '/' + subtotal });
+							} else {
+								newTemplateName.colorSubTaskText = this.settings.APB_pureBlack;
+							}
 						}
-					}
+					}					
 				}
 				
 				// APB_Percentage
 				const APB_percentage = document.createElement('div');
 				APB_percentage.addClass('progressBar-percentage');
-				if (this.settings.APB_percentageToggle) {
+				if (newTemplateName.percentageTextColor !== this.settings.APB_pureBlack) {
 					if(this.settings.APB_overageToggle && overage > 0) {
 						APB_percentage.createEl('span', { text: (overage+100)+'%' });
 						APB_percentage.style.color = this.settings.APB_overageColor;
 					} else {
 						APB_percentage.createEl('span', { text: clampedPercentage+'%' });
-						APB_percentage.style.color = this.settings.APB_percentageColor;
+						APB_percentage.style.color = newTemplateName.percentageTextColor;
 					}
 
 				}
@@ -718,17 +771,16 @@ export default class ObsidianProgressBars extends Plugin {
 				// APB_Value
 				const APB_value = document.createElement('div');
 				APB_value.addClass('progressBar-value');
-				if (this.settings.APB_fractionToggle) {
+				if (newTemplateName.fractionTextColor !== this.settings.APB_pureBlack) {
 					APB_value.createEl('span', { text: '('+current+'/'+total+')' });
-					APB_value.style.color = this.settings.APB_fractionColor;
+					APB_value.style.color = newTemplateName.fractionTextColor
 				}
 
 				// APB_Completed
 				const APB_completed = document.createElement('div');
 				APB_completed.addClass('progressBar-completed');
-				if (this.settings.APB_completedToggle) {
+				if (newTemplateName.completedTextColor !== this.settings.APB_pureBlack) {
 					APB_completed.createEl('span', { text: '' });
-					APB_completed.style.color = this.settings.APB_percentageColor;
 				}
 		
 				let template = null;
@@ -785,7 +837,7 @@ export default class ObsidianProgressBars extends Plugin {
 					APB.style.width = `${100 - clampedPercentage}%`;
 				}
 				
-				APB.style.background = this.settings.APB_colorBarBackground;
+				APB.style.background = newTemplateName.barBackgroundColor;
 				APB.style.height = `${this.settings.APB_height}px`;		
 
 				this.settingsTab.setEndCaps(APB_background, APB, this.settings.APB_endcapToggle,  clampedPercentage);
@@ -850,7 +902,7 @@ export default class ObsidianProgressBars extends Plugin {
 							<circle cx="0" cy="${this.settings.APB_height / 2}" r="${this.settings.APB_height / 2}" fill="black"/>
 							</mask>
 						</defs>
-						<rect x="0" y="-1" width="${(this.settings.APB_height + 10.5) / 2}" height="${this.settings.APB_height +3}" fill="${this.settings.APB_colorBarBackground}" mask="url(#${uniqueId})"/>
+						<rect x="0" y="-1" width="${(this.settings.APB_height + 10.5) / 2}" height="${this.settings.APB_height +3}" fill="${newTemplateName.barBackgroundColor}" mask="url(#${uniqueId})"/>
 						`;
 						filledBar.appendChild(mask);						
 				}
@@ -889,14 +941,14 @@ export default class ObsidianProgressBars extends Plugin {
 					}
 				} else {
 					// Completed Progress Bar	
-					APB.style.backgroundColor = this.settings.APB_colorBarCompleted;
-					if (this.settings.APB_completedToggle) {
+					APB.style.backgroundColor = newTemplateName.completedColor;
+					if (newTemplateName.completedTextColor !== this.settings.APB_pureBlack) {
 						APB_completed.addClass('progressBar-completed');
-						APB_completed.style.color = this.settings.APB_completedColor;
+						APB_completed.style.color = newTemplateName.completedTextColor;
 						APB_completed.textContent ='COMPLETED';
 					}						
 					filledBar.style.backgroundImage = '';
-					APB_background.style.backgroundColor = clampedPercentage === 100 ? this.settings.APB_colorBarCompleted : colors[0];
+					APB_background.style.backgroundColor = clampedPercentage === 100 ? newTemplateName.completedColor : colors[0];
 				}
 
 				APB_background.style.backgroundSize = '100% 100%';
@@ -905,13 +957,13 @@ export default class ObsidianProgressBars extends Plugin {
 				this.settings.APB_progressBarChange = true;
 				APB_container.appendChild(APB_textContainer);
 				
-				if (this.settings.APB_titleToggle) {
+				if (newTemplateName.titleTextColor !== this.settings.APB_pureBlack) {
 					APB_textContainer.appendChild(APB_title);
 				}
-				if (this.settings.APB_percentageToggle) {
+				if (newTemplateName.percentageTextColor !== this.settings.APB_pureBlack) {
 					APB_textContainer.appendChild(APB_percentage);
 				}
-				if (this.settings.APB_fractionToggle) {
+				if (newTemplateName.fractionTextColor !== this.settings.APB_pureBlack) {
 					APB_textContainer.appendChild(APB_value);
 				}
 
@@ -928,28 +980,43 @@ export default class ObsidianProgressBars extends Plugin {
 						APB_container.style.marginTop = '7px';
 					}
 
+
+					let contrastText: string;
+					let contrastTextHover: string;
+
+					// console.log(APB_container.style.background);
+					if (APB_container.style.background !== 'transparent') {
+							contrastText = getContrastTextColorRGB(APB_container.style.background, 0.3);
+							contrastTextHover = getContrastTextColorRGB(APB_container.style.background, 0.5);
+					} else {
+							contrastText ='#999999';
+							contrastTextHover ='#666666';
+					}
+
+
 					// Settings gear button
 					const settingsButton = document.createElement('button');
 					settingsButton.className = 'progressBar-settings-button';
 					settingsButton.innerHTML = `
-					<svg class="settings-icon" width="16" height="16" viewBox="0 0 24 24" fill="`+this.settings.APB_gearColor+`" xmlns="http://www.w3.org/2000/svg">
+					<svg class="settings-icon" width="16" height="16" viewBox="0 0 24 24" fill="`+contrastText+`" xmlns="http://www.w3.org/2000/svg">
 						<path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97s-.03-.66-.07-.97l2.03-1.63a.5.5 0 0 0 .11-.64l-2-3.46a.5.5 0 0 0-.61-.22l-2.39.96c-.51-.38-1.06-.7-1.65-.97l-.36-2.55a.5.5 0 0 0-.5-.41h-4a.5.5 0 0 0-.5.41l-.36 2.55c-.59.27-1.14.59-1.65.97l-2.39-.96a.5.5 0 0 0-.61.22l-2 3.46a.5.5 0 0 0 .11.64l2.03 1.63c-.04.31-.07.65-.07.97s.03.66.07.97l-2.03 1.63a.5.5 0 0 0-.11.64l2 3.46a.5.5 0 0 0 .61.22l2.39-.96c.51.38 1.06.7 1.65.97l.36 2.55a.5.5 0 0 0 .5.41h4a.5.5 0 0 0 .5-.41l.36-2.55c.59-.27 1.14-.59 1.65-.97l2.39.96a.5.5 0 0 0 .61-.22l2-3.46a.5.5 0 0 0-.11-.64l-2.03-1.63z"/>
 					</svg>
 					`;
-					settingsButton.style.backgroundColor = this.settings.APB_colorBackground;
-					settingsButton.style.border = '1px solid ' + this.settings.APB_colorBackground;
+					// settingsButton.style.backgroundColor = this.settings.APB_colorBackground;
+					settingsButton.style.backgroundColor = 'transparent';
+					// settingsButton.style.border = '1px solid ' + this.settings.APB_colorBackground;
+					settingsButton.style.border = '0px solid ' + 'transparent';
 					settingsButton.style.display = 'inline-flex';
 					settingsButton.style.alignItems = 'center';
 					settingsButton.style.justifyContent = 'center';
 					settingsButton.style.boxShadow = 'none';
 
-					// Programmatically set hover color
-					const hoverColor = this.settings.APB_gearHoverColor || '#666666';
+					// Programmatically set gear hover color					
 					const style = document.createElement('style');
 					style.setAttribute('data-plugin', 'SvgIconPlugin');
 					style.textContent = `
 						.progressBar-settings-button:hover .settings-icon {
-							fill: ${hoverColor};
+							fill: ${contrastTextHover};
 						}
 					`;
 					document.head.appendChild(style);
@@ -1209,9 +1276,13 @@ async updateProgressValue(file: TFile, rowIndex: number, newCurrent: number, tot
 // Create Settings Tab Content
 class ObsidianProgressBarsSettingTab extends PluginSettingTab {
 	plugin: ObsidianProgressBars;
-
+ 	colorPickerContainers: Record<number, HTMLDivElement> = {};
+	colorPickers: Record<string, ColorComponent> = {}; // Store color pickers by settingKey
+	
 	// Explicitly define the type of the event listener
     private copyButtonListener: (event: MouseEvent) => void;
+	colorPickerContainer: HTMLDivElement;
+	defaultColorPickerContainer: HTMLDivElement;
 
 	constructor(app: App, plugin: ObsidianProgressBars) {
 		super(app, plugin);
@@ -1331,72 +1402,6 @@ class ObsidianProgressBarsSettingTab extends PluginSettingTab {
 			}
 		});
 
-/************ SECTION Light & Dark *************/
-const setting = new Setting(containerEl).setName('Light & dark').setHeading();
-const heading = setting.settingEl.querySelector('.setting-item-name');
-if (heading) {heading.addClass('header-highlight');}
-
-
-/************ Light & Dark Quick Apply *************/
-descText = 'These two options %%(Light & Dark)%% will change %%ALL%% the color settings below to their respective defaults. (Templates and all other settings will remain unchanged).<br>Note: once selected, all previous colors will be lost forever and can not be retrieved.'
-segments = this.splitTextIntoSegments(descText);
-
-new Setting(containerEl)
-	.setName('Apply all light & dark color defaults (excluding templates)')
-	.setDesc(createFragment(frag => this.renderSegments(segments, frag)))
-	.addButton((button) =>
-	button.setIcon('sun').setTooltip('Reset to light default')	
-	.onClick(async() => {				
-		this.plugin.settings.APB_marksColor = DEFAULT_SETTINGS.APB_marksLightColor as string;
-		this.plugin.settings.APB_titleColor = DEFAULT_SETTINGS.APB_titleLightColor as string;
-		this.plugin.settings.APB_percentageColor = DEFAULT_SETTINGS.APB_percentageLightColor as string;
-		this.plugin.settings.APB_fractionColor = DEFAULT_SETTINGS.APB_fractionLightColor as string;
-		this.plugin.settings.APB_colorBorder = DEFAULT_SETTINGS.APB_colorLightBorder as string;
-		this.plugin.settings.APB_colorBackground = DEFAULT_SETTINGS.APB_colorLightBackground as string;
-		this.plugin.settings.APB_colorBarCompleted = DEFAULT_SETTINGS.APB_colorLightBarCompleted as string;
-		this.plugin.settings.APB_colorBarBackground = DEFAULT_SETTINGS.APB_colorLightBarBackground as string;
-		this.plugin.settings.APB_completedColor = DEFAULT_SETTINGS.APB_completedLightColor as string;
-		this.plugin.settings.APB_overageColor = DEFAULT_SETTINGS.APB_overageLightColor as string;
-
-		this.plugin.settings.APB_gearColor = DEFAULT_SETTINGS.APB_gearLightColor as string;
-		this.plugin.settings.APB_gearHoverColor = DEFAULT_SETTINGS.APB_gearHoverLightColor as string;		
-
-		this.plugin.settings.APB_colorBoxShadow = DEFAULT_SETTINGS.APB_colorLightBoxShadow as string;			
-		this.plugin.settings.APB_colorTaskText = DEFAULT_SETTINGS.APB_colorLightTaskText as string;
-		this.plugin.settings.APB_colorTaskBackground = DEFAULT_SETTINGS.APB_colorLightTaskBackground as string;
-		this.plugin.settings.APB_colorSubTaskText = DEFAULT_SETTINGS.APB_colorLightSubTaskText as string;
-		this.plugin.settings.APB_colorSubTaskCompletedText = DEFAULT_SETTINGS.APB_colorLightSubTaskCompletedText as string;
-
-		await this.plugin.saveSettings();
-		this.display();
-	}))
-	.addButton((button) =>
-		button.setIcon('moon').setTooltip('Reset to dark default')
-		.onClick(async() => {
-			this.plugin.settings.APB_marksColor = DEFAULT_SETTINGS.APB_marksColor as string;			
-			this.plugin.settings.APB_titleColor = DEFAULT_SETTINGS.APB_titleColor as string;
-			this.plugin.settings.APB_percentageColor = DEFAULT_SETTINGS.APB_percentageColor as string;
-			this.plugin.settings.APB_fractionColor = DEFAULT_SETTINGS.APB_fractionColor as string;
-			this.plugin.settings.APB_colorBorder = DEFAULT_SETTINGS.APB_colorBorder as string;
-			this.plugin.settings.APB_colorBackground = DEFAULT_SETTINGS.APB_colorBackground as string;
-			this.plugin.settings.APB_colorBarCompleted = DEFAULT_SETTINGS.APB_colorBarCompleted as string;
-			this.plugin.settings.APB_colorBarBackground = DEFAULT_SETTINGS.APB_colorBarBackground as string;
-			this.plugin.settings.APB_completedColor = DEFAULT_SETTINGS.APB_completedColor as string;
-			this.plugin.settings.APB_overageColor = DEFAULT_SETTINGS.APB_overageColor as string;
-
-			this.plugin.settings.APB_gearColor = DEFAULT_SETTINGS.APB_gearColor as string;
-			this.plugin.settings.APB_gearHoverColor = DEFAULT_SETTINGS.APB_gearHoverColor as string;	
-
-			this.plugin.settings.APB_colorBoxShadow = DEFAULT_SETTINGS.APB_colorBoxShadow as string;
-			this.plugin.settings.APB_colorTaskText = DEFAULT_SETTINGS.APB_colorTaskText as string;
-			this.plugin.settings.APB_colorTaskBackground = DEFAULT_SETTINGS.APB_colorTaskBackground as string;
-			this.plugin.settings.APB_colorSubTaskText = DEFAULT_SETTINGS.APB_colorSubTaskText as string;
-			this.plugin.settings.APB_colorSubTaskCompletedText = DEFAULT_SETTINGS.APB_colorSubTaskCompletedText as string;			
-
-			await this.plugin.saveSettings();
-			this.display();
-		})
-	);
 
 /************ SECTION Demo Progress Bar *************/
 const setting2 = new Setting(containerEl).setName('Demonstration progress bar').setHeading();
@@ -1410,14 +1415,14 @@ new Setting(containerEl)
 	const progressBarContainer = containerEl.createEl('div');
 	progressBarContainer.addClass('progressBar-container');
 
-	if (this.plugin.settings.APB_borderToggle) {
-		progressBarContainer.style.border = '1px solid'+ this.plugin.settings.APB_colorBorder;
+	if (this.plugin.settings.defaultTemplate.borderColor !== this.plugin.settings.APB_pureBlack) {
+		progressBarContainer.style.border = '1px solid'+ this.plugin.settings.defaultTemplate.borderColor;
 	} else {
 		progressBarContainer.style.border = '0px';
 	}
 
-	if (this.plugin.settings.APB_backgroundToggle) {
-		progressBarContainer.style.background = this.plugin.settings.APB_colorBackground;
+	if (this.plugin.settings.defaultTemplate.backgroundColor !== this.plugin.settings.APB_pureBlack) {
+		progressBarContainer.style.background = this.plugin.settings.defaultTemplate.backgroundColor;
 	} else {
 		progressBarContainer.style.background = 'transparent';
 	}	
@@ -1445,26 +1450,26 @@ new Setting(containerEl)
 	// DemoBar Title
 	const progressBarTitle = containerEl.createEl('div');
 	progressBarTitle.addClass('progressBar-title');
-	if (this.plugin.settings.APB_titleToggle) {
+	if (this.plugin.settings.defaultTemplate.titleTextColor !== this.plugin.settings.APB_pureBlack) {
 		progressBarTitle.createEl('span', { text: this.plugin.settings.APB_title });
-		progressBarTitle.style.color = this.plugin.settings.APB_titleColor;
+		progressBarTitle.style.color = this.plugin.settings.defaultTemplate.titleTextColor;
 	}
 
 	// DemoBar Percentage
 	const progressBarPercentage = containerEl.createEl('div');
 	progressBarPercentage.addClass('progressBar-percentage');
-	if (this.plugin.settings.APB_percentageToggle) {
+	if (this.plugin.settings.defaultTemplate.percentageTextColor !== this.plugin.settings.APB_pureBlack) {
 		progressBarPercentage.createEl('span', { text: this.plugin.settings.APB_progressBarPercentage+'%' });
-		progressBarPercentage.style.color = this.plugin.settings.APB_percentageColor;
+		progressBarPercentage.style.color = this.plugin.settings.defaultTemplate.percentageTextColor;
 	}
 
 	// DemoBar Value
 	const progressBarValue = containerEl.createEl('div');
 	progressBarValue.addClass('progressBar-value');
 	const valueFromPercentageOfTotal = Math.floor((this.plugin.settings.APB_total/100) * this.plugin.settings.APB_progressBarPercentage);
-	if (this.plugin.settings.APB_fractionToggle) {
+	if (this.plugin.settings.defaultTemplate.fractionTextColor !== this.plugin.settings.APB_pureBlack) {
 		progressBarValue.createEl('span', { text: '('+valueFromPercentageOfTotal+'/'+this.plugin.settings.APB_total+')' });
-		progressBarValue.style.color = this.plugin.settings.APB_fractionColor;
+		progressBarValue.style.color = this.plugin.settings.defaultTemplate.fractionTextColor;
 	}
 
 	// DemoBar
@@ -1486,7 +1491,8 @@ new Setting(containerEl)
 		progressBarBackground.style.width = `${String(numericWidth - 12)}px`; // -12 for 5px padding and for 1px border
 		progressbar.style.width = `${100 - clampedPercentage}%`;
 	}
-	progressbar.style.background = this.plugin.settings.APB_colorBarBackground;
+	progressbar.style.background = this.plugin.settings.defaultTemplate.barBackgroundColor;
+
 	progressBarContainer.style.margin = '17px';
 	progressbar.style.height = `${this.plugin.settings.APB_height}px`;
 
@@ -1521,7 +1527,7 @@ new Setting(containerEl)
 				<circle cx="0" cy="${this.plugin.settings.APB_height / 2}" r="${this.plugin.settings.APB_height / 2}" fill="black"/>
 				</mask>
 			</defs>
-			<rect x="0" y="-1" width="${(this.plugin.settings.APB_height + 10.5) / 2}" height="${this.plugin.settings.APB_height +3}" fill="${this.plugin.settings.APB_colorBarBackground}" mask="url(#round-end-mask-demo)"/>
+			<rect x="0" y="-1" width="${(this.plugin.settings.APB_height + 10.5) / 2}" height="${this.plugin.settings.APB_height +3}" fill="${this.plugin.settings.defaultTemplate.barBackgroundColor}" mask="url(#round-end-mask-demo)"/>
 			`;
 			filledBar.appendChild(mask);
 	// console.log(mask.outerHTML)
@@ -1572,8 +1578,8 @@ new Setting(containerEl)
 		// Completed Progress Bar
 		const completed = containerEl.createEl('div');
 		completed.addClass('progressBar-completed');
-		if (this.plugin.settings.APB_completedToggle) {
-			completed.style.color = this.plugin.settings.APB_completedColor;
+		if (this.plugin.settings.defaultTemplate.completedTextColor !== this.plugin.settings.APB_pureBlack) {
+			completed.style.color = this.plugin.settings.defaultTemplate.completedTextColor;
 
 			if (this.plugin.settings.APB_progressBarPercentage == 100) {
 				completed.textContent = 'COMPLETED';
@@ -1586,7 +1592,9 @@ new Setting(containerEl)
 		}
 		filledBar.style.backgroundImage = '';
 		filledBar.appendChild(completed);
-		progressBarBackground.style.backgroundColor = clampedPercentage === 100 ? this.plugin.settings.APB_colorBarCompleted : colors[0];
+		if (this.plugin.settings.defaultTemplate.completedColor !== this.plugin.settings.APB_pureBlack) {
+			progressBarBackground.style.backgroundColor = clampedPercentage === 100 ? this.plugin.settings.defaultTemplate.completedColor : colors[0];
+		}
 	}
 
 	progressBarBackground.style.backgroundSize = '100% 100%';
@@ -1634,13 +1642,13 @@ new Setting(containerEl)
 	containerprogress.appendChild(progresstext);
 
 	progressBarContainer.appendChild(progressBarTextContainer);
-	if (this.plugin.settings.APB_titleToggle) {
+	if (this.plugin.settings.defaultTemplate.titleTextColor !== this.plugin.settings.APB_pureBlack) {
 		progressBarTextContainer.appendChild(progressBarTitle);
 	}
-	if (this.plugin.settings.APB_percentageToggle) {
+	if (this.plugin.settings.defaultTemplate.percentageTextColor !== this.plugin.settings.APB_pureBlack) {
 		progressBarTextContainer.appendChild(progressBarPercentage);
 	}
-	if (this.plugin.settings.APB_fractionToggle) {
+	if (this.plugin.settings.defaultTemplate.fractionTextColor !== this.plugin.settings.APB_pureBlack) {
 		progressBarTextContainer.appendChild(progressBarValue);
 	}
 
@@ -1855,53 +1863,12 @@ new Setting(containerEl)
 
 		/************ Section Mark Color *************/
 		this.createColorPickerSetting(containerEl, 'Section mark color', 'Select the color of the section %%Marks%%.<br>Note: The color will be set to 50% transparency, allowing the progress bar\'s color to blend and influence the final appearance.',
-			'APB_marksColor', DEFAULT_SETTINGS.APB_marksLightColor as string, DEFAULT_SETTINGS.APB_marksColor as string);
+			'APB_marksColor', undefined, undefined, DEFAULT_SETTINGS.APB_marksLightColor as string, DEFAULT_SETTINGS.APB_marksColor as string);
 
 		/************ Bar Section Mark Width *************/
 		this.createSliderSetting(containerEl, 'Section mark width', 'Set the width of the section mark lines on the progress bar from a range of 1 to 5 pixels.<br>(See demonstration progress bar above)',
 			'APB_marksWidth', 1, 5, 1 );
 		}
-
-	/************ SECTION Text *************/
-	const setting5 = new Setting(containerEl).setName('Text').setHeading();
-	const heading5 = setting5.settingEl.querySelector('.setting-item-name');
-	if (heading5) {heading5.addClass('header-highlight');}
-
-	/************ Show Title *************/
-	this.createToggleSetting(containerEl, 'Show title text',
-		'When toggled on, the %%Title%% text will be displayed above the progress bar.<br>(See demonstration progress bar above)',
-		'APB_titleToggle');
-
-	/************ Title Color *************/
-	this.createColorPickerSetting(containerEl, 'Title text color', 'Select the color of the %%Title%% text.',
-		'APB_titleColor', DEFAULT_SETTINGS.APB_titleLightColor as string, DEFAULT_SETTINGS.APB_titleColor as string);
-
-	/************ Show Percentage *************/
-	this.createToggleSetting(containerEl, 'Show percentage text',
-		'When toggled on, the %%Percentage%% text will be displayed above the progress bar<br>(See demonstration progress bar above)',
-		'APB_percentageToggle');
-
-	/************ Percentage Color *************/
-	this.createColorPickerSetting(containerEl, 'Percentage text color', 'Select the color of the %%Percentage%% text.',
-		'APB_percentageColor', DEFAULT_SETTINGS.APB_percentageLightColor as string, DEFAULT_SETTINGS.APB_percentageColor as string);
-
-	/************ Show Fraction *************/
-	this.createToggleSetting(containerEl, 'Show fraction text (value/total)',
-		'When toggled on, the fraction text %%(Value/Total)%% will be displayed above the progress bar.<br>(See demonstration progress bar above)',
-		'APB_fractionToggle');
-
-	/************ Fraction Color *************/
-	this.createColorPickerSetting(containerEl, 'Fraction text color', 'Select the color of the %%Fraction%% text.',
-		'APB_fractionColor', DEFAULT_SETTINGS.APB_fractionLightColor as string, DEFAULT_SETTINGS.APB_fractionColor as string);
-
-	/************ Show Completed *************/
-	this.createToggleSetting(containerEl, 'Show completed text',
-		'When toggled on, the word %%COMPLETED%% will be displayed on the progress bar when it reaches 100%.<br>(See demonstration progress bar above)',
-		'APB_completedToggle');
-
-	/************ Completed Color *************/
-	this.createColorPickerSetting(containerEl, 'Completed text color', 'Select the color of the %%Completed%% text.',
-		'APB_completedColor', DEFAULT_SETTINGS.APB_completedLightColor as string, DEFAULT_SETTINGS.APB_completedColor as string);
 
 	/************ SECTION Inline Edit *************/
 	const setting6 = new Setting(containerEl).setName('Inline edit').setHeading();
@@ -1913,15 +1880,7 @@ new Setting(containerEl)
 		'When toggled on, you will see a gear icon to the right of the progress bar\'s text which allows you to edit the value without editing the code block.<br>(See documentation for full details)',
 		'APB_inlineEditToggle');
 
-	if (this.plugin.settings.APB_inlineEditToggle) {
-		/************ Gear Icon Color *************/
-		this.createColorPickerSetting(containerEl, 'Gear icon color', 'Choose the color of the %%gear icon%%.',
-			'APB_gearColor', DEFAULT_SETTINGS.APB_gearLightColor as string, DEFAULT_SETTINGS.APB_gearColor as string);
-
-		/************ Gear Icon Hover Color *************/
-		this.createColorPickerSetting(containerEl, 'Gear icon hover color', 'Choose the color for the %%gear icon\'s%% mouse hover effect.',
-			'APB_gearHoverColor', DEFAULT_SETTINGS.APB_gearHoverLightColor as string, DEFAULT_SETTINGS.APB_gearHoverColor as string);
-																			
+	if (this.plugin.settings.APB_inlineEditToggle) {																					
 		/************ Step Size *************/
 		this.createSliderSetting(containerEl, 'Step size', 'Set the step size for the increment and decrement buttons on the inline edit panel.<br>(See documentation for full details)',
 			'APB_inlineEditStepSize', 1, 100, 1 );
@@ -1940,32 +1899,14 @@ new Setting(containerEl)
 	if (this.plugin.settings.APB_overageToggle) {
 		/************ Overage Color *************/
 		this.createColorPickerSetting(containerEl, 'Overage percentage text color', 'Select the color of the %%Percentage%% text when it is greater than 100%.',
-			'APB_overageColor', DEFAULT_SETTINGS.APB_overageLightColor as string, DEFAULT_SETTINGS.APB_overageColor as string);
+			'APB_overageColor', undefined, undefined, DEFAULT_SETTINGS.APB_overageLightColor as string, DEFAULT_SETTINGS.APB_overageColor as string);
 	}
 
 	/************ SECTION Progress Bar Container *************/	
 	const setting8 = new Setting(containerEl).setName('Progress bar container').setHeading();
 	const heading8 = setting8.settingEl.querySelector('.setting-item-name');
 	if (heading8) {heading8.addClass('header-highlight');}
-
-	/************ Border *************/
-	this.createToggleSetting(containerEl, 'Border',
-		'When toggled on, a border will be displayed around the progress bar container.',
-		'APB_borderToggle');
-
-	/************ Border Color *************/
-	this.createColorPickerSetting(containerEl, 'Border color', 'Select the color of the border around the progress bar container.',
-		'APB_colorBorder', DEFAULT_SETTINGS.APB_colorLightBorder as string, DEFAULT_SETTINGS.APB_colorBorder as string);
-
-	/************ Background *************/
-	this.createToggleSetting(containerEl, 'Background',
-		'When toggled on, the background of the progress bar container will show.',
-		'APB_backgroundToggle');
-
-	/************ Background Color *************/
-	this.createColorPickerSetting(containerEl, 'Background color', 'Select the background color of the progress bar container.',
-		'APB_colorBackground', DEFAULT_SETTINGS.APB_colorLightBackground as string, DEFAULT_SETTINGS.APB_colorBackground as string);
-
+	
 	/************ Top Margin *************/
 	this.createToggleSetting(containerEl, 'Top margin',
 		'When toggled on, the progress bar container will have a larger margin at the top to avoid text being obscured by the %%</>%% in the top right of the code block when you mouse over.',
@@ -2011,23 +1952,8 @@ new Setting(containerEl)
 
 		/************ Box-shadow Color *************/
 		this.createColorPickerSetting(containerEl, 'Box-shadow color', 'Select the color of the container\'s box-shadow.',
-			'APB_colorBoxShadow', DEFAULT_SETTINGS.APB_colorLightBoxShadow as string, DEFAULT_SETTINGS.APB_colorBoxShadow as string);
+			'APB_colorBoxShadow', undefined, undefined, DEFAULT_SETTINGS.APB_colorLightBoxShadow as string, DEFAULT_SETTINGS.APB_colorBoxShadow as string);
 	}
-
-
-	/************ SECTION Progress Bar Color *************/
-	const setting10 = new Setting(containerEl).setName('Progress bar color').setHeading();
-	const heading10 = setting10.settingEl.querySelector('.setting-item-name');
-	if (heading10) {heading10.addClass('header-highlight');}
-
-	/************ Completed Color *************/
-	this.createColorPickerSetting(containerEl, 'Completed color', 'Select the color the entire progress bar will use when it reaches 100% completion.',
-		'APB_colorBarCompleted', DEFAULT_SETTINGS.APB_colorLightBarCompleted as string, DEFAULT_SETTINGS.APB_colorBarCompleted as string);
-
-	/************ Bar Background Color *************/
-	this.createColorPickerSetting(containerEl, 'Bar background color', 'This color will be used for the progress bar\'s background, representing the remaining percentage.',
-		'APB_colorBarBackground', DEFAULT_SETTINGS.APB_colorLightBarBackground as string, DEFAULT_SETTINGS.APB_colorBarBackground as string);
-
 
 
 	/************ SECTION Tasks *************/
@@ -2046,30 +1972,11 @@ new Setting(containerEl)
 			'When %%toggled on%%, tasks are automatically updated when it detects editing on the current page.  It is %%highly recommended%% that this is turned %%off%% and you use manually triggered updates instead using page switching or hotkey.  See documentation for full details.',
 			'APB_autoTasksToggle');
 
-		/************ Task Text Color *************/
-		this.createColorPickerSetting(containerEl, 'Task text color', 'Choose the %%text%% color for task badges.',
-			'APB_colorTaskText', DEFAULT_SETTINGS.APB_colorLightTaskText as string, DEFAULT_SETTINGS.APB_colorTaskText as string);
-
-		/************ Task Background Color *************/
-		this.createColorPickerSetting(containerEl, 'Task background color', 'Choose the %%background%% color for task badges.',
-			'APB_colorTaskBackground', DEFAULT_SETTINGS.APB_colorLightTaskBackground as string, DEFAULT_SETTINGS.APB_colorTaskBackground as string);
-
-
 		/************ Allow Sub Tasks *************/
 		this.createToggleSetting(containerEl, 'Enable sub-task linking',
 			'When %%toggled on%%, you will be able to automatically see your subtask status under the progerss bar.<br>See documentation for full details.',
 			'APB_allowSubTasksToggle');
-
-		if (this.plugin.settings.APB_allowSubTasksToggle) {
-			/************ Sub Task Color *************/
-			this.createColorPickerSetting(containerEl, 'Sub task color', 'Choose the %%text%% color for the sub task shown under your progress bar.',
-				'APB_colorSubTaskText', DEFAULT_SETTINGS.APB_colorLightSubTaskText as string, DEFAULT_SETTINGS.APB_colorSubTaskText as string);
-
-			/************ Sub Task Completed Color *************/
-			this.createColorPickerSetting(containerEl, 'Sub task completed color', 'Choose the %%completed text%% color for the sub task shown under your progress bar.',
-				'APB_colorSubTaskCompletedText', DEFAULT_SETTINGS.APB_colorLightSubTaskCompletedText as string, DEFAULT_SETTINGS.APB_colorSubTaskCompletedText as string);		
 		}
-	}
 
 
 
@@ -2094,6 +2001,17 @@ new Setting(containerEl)
 			gradient: false,
 			gradientType: false,
 			colors: ['#000000', '#000000', '#000000', '#000000', '#000000'],
+			isColorPanelVisible: false,
+			borderColor: '#000000',
+			backgroundColor: '#000000',
+			titleTextColor: '#000000',
+			percentageTextColor: '#000000',
+			fractionTextColor: '#000000',
+			completedTextColor: '#000000',
+			completedColor: '#000000',
+			barBackgroundColor: '#000000',
+			colorSubTaskCompletedText: '#000000',
+			colorSubTaskText: '#000000'
 		});
 		await this.plugin.saveSettings();
 		this.display();
@@ -2102,7 +2020,7 @@ new Setting(containerEl)
 	const rowContainer = containerEl.createDiv({ cls: 'settings-row-container' });
 	const headersRow = rowContainer.createDiv({ cls: 'settings-row-headers' });
 
-	const headers = ['Template Name', '|', 'Gradient Toggle', '|', 'Gradient Type Toggle', '|',  'Color 1 - 5', '|',  '3 Color Presets'];
+	const headers = ['Template Name', '|',  'Settings', '|', 'Gradient Toggle', '|', 'Gradient Type Toggle', '|',  'Color 1 - 5', '|',  '3 Color Presets'];
 	headers.forEach((header, index) => {
 		headersRow.createEl('span', {
 			text: header,
@@ -2124,6 +2042,27 @@ new Setting(containerEl)
 		attr: { style: 'flex: 1; padding: 4px 8px; color: #888888;' }
 	  });
   });
+
+  	// Gear Settings
+	defaultSetting.addButton((button) => {
+		button
+		.setIcon('gear')
+		.setTooltip('Edit Extended Colors')
+		.setClass(this.plugin.settings.defaultTemplate.isColorPanelVisible ? 'active-default-gear' : 'inactive-gear')
+		.onClick(async () => {
+			this.collapseOtherPanels('default'); // Collapse other panels
+			this.plugin.settings.defaultTemplate.isColorPanelVisible = !this.plugin.settings.defaultTemplate.isColorPanelVisible;
+			await this.plugin.saveSettings();
+			this.display();
+			this.defaultContainerColorPickerPanel();
+		});
+	});
+
+	// Create container for default color pickers
+    this.defaultColorPickerContainer = containerEl.createDiv({
+      	cls: 'default-container-color-picker-panel',
+    });
+    this.defaultContainerColorPickerPanel();
 
 	// Gradient toggle
 	defaultSetting.addToggle((toggle) => {
@@ -2153,7 +2092,7 @@ new Setting(containerEl)
 	for (let i = 0; i < 5; i++) {
 		defaultSetting.addColorPicker((color) => {
 			color
-			.setValue(this.plugin.settings.defaultTemplate.colors[i] || '#000000')
+			.setValue(this.plugin.settings.defaultTemplate.colors[i] || this.plugin.settings.APB_pureBlack)
 			.onChange(async (value) => {
 				this.plugin.settings.defaultTemplate.colors[i] = value;
 				await this.plugin.saveSettings();
@@ -2201,6 +2140,7 @@ new Setting(containerEl)
 	// padding to align default with template controls
 	defaultSetting.settingEl.createDiv({ cls: 'spacer-button' });
 
+
     // Render each template as a row
     this.plugin.settings.templates.forEach((template, index) => {
       const setting = new Setting(containerEl)
@@ -2242,6 +2182,31 @@ new Setting(containerEl)
 		text.inputEl.style.flex = '1';
 	});
 
+
+	// Gear Settings Button
+    setting.addButton((button) =>
+        button
+        .setIcon('gear')
+        .setTooltip('Edit Extended Colors')
+		.setClass(this.plugin.settings.templates[index].isColorPanelVisible ? 'active-template-gear' : 'inactive-gear')
+        .onClick(async () => {
+			this.collapseOtherPanels(index); // Collapse other panels
+            this.plugin.settings.templates[index].isColorPanelVisible = !this.plugin.settings.templates[index].isColorPanelVisible;
+            await this.plugin.saveSettings();
+			this.display();
+            this.containerColorPickerPanel(index);
+        }),
+    );
+     
+
+    // Create container for color pickers
+    this.colorPickerContainers[index] = containerEl.createDiv({
+      	cls: 'container-color-picker-panel',
+    });
+    this.containerColorPickerPanel(index);
+  
+
+
 	// Gradient toggle
 	setting.addToggle((toggle: ToggleComponent) => {
 	toggle
@@ -2270,7 +2235,7 @@ new Setting(containerEl)
 	for (let i = 0; i < 5; i++) {
 	setting.addColorPicker((color: ColorComponent) => {
 		color
-		.setValue(template.colors[i] || '#000000')
+		.setValue(template.colors[i] || this.plugin.settings.APB_pureBlack)
 		.onChange(async value => {
 			this.plugin.settings.templates[index].colors[i] = value;
 			await this.plugin.saveSettings();
@@ -2370,6 +2335,127 @@ new Setting(containerEl)
 	return;
 }
 
+defaultContainerColorPickerPanel(): void {
+    const container = this.defaultColorPickerContainer;
+    if (!container) return;
+
+    // Clear existing content
+    container.empty();
+
+    // Show or hide based on template's settings
+    const template = this.plugin.settings.defaultTemplate;
+    container.style.display = template.isColorPanelVisible ? 'block' : 'none';
+
+	if (template.isColorPanelVisible) {
+		this.createColorPickerSetting(container, 'Default container border color', 'Choose the %%border%% color of the default progress bar container.',
+				'default', undefined, 'borderColor', DEFAULT_SETTINGS.APB_colorLightBorder as string, DEFAULT_SETTINGS.APB_colorBorder as string);
+		
+		this.createColorPickerSetting(container, 'Default container background color', 'Choose the %%background%% color of the default progress bar container.',
+				'default', undefined, 'backgroundColor', DEFAULT_SETTINGS.APB_colorLightBackground as string, DEFAULT_SETTINGS.APB_colorBackground as string);
+	
+		this.createColorPickerSetting(container, 'Default title text color', 'Choose the %%Title%% text color for the default template.',
+				'default', undefined, 'titleTextColor', DEFAULT_SETTINGS.APB_titleLightColor as string, DEFAULT_SETTINGS.APB_titleColor as string);
+
+		this.createColorPickerSetting(container, 'Default percentage text color', 'Choose the %%Percentage%% text color for the default template.',
+				'default', undefined, 'percentageTextColor', DEFAULT_SETTINGS.APB_percentageLightColor as string, DEFAULT_SETTINGS.APB_percentageColor as string);
+	
+		this.createColorPickerSetting(container, 'Default fraction text color', 'Choose the %%Fraction%% text color for the default template.',
+				'default', undefined, 'fractionTextColor', DEFAULT_SETTINGS.APB_fractionLightColor as string, DEFAULT_SETTINGS.APB_fractionColor as string);
+
+		this.createColorPickerSetting(container, 'Default completed text color', 'Choose the %%Completed text%% color for the default template.',
+				'default', undefined, 'completedTextColor', DEFAULT_SETTINGS.APB_completedLightColor as string, DEFAULT_SETTINGS.APB_completedColor as string);
+
+		this.createColorPickerSetting(container, 'Default bar background color', 'Choose the %%Bar background%% color for the default template.  NOTE: this is the only color that can be set to pure black #000000 as it can not be transparent for the progress bar to work corectly',
+				'default', undefined, 'barBackgroundColor', DEFAULT_SETTINGS.APB_colorLightBarBackground as string, DEFAULT_SETTINGS.APB_colorBarBackground as string);
+
+		this.createColorPickerSetting(container, 'Default completed bar background color', 'Choose the %%Completed bar%% background color for the default template.',
+				'default', undefined, 'completedColor', DEFAULT_SETTINGS.APB_colorLightBarCompleted as string, DEFAULT_SETTINGS.APB_colorBarCompleted as string);
+	
+		this.createColorPickerSetting(container, 'Default Sub task text color', 'Choose the %%text%% color for the sub task shown under your progress bar.',
+				'default', undefined, 'colorSubTaskText', DEFAULT_SETTINGS.APB_colorLightSubTaskText as string, DEFAULT_SETTINGS.APB_colorSubTaskText as string);
+		
+		this.createColorPickerSetting(container, 'Default Sub task completed text color', 'Choose the %%completed text%% color for the sub task shown under your progress bar.',
+				'default', undefined, 'colorSubTaskCompletedText', DEFAULT_SETTINGS.APB_colorLightSubTaskCompletedText as string, DEFAULT_SETTINGS.APB_colorSubTaskCompletedText as string);
+
+		/************ Transfer default values to default template *************/
+		const descText = 'All the above settings within the green border have been removed from standard settings and are now integrated into this default template.  Use this button to copy %%ALL pre v1.1.4%% values into this default template container settings.'
+		const segments = this.splitTextIntoSegments(descText);
+
+		new Setting(container)
+			.setName('Transfer all your default settings to this default template')
+			.setDesc(createFragment(frag => this.renderSegments(segments, frag)))
+			.addButton((button) =>
+			button.setIcon('copy').setTooltip('Transfer default values')	
+			.onClick(async() => {	
+				// Set default template colors to old colors - with a pureBlack fallback color (and taking into account toggles)
+				this.plugin.settings.defaultTemplate.borderColor = this.plugin.settings.APB_borderToggle ? this.plugin.settings.APB_colorBorder ?? this.plugin.settings.APB_pureBlack : this.plugin.settings.APB_pureBlack;
+				this.plugin.settings.defaultTemplate.backgroundColor = this.plugin.settings.APB_backgroundToggle ? this.plugin.settings.APB_colorBackground ?? this.plugin.settings.APB_pureBlack : this.plugin.settings.APB_pureBlack;
+				this.plugin.settings.defaultTemplate.titleTextColor = this.plugin.settings.APB_titleToggle ? this.plugin.settings.APB_titleColor ?? this.plugin.settings.APB_pureBlack : this.plugin.settings.APB_pureBlack;
+				this.plugin.settings.defaultTemplate.percentageTextColor = this.plugin.settings.APB_percentageToggle ? this.plugin.settings.APB_percentageColor ?? this.plugin.settings.APB_pureBlack : this.plugin.settings.APB_pureBlack;
+				this.plugin.settings.defaultTemplate.fractionTextColor = this.plugin.settings.APB_fractionToggle ? this.plugin.settings.APB_fractionColor ?? this.plugin.settings.APB_pureBlack : this.plugin.settings.APB_pureBlack;
+				this.plugin.settings.defaultTemplate.completedTextColor = this.plugin.settings.APB_completedToggle ? this.plugin.settings.APB_completedColor ?? this.plugin.settings.APB_pureBlack : this.plugin.settings.APB_pureBlack;		
+				this.plugin.settings.defaultTemplate.completedColor = this.plugin.settings.APB_colorBarCompleted ?? this.plugin.settings.APB_pureBlack;
+				this.plugin.settings.defaultTemplate.barBackgroundColor = this.plugin.settings.APB_colorBarBackground ?? this.plugin.settings.APB_pureBlack;
+
+				if (this.plugin.settings.APB_allowTasksToggle && this.plugin.settings.APB_allowSubTasksToggle) {
+					this.plugin.settings.defaultTemplate.colorSubTaskText = this.plugin.settings.APB_colorSubTaskText ?? this.plugin.settings.APB_pureBlack;
+					this.plugin.settings.defaultTemplate.colorSubTaskCompletedText = this.plugin.settings.APB_colorSubTaskCompletedText ?? this.plugin.settings.APB_pureBlack;
+				} else {
+					this.plugin.settings.defaultTemplate.colorSubTaskText = this.plugin.settings.APB_pureBlack;
+					this.plugin.settings.defaultTemplate.colorSubTaskCompletedText = this.plugin.settings.APB_pureBlack;
+				}
+
+				await this.plugin.saveSettings();
+				this.display();
+			}));
+	}
+}
+
+containerColorPickerPanel(templateIndex: number): void {
+    const container = this.colorPickerContainers[templateIndex];
+    if (!container) return;
+
+    // Clear existing content
+    container.empty();
+
+    // Show or hide based on template's settings
+    const template = this.plugin.settings.templates[templateIndex];
+    container.style.display = template.isColorPanelVisible ? 'block' : 'none';
+
+	if (template.isColorPanelVisible) {
+		this.createColorPickerSetting(container, 'Container border color', 'Choose the %%border%% color of the %%progress bar%% container.',
+				'templates', templateIndex, 'borderColor', this.plugin.settings.defaultTemplate?.borderColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+
+		this.createColorPickerSetting(container, 'Container background color', 'Choose the %%background%% color of the %%progress bar%% container.',
+				'templates', templateIndex, 'backgroundColor', this.plugin.settings.defaultTemplate?.backgroundColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+
+		this.createColorPickerSetting(container, 'Container title text color', 'Choose the %%Title%% text color for this template.',
+				'templates', templateIndex, 'titleTextColor', this.plugin.settings.defaultTemplate?.titleTextColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+
+		this.createColorPickerSetting(container, 'Container percentage text color', 'Choose the %%Percentage%% text color for this template.',
+				'templates', templateIndex, 'percentageTextColor', this.plugin.settings.defaultTemplate?.percentageTextColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+	
+		this.createColorPickerSetting(container, 'Container fraction text color', 'Choose the %%Fraction%% text color for this template.',
+				'templates', templateIndex, 'fractionTextColor', this.plugin.settings.defaultTemplate?.fractionTextColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+
+		this.createColorPickerSetting(container, 'Container completed text color', 'Choose the %%Completed%% text color for this template.',
+				'templates', templateIndex, 'completedTextColor', this.plugin.settings.defaultTemplate?.completedTextColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+
+		this.createColorPickerSetting(container, 'Bar background color', 'Choose the %%Background Bar%% color for this template.  NOTE: this is the only color that can be set to pure black #000000 as it can not be transparent for the progress bar to work corectly',
+				'templates', templateIndex, 'barBackgroundColor', this.plugin.settings.defaultTemplate?.barBackgroundColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+
+		this.createColorPickerSetting(container, 'Completed bar color', 'Choose the %%Completed%% bar color for this template.',
+				'templates', templateIndex, 'completedColor', this.plugin.settings.defaultTemplate?.completedColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+		
+		this.createColorPickerSetting(container, 'Sub task color', 'Choose the %%text%% color for the sub task shown under your progress bar.',
+				'templates', templateIndex, 'colorSubTaskText', this.plugin.settings.defaultTemplate?.colorSubTaskText as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+		
+		this.createColorPickerSetting(container, 'Sub task completed color', 'Choose the %%completed text%% color for the sub task shown under your progress bar.',
+				'templates', templateIndex, 'colorSubTaskCompletedText', this.plugin.settings.defaultTemplate?.colorSubTaskCompletedText as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+    }
+  }
+
+	
 /************ setEndCaps Function *************/
 setEndCaps(progressBarBackground: HTMLElement | null, progressbar: HTMLElement | null, endCap: boolean, clampedPercentage: number) {
 	if (progressBarBackground && progressbar) {
@@ -2409,52 +2495,139 @@ hexToRgba(hex: string, alpha: number = 1): string {
 }
 
 /************ Create light/dark buttons Function *************/
-addColorResetButtonsForSettings<K extends keyof ObsidianProgressBarsSettings>(setting: Setting, colorSettingKey: K, defaultLightColor: ObsidianProgressBarsSettings[K],
-	defaultDarkColor: ObsidianProgressBarsSettings[K]) {
-	setting.addButton((button: ButtonComponent) => {
-		this.addColorResetButton(button, 'sun', 'Reset to light default', 
-			colorSettingKey, defaultLightColor);
-	});
+addColorResetButtonsForSettings(
+    setting: Setting,
+    colorSettingKey: string, // Changed to string for nested keys
+    defaultLightColor: string,
+    defaultDarkColor: string,
+	index?: number
+) {
+	// Use different icons for templates vs defaultTemplate
+	const lightIcon = index !== undefined ? 'paintbrush' : 'sun';
+	const darkIcon = index !== undefined ? 'rotate-ccw' : 'moon';
 
-	setting.addButton((button: ButtonComponent) => {
-		this.addColorResetButton(button, 'moon', 'Reset to dark default', 
-			colorSettingKey, defaultDarkColor);
-	});
+	const lightTooltip = index !== undefined ? 'Reset to default template color' : 'Reset to light default';
+	const darkTooltip = index !== undefined ? 'Reset to pure black' : 'Reset to dark default';
+
+    setting.addButton((button: ButtonComponent) => {
+        this.addColorResetButton(button, lightIcon, lightTooltip, 
+            colorSettingKey, defaultLightColor, this.colorPickers[colorSettingKey]);
+    });
+
+    setting.addButton((button: ButtonComponent) => {
+        this.addColorResetButton(button, darkIcon, darkTooltip, 
+            colorSettingKey, defaultDarkColor, this.colorPickers[colorSettingKey]);
+    });
 }
 
 /************ Create a color reset button Function *************/
-addColorResetButton<K extends keyof ObsidianProgressBarsSettings>(button: ButtonComponent, icon: string, tooltip: string, colorSettingKey: K, defaultColorValue: ObsidianProgressBarsSettings[K]) {
-	button.setIcon(icon)
-		.setTooltip(tooltip)
-		.onClick(async() => {
-			this.plugin.settings[colorSettingKey] = defaultColorValue;
-			await this.plugin.saveSettings();
-			this.display();
-		});
+addColorResetButton(
+    button: ButtonComponent,
+    icon: string,
+    tooltip: string,
+    colorSettingKey: string,
+    defaultColor: string,
+	colorPicker: ColorComponent | undefined
+) {
+    button
+        .setIcon(icon)
+        .setTooltip(tooltip)
+        .onClick(async () => {
+            this.setSettingValue(colorSettingKey, defaultColor);
+			if (colorPicker) {
+				colorPicker.setValue(defaultColor); // Update color picker UI
+			}
+            await this.plugin.saveSettings();
+            this.display();
+        });
 }
+
 
 /************ Create a colorPicker with light/dark buttons Function *************/
 createColorPickerSetting(
 	containerEl: HTMLElement,
 	setName: string,
 	setDesc: string,
-	settingKey: keyof ObsidianProgressBarsSettings,
-	defaultLightColor: string,
-	defaultDarkColor: string
+	settingKey: string,
+	index?: number,
+	settingName?: string,
+	defaultLightColor?: string,
+	defaultDarkColor?: string
 ) {
 	const segments = this.splitTextIntoSegments(setDesc);
 	const setting = new Setting(containerEl)
 		.setName(setName)
 		.setDesc(createFragment(frag => this.renderSegments(segments, frag)))
-		.addColorPicker((colorPicker: ColorComponent) => colorPicker
-			.setValue(this.plugin.settings[settingKey] as string)
-			.onChange(async (value: string) => {
-				(this.plugin.settings[settingKey] as string) = value;
-				await this.plugin.saveSettings();
-				this.display();
-			}));
-	this.addColorResetButtonsForSettings(setting, settingKey, defaultLightColor, defaultDarkColor);
+		.addColorPicker((colorPicker: ColorComponent) => {
+                this.colorPickers[settingKey] = colorPicker; // Store color picker
+                const value = index !== undefined && settingName
+                    ? (this.plugin.settings.templates[index][settingName] as string) || this.plugin.settings.APB_pureBlack
+                    : settingName
+                    ? (this.plugin.settings.defaultTemplate[settingName] as string) || this.plugin.settings.APB_pureBlack
+                    : (this.plugin.settings[settingKey] as string) || this.plugin.settings.APB_pureBlack;
+                colorPicker
+                    .setValue(value)
+                    .onChange(async (value: string) => {
+                        if (index !== undefined && settingName) {
+                            this.plugin.settings.templates[index][settingName] = value;
+                        } else if (settingName) {
+                            this.plugin.settings.defaultTemplate[settingName] = value;
+                        } else {
+                            this.plugin.settings[settingKey] = value;
+                        }
+                        await this.plugin.saveSettings();
+                        this.display();
+            });
+        });
+	this.addColorResetButtonsForSettings(setting, settingKey, defaultLightColor || '#ffffff', defaultDarkColor || '#000000', index);
 }
+
+// Helper to get nested setting value
+getSettingValue(settingKey: string): string {
+    const keyParts = settingKey.split('.');
+    if (keyParts[0] === 'templates' && keyParts.length >= 3) {
+        const templateIndex = parseInt(keyParts[1]);
+        if (templateIndex >= 0 && templateIndex < this.plugin.settings.templates.length) {
+            if (keyParts[2] === 'colors' && keyParts[3]) {
+                const colorIndex = parseInt(keyParts[3]);
+                return this.plugin.settings.templates[templateIndex].colors[colorIndex] || '#ffffff';
+            }
+            return (this.plugin.settings.templates[templateIndex][keyParts[2]] as string) || '#ffffff';
+        }
+    }
+    return '#ffffff';
+}
+
+// Helper to set nested setting value
+setSettingValue(settingKey: string, value: string): void {
+    const keyParts = settingKey.split('.');
+    if (keyParts[0] === 'templates' && keyParts.length >= 3) {
+        const templateIndex = parseInt(keyParts[1]);
+        if (templateIndex >= 0 && templateIndex < this.plugin.settings.templates.length) {
+            if (keyParts[2] === 'colors' && keyParts[3]) {
+                const colorIndex = parseInt(keyParts[3]);
+                this.plugin.settings.templates[templateIndex].colors[colorIndex] = value;
+            } else {
+                this.plugin.settings.templates[templateIndex][keyParts[2]] = value;
+            }
+        }
+    }
+}
+
+
+// method to collapse all other panels
+collapseOtherPanels(exceptIndex: number | 'default'): void {
+	this.plugin.settings.templates.forEach((template, index) => {
+			if (index !== exceptIndex) {
+				template.isColorPanelVisible = false; // Close all template panels
+			}
+		});
+	if (exceptIndex !== 'default') {
+		this.plugin.settings.defaultTemplate.isColorPanelVisible = false; // Close defaultTemplate if not the target
+	}
+}
+
+
 
 /************ Create a Toggle with reset button Function *************/
 createToggleSetting(
@@ -2576,6 +2749,39 @@ createSliderSetting(
     }
 }
 
+function getContrastTextColorRGB(rgbInput: string, textOpacity: number = 1): string {
+	// Parse rgb() or rgba() string
+	const cleaned = rgbInput.replace(/rgb(a)?\(|\)/g, "").trim();
+	const values = cleaned.split(/,\s*|\s+/).map(Number);
+
+	// Validate RGB values
+	if (values.length < 3 || values.length > 4 || values.some(isNaN) || values.slice(0, 3).some(v => v < 0 || v > 255)) {
+		throw new Error("Invalid RGB/A format. Expected: rgb(r, g, b) or rgba(r, g, b, a) with r,g,b 0-255, a 0-1");
+	}
+
+	const [r, g, b] = values;
+
+	// Normalize RGB values to 0-1 range
+	const normalizedR = r / 255;
+	const normalizedG = g / 255;
+	const normalizedB = b / 255;
+
+	// Calculate relative luminance (W3C formula)
+	const luminance = 0.2126 * normalizedR + 0.7152 * normalizedG + 0.0722 * normalizedB;
+
+	// Choose black or white based on luminance
+	const textColor = luminance > 0.5 ? "#000000" : "#FFFFFF";
+
+	// Apply opacity to text color (convert hex to rgba if textOpacity < 1)
+	if (textOpacity < 1) {
+		const hex = textColor.replace("#", "");
+		const rHex = parseInt(hex.substring(0, 2), 16);
+		const gHex = parseInt(hex.substring(2, 4), 16);
+		const bHex = parseInt(hex.substring(4, 6), 16);
+		return `rgba(${rHex}, ${gHex}, ${bHex}, ${textOpacity})`;
+	}
+	return textColor;
+}
 
 // Debounce function to limit frequent calls
 function debounce(func: (...args: any[]) => void, wait: number) {
