@@ -117,6 +117,7 @@ If you want to manually trigger a task update without switching between notes, y
 If you are not going to be using tags to keep track of your task progress, then it is **highly** advised to turn `off` the `Enable Task Linking` for a smoother and efficient experience.
 
 ### Tag Badge Colors <span class="label label-red badge">REMOVED v1.1.4</span>
+
 {: .removed }
 The badge color settings were removed in version 1.1.4 as these are now automatically set based on your containers background color.
 
@@ -129,6 +130,7 @@ Once you toggle the task linking setting to `on`, two additional color settings 
 In addition to the color settings mentioned above, you should also see a new toggle option called `Enable Sub-Task Linking`.
 
 <span class="label label-grey badge">REMOVED v1.1.4</span>
+
 {: .removed }
 The sub task color settings were removed in version 1.1.4 as these are now handled with the expanded template system.
 
