@@ -23,7 +23,7 @@ To make it more convenient, you can add a hotkey that automatically inserts a pr
 ![Hotkey](/assets/Obsidian Advanced Progress Bars - Hotkey.png)
 
 
-## Task Manual Refresh Hotkey Setup <span class="label">NEW v1.1.2</span>
+## Task Manual Refresh Hotkey Setup <span class="label label-grey badge">NEW v1.1.2</span>
 If you want to manually trigger a task update without switching between notes, you can now configure a hotkey for quick access.  Simply follow these steps:
 
 1. Open Obsidian and go to the **Settings** by clicking the gear icon in the bottom left corner.
