@@ -82,7 +82,7 @@ In the image above, both `#orange` and `#banana` are being tracked automatically
 
 And you can track as many tags as you wish by simply adding additonal progress bars with a new tag for each.
 
-### Auto Tasks <span class="label label-green badge">NEW v1.1.2</span>
+### Auto Tasks <span class="label label-grey badge">NEW v1.1.2</span>
 When toggled `on`, tasks are automatically updated when it detects editing on the current page.
 
 {: .note }
@@ -102,7 +102,7 @@ This can be used to manually make sure that notes are refreshed and up-to-date.
 {: .note }
 You have to change to another page, and stay on it for at least 2 seconds before returning to your current page for the tasks to refresh.
 
-### Hotkey Setup <span class="label label-green badge">NEW v1.1.2</span>
+### Hotkey Setup <span class="label label-grey badge">NEW v1.1.2</span>
 If you want to manually trigger a task update without switching between notes, you can now configure a hotkey for quick access.  Simply follow these steps:
 
 1. Open Obsidian and go to the **Settings** by clicking the gear icon in the bottom left corner.
@@ -116,7 +116,10 @@ If you want to manually trigger a task update without switching between notes, y
 {: .note }
 If you are not going to be using tags to keep track of your task progress, then it is **highly** advised to turn `off` the `Enable Task Linking` for a smoother and efficient experience.
 
-### Tag Badge Colors
+### Tag Badge Colors <span class="label label-red badge">REMOVED v1.1.4</span>
+{: .removed }
+The badge color settings were removed in version 1.1.4 as these are now automatically set based on your containers background color.
+
 Once you toggle the task linking setting to `on`, two additional color settings will appear underneath.
 
 `Task Text Color`  is used to set the color of the tag badge's text, whilst the `Task Background Color` is used to set the background color of the tag badge.
@@ -124,6 +127,10 @@ Once you toggle the task linking setting to `on`, two additional color settings 
 
 ## Sub Tasks
 In addition to the color settings mentioned above, you should also see a new toggle option called `Enable Sub-Task Linking`.
+
+<span class="label label-grey badge">REMOVED v1.1.4</span>
+{: .removed }
+The sub task color settings were removed in version 1.1.4 as these are now handled with the expanded template system.
 
 When toggled `on` it should reveal two further color settings underneath it.
 
