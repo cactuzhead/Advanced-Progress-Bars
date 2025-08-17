@@ -6,14 +6,17 @@ back_to_top_text: "Back to top"
 nav_order: 80
 ---
 
-## Container Settings
-Similar to the text settings above, this section includes two pairs of options for customizing the Border and Background of the container.
+## Container Settings <span class="label label-red badge">REMOVED v1.1.4</span>
+{: .removed }
+These color settings were removed in version 1.1.4 as most of the colors are now handled with the expanded template system.  The `Top Margin` setting remains.
+
+Similar to the text settings, this section includes two pairs of options for customizing the Border and Background of the container.
 
 - use the toggles to turn them `on` or `off`
 - use the color picker to set a custom color
 - or use the `Light` and `Dark` color defaults
 
-### Top Margin <span class="label label-green badge">NEW v1.1.2</span>
+### Top Margin <span class="label label-grey badge">NEW v1.1.2</span>
 When this is toggled `on`, the progress bar will have a larger margin at the top to avoid text being obscured by the `</>` in the top right of the code block when you mouse over.
 
 ![Container](/assets/Obsidian Advanced Progress Bars - Top Margin Before and After.png)
