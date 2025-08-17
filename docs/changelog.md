@@ -8,7 +8,42 @@ nav_order: 999
 
 # Changelog
 
-## Release v1.1.3 <span class="label label-green badge">NEW</span>
+## Release v1.1.4 <span class="label label-green badge">NEW</span>
+### New Features
+- Expanded the templates system to allow for additional per template container, text and bar colors.
+- Added a button to transfer all your default settings to the default template.
+- <span class="label label-red badge">REMOVED</span> many settings that are now handled by the templates :-
+    - **Light & Dark setting**
+    - **Progress bar color**
+        - completed color
+        - bar background color
+    - **Progress bar container**      
+        - border toggle
+        - border color
+        - background toggle
+        - background color
+    - **Text**
+        - show title text toggle
+        - title text color
+        - show percentage text toggle
+        - percentage tect color
+        - show fraction text toggle
+        - fraction text color
+        - show completed text toggle
+        - completed text color
+    - **Tasks**
+        - sub task color
+        - sub task completed color
+- <span class="label label-red badge">REMOVED</span> inline edit gear color settings as this is now automatically assigned based on your progress bar containers background color.
+
+### Documentation
+- Added comprehensive info about new expanded templates functionality.
+- Removed info about settings that have been replaced by the new template functionality.
+
+### Bug Fixes
+- Removed an unused rogue CSS property which was causing a white bar to briefly appear at the top of the notes when starting Obsidian.
+
+## Release v1.1.3
 ### New Features
 - Inline editing for swift adjustments to the value of a standard progress bar (without a tag).
 
