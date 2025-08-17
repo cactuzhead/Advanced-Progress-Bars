@@ -19,6 +19,7 @@ The default template will automatically be applied to all progress bars that hav
 With the introduction of templates, you can now have gradients with up to 5 equally spaced color stops for greater customisation.
 
 <span class="label label-green badge">NEW v1.1.4</span>
+
 {: .note }
 With the introduction of version 1.1.4 most of the default color settings have now been moved into the template system for greater customisability. Please visit our `Templates Extended` page for full details.
 
