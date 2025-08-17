@@ -6,7 +6,10 @@ back_to_top_text: "Back to top"
 nav_order: 60
 ---
 
-## Text Settings
+## Text Settings <span class="label label-grey badge">REMOVED v1.1.4</span>
+{: .removed }
+The text settings were removed in version 1.1.4 as these are now handled with the expanded template system.
+
 There are four pairs of settings which relate to `Title`, `Percentage`, `Fraction` (value/total) and `Completed Text`.
 
 ![Text Diagram](/assets/Obsidian Advanced Progress Bars - Text Diagram.png)
