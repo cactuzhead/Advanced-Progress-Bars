@@ -6,7 +6,7 @@ back_to_top_text: "Back to top"
 nav_order: 80
 ---
 
-## Container Settings <span class="label label-red badge">REMOVED v1.1.4</span>
+## Container Settings
 
 {: .removed }
 These color settings were removed in version 1.1.4 as most of the colors are now handled with the expanded template system.  The `Top Margin` setting remains.
