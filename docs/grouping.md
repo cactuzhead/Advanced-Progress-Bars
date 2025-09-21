@@ -6,7 +6,7 @@ back_to_top: true
 back_to_top_text: "Back to top"
 nav_order: 25
 ---
-## Usage Grouping
+## Grouping
 With the introduction of version `1.2.0` you have the ability to visually group together multiple progress bars within a container.
 
 You have always had the ability to stack multiple progress bars in a single code block by simply adding additional lines see example below.
@@ -50,7 +50,8 @@ Very Large Total: 2034/2345
 ```
 ````
 
-This code block will result in the output seen below (example only uses default templates for progress bars)
+This code block will result in the output seen below (example only uses default templates for progress bars).
+
 ![date title](/assets/Obsidian Advanced Progress Bars - Templates Extended Date Title.png)
 
 
