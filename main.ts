@@ -1,5 +1,6 @@
-import { App, Plugin, PluginSettingTab, Setting,  Notice, ButtonComponent, ColorComponent, ToggleComponent, TextComponent, TFile, MarkdownView } from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting,  Notice, ButtonComponent, ColorComponent, ToggleComponent, TextComponent, TFile, MarkdownView, DropdownComponent } from 'obsidian';
 
+const APB_PURE_BLACK = '#000000';
 interface Template {
 	name: string;
 	gradient: boolean;
@@ -14,9 +15,20 @@ interface Template {
 	completedTextColor: string;
 	completedColor: string;
 	barBackgroundColor: string;
-	colorSubTaskCompletedText: string;
 	colorSubTaskText: string;
-	[key: string]: string | string[] | boolean;
+	colorSubTaskCompletedText: string;
+	prefixValue: string;
+	suffixValue: string;
+	prefixTotal: string;
+	suffixTotal: string;
+	colorDates: string;
+	colorDaysLeft: string;
+	dateFormat: boolean;
+	colorOverage: string;
+	endcap: boolean;
+	barHeight: number;
+	manualMarks: number;
+	[key: string]: string | boolean | string[] | number;
 }
 
 interface TextSegment {
@@ -42,6 +54,7 @@ interface ObsidianProgressBarsSettings {
 	APB_width: number;
 	APB_height: number;
 	APB_endcapToggle: boolean;
+	APB_dateIncrement: number;
 	/* Section Mark Settings */
 	APB_marksToggle: boolean;
 	APB_autoMarksToggle: boolean;
@@ -113,7 +126,6 @@ interface ObsidianProgressBarsSettings {
 	/* Additional Settings */
 	APB_progressBarChange: boolean;
 	APB_fallbackColor: string;
-	APB_pureBlack: string;
 	/* Default Color Palettes */
 	defaultLightColors: string[];
   	defaultDarkColors: string[];
@@ -135,6 +147,7 @@ const DEFAULT_SETTINGS: Partial<ObsidianProgressBarsSettings> = {
 	APB_width: 190,	
 	APB_height: 8,
 	APB_endcapToggle: true,
+	APB_dateIncrement: 7,
 	/* Section Mark Settings */
 	APB_marksToggle: true,
 	APB_autoMarksToggle: true,	
@@ -206,7 +219,10 @@ const DEFAULT_SETTINGS: Partial<ObsidianProgressBarsSettings> = {
 	/* Additional Settings */
 	APB_progressBarChange: true,
 	APB_fallbackColor: '#2978ef',
-	APB_pureBlack: '#000000',
+	APB_colorDates: '#c1d7f9',
+	APB_colorLightDates: '#5E4A45',
+	APB_colorDaysLeft: '#7EEAEC',
+	APB_colorLightDaysLeft: '#9E5542',
 	/* Default Color Palettes */
 	defaultLightColors: ['#278378', '#2baab9', '#4a32e2', '#7c328e', '#c11e49'], // old APB_color1Light to APB_color5Light
   	defaultDarkColors: ['#2978ef', '#8ec822', '#dfaa22', '#c84922', '#dd4a86'], // old APB_color1 to APB_color5
@@ -227,7 +243,20 @@ const DEFAULT_SETTINGS: Partial<ObsidianProgressBarsSettings> = {
 		completedColor: '#576178',
 		barBackgroundColor: '#3b4252',
 		colorSubTaskText: '#8fa0ba',
-		colorSubTaskCompletedText: '#6dd374'
+		colorSubTaskCompletedText: '#6dd374',
+		prefixValue: '',
+		suffixValue: '',
+		prefixTotal: '',
+		suffixTotal: '',
+		colorDates: '#c1d7f9',
+		colorLightDates: '#5E4A45',
+		colorDaysLeft: '#c1d7f9',
+		colorLightDaysLeft: '#5E4A45',
+		dateFormat: false,
+		colorOverage: '#38edef',
+		endcap: true,
+		barHeight: 8,
+		manualMarks: 3
 	},
 	/* Array of templates */
 	  templates: []	
@@ -330,6 +359,61 @@ export default class ObsidianProgressBars extends Plugin {
 				}
 				// await this.processTaskUpdate(activeFile);
 			}
+		});
+
+		// Command to calculate days since a start date
+			this.addCommand({
+			id: 'paste-date-code-block',
+			name: 'Paste date code block',
+			editorCallback: async (editor, view) => {
+				editor.focus();
+				// Ensure editor is valid
+				if (!editor) {
+					new Notice("No active editor found!");
+					return;
+				}
+
+				// Get the current cursor position
+				const cursor = editor.getCursor();
+
+				// Get current date
+				const currentDate = new Date();
+				const year = currentDate.getFullYear();
+				const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+				const day = String(currentDate.getDate()).padStart(2, '0');
+				const formattedCurrentDate = `${year}-${month}-${day}`;
+
+				// Add users prefered date increment to current date
+				const weekLaterDate = new Date(formattedCurrentDate);
+				const timeoutDays = Number(this.settings.APB_dateIncrement);
+				if (isNaN(timeoutDays)) {
+					new Notice('Error: APB_dateIncrement is not a valid number.'+this.settings.APB_dateIncrement);
+					return;
+				}
+        		weekLaterDate.setDate(weekLaterDate.getDate() + timeoutDays);
+
+				const newYear = weekLaterDate.getFullYear();
+				const newMonth = String(weekLaterDate.getMonth() + 1).padStart(2, '0');
+				const newDay = String(weekLaterDate.getDate()).padStart(2, '0');
+				const newFormattedDate = `${newYear}-${newMonth}-${newDay}`;				
+				const codeBlockText = `\`\`\`apb\n${this.settings.APB_title}: ${formattedCurrentDate}||${newFormattedDate}\n\`\`\``;
+
+				// Calculate the new cursor position
+				const lines = codeBlockText.split('\n');
+				const newCursor = {
+					line: cursor.line + lines.length - 1,
+					ch: lines[lines.length - 1].length // Length of the last line
+				};
+				// Insert the code block text at the cursor position
+				editor.replaceRange(codeBlockText, cursor);			
+			
+				// Ensure the cursor moves after the insertion
+				setTimeout(() => {
+					editor.setCursor(newCursor);
+					editor.refresh();
+				}, 0); // Zero-delay timeout ensures this runs after DOM updates
+			
+			},
 		});
 
 	}
@@ -508,11 +592,13 @@ export default class ObsidianProgressBars extends Plugin {
 
 	// change the CSS of the progress bars tag depending on whether it matches task tag
 	async updateTagSpan(tagSpan: HTMLSpanElement, extractedTag: string) {
-		if (extractedTag) {			
+		if (extractedTag) {
 			try {
-				if (this.settings.APB_allowTasksToggle) {
-					const hasMatchingProgressBar = await this.findMatchingTasks(extractedTag);
+				if (this.settings.APB_allowTasksToggle) {					
+					const hasMatchingProgressBar = await this.findMatchingTasks(extractedTag);					
 					tagSpan.id = hasMatchingProgressBar ? 'APB_tag' : 'APB_notag';
+					// console.warn('tagSpan created:', { id: tagSpan.id, textContent: tagSpan.textContent, style: tagSpan.style.cssText, TAG: extractedTag });
+
 					if (tagSpan.id == 'APB_tag') {
 						tagSpan.style.color = 'rgba(255, 255, 255, 0.8)';
 						tagSpan.style.background ='rgba(0, 0, 0, 0.4)';
@@ -529,7 +615,7 @@ export default class ObsidianProgressBars extends Plugin {
 			}
 		} else {
 			console.warn('No tag was found.');
-		}
+		}		
 	}
 
 	updateProgressBarInNote(tag: string, value: number, total: number, subCompleted: number, subTotal: number) {
@@ -588,7 +674,10 @@ export default class ObsidianProgressBars extends Plugin {
 
 // Helper to find template index by name
 getTemplateIndexByName(name: string): number {
-	return this.settings.templates.findIndex(template => template.name === name);
+  return this.settings.templates.findIndex(template => 
+    template.name && typeof template.name === 'string' && 
+    template.name.trim().toLowerCase() === name.trim().toLowerCase()
+  );
 }
  
 // Helper to apply container styles
@@ -599,33 +688,138 @@ private applyContainerStyle(
     defaultValue: string,
     pureBlack: string
 ): void {
-    container.style[property] = color !== pureBlack 
+    container.style[property] = color !== pureBlack
         ? (property === 'border' ? `1px solid ${color}` : color)
         : defaultValue;
 }
 
-	renderProgressBar(source: string, el: HTMLElement) { {	
-			// Split the source string into rows
-			const rows = source.trim().split('\n');
-			el.empty(); // Clear the default rendering
+	renderProgressBar(source: string, el: HTMLElement) { {
+  	 	const groupRegex = /^\s*\[\[group\]\](?:([^{}\s][^{}]*))?(?:\s*\{([^}]+)\})?\s*$/iu;
+		const regex = new RegExp(
+		`^` +
+		`(?:` +
+			`(.+?)(?:#([\\p{L}\\p{N}\\p{Emoji}_-]+))?(?:~(\\d+)/(\\d+))?(?::\\s*(\\d+)/(\\d+))(?:\\{([^}]+)\\})?(?:\\s.*)?` +
+			`|` +
+			`([^:]+?):\\s*((19|20)\\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))\\|\\|((19|20)\\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))(?:\\{([^}]+)\\})?` +
+		`)$`,
+		'u'
+		);
 
-			// Loop through each line
-			rows.forEach((row, index) => {
-				// Use regex to extract the label and progress (Value/Total)
-				const match = row.match(/^(.+?)(?:#([\p{L}\p{N}\p{Emoji}_-]+))?(?:~(\d+)\/(\d+))?(?::\s*(\d+)\/(\d+))(?:\{([^}]+)\})?(?:\s.*)?$/u);
-				
+		// Split the source string into rows
+		const rows = source.trim().split('\n');
+		el.empty(); // Clear the default rendering
+
+		let isGrouped = false;
+		let groupTitle: string = ''
+  		let groupTemplate: string = '';
+		let titleExist = false;
+		let startIndex = 0;
+		if (rows.length > 0) {
+    		const groupMatch = rows[0].match(groupRegex);
+	
+			if (groupMatch) {
+				isGrouped = true;
+				groupTitle = groupMatch[1];
+				groupTemplate = groupMatch[2];
+				startIndex = 1; // Skip the first line for regular processing			
+			}
+		}
+  		
+		let isValidTemplate = false;		
+		if (groupTemplate && groupTemplate.trim() !== "") {			
+			const matchedTemplate = this.settings.templates.find(t => t.name.toLowerCase() === groupTemplate.toLowerCase());
+			
+			isValidTemplate = !!matchedTemplate;
+			
+			if (!isValidTemplate) {
+				displayAPBError(el, `APB_Error: Template "${groupTemplate}" not found`);
+				// return;
+			}
+		}
+
+	
+		// Loop through each line
+		rows.slice(startIndex).forEach(async (row, index) => {
+			try {		
+				const match: RegExpMatchArray | null = row.match(regex);
+
+				let isProgressBarPattern = false;
+				let isDatePattern = false;
+
 				if (!match) {
 					displayAPBError(el, `APB_Error: Invalid block format`);
-    			return;
+					return;
 				}
+	 
+			if (match[9] && match[13]) {
+				isDatePattern = true;
+			} else {
+				isProgressBarPattern = true;
+			}	
 
-				const label = match[1] || '';
-				const extractedTag = match[2] || '';
-				const subvalue = match[3] ? parseInt(match[3], 10) : null;
-				const subtotal = match[4] ? parseInt(match[4], 10) : null;
-				const current = match[5] ? parseInt(match[5], 10) : 0;
-				const total = match[6] ? parseInt(match[6], 10) : 0;
-				const templateName = match[7] || '';
+		const label: string = isDatePattern ? match[8] || '' : match[1] ? match[1].split('#')[0] || '' : '';
+        const extractedTag: string = isDatePattern ? '' : match[2] || '';
+        const templateName: string = isDatePattern ? match[17] || '' : match[7] || '';
+        const startDateStr: string = isDatePattern ? match[9] : '';
+        const endDateStr: string = isDatePattern ? match[13] : '';
+        const subvalue: number = isDatePattern ? 0 : match[3] && !isNaN(parseInt(match[3], 10)) ? parseInt(match[3], 10) : 0;
+        const subtotal: number = isDatePattern ? 0 : match[4] && !isNaN(parseInt(match[4], 10)) ? parseInt(match[4], 10) : 0;
+        let current: number = isDatePattern ? 0 : match[5] && !isNaN(parseInt(match[5], 10)) ? parseInt(match[5], 10) : 0;
+        let total: number = isDatePattern ? 0 : match[6] && !isNaN(parseInt(match[6], 10)) ? parseInt(match[6], 10) : 0;
+
+
+		
+	  
+const APB_dates = document.createElement('div');
+		if (isDatePattern) {
+          	// Date pattern: yyyy-mm-dd||yyyy-mm-dd{template}
+			// Validate dates
+			const startDate = new Date(startDateStr);
+			const endDate = new Date(endDateStr);
+			if (
+					isNaN(startDate.getTime()) ||
+					isNaN(endDate.getTime()) ||
+					startDateStr !== startDate.toISOString().split('T')[0] ||
+					endDateStr !== endDate.toISOString().split('T')[0]
+			) {
+					new Notice('APB_Error: Invalid date format.');					
+					isDatePattern = false;
+					return;
+			}
+
+			// Calculate days since startDate (relative to current date)
+			const currentDate = new Date();
+			const year = currentDate.getFullYear();
+				const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+				const day = String(currentDate.getDate()).padStart(2, '0');
+				const formattedCurrentDate = `${year}-${month}-${day}`;
+
+			const currentDateStr = currentDate.toISOString().split('T')[0];
+
+			const normalizedCurrentDate = new Date(currentDateStr);
+			// Normalize to remove time
+			startDate.setHours(0, 0, 0, 0);
+			endDate.setHours(0, 0, 0, 0);
+			normalizedCurrentDate.setHours(0, 0, 0, 0);
+
+			// Calculate days between dates
+			const timeDifference = endDate.getTime() - startDate.getTime();
+			const daysTotal = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+
+			// Calculate days left (endDate - currentDate)
+			const daysLeftDiffTime = endDate.getTime() - normalizedCurrentDate.getTime();
+			const daysLeft = Math.ceil(daysLeftDiffTime / (1000 * 60 * 60 * 24));
+
+			current = daysTotal - daysLeft;
+			total = daysTotal;
+
+			// Add timeoutIdDate days to startDate
+			const timeoutDays = Number(this.settings.APB_dateIncrement);
+			if (isNaN(timeoutDays)) {
+				new Notice('APB_Error: APB_dateIncrement is not a valid number.');
+				return;
+			}			
+        } 
 
 				if (!this.settings.APB_overageToggle) {
 					// Check if current value is too large or total is not zero
@@ -633,8 +827,8 @@ private applyContainerStyle(
 						displayAPBError(el, `APB_Error: Value is too large`);
     					return;
 					}
-				}
-		
+				}	  
+
 				// Check if parsing was successful and that total is zero
 				if (isNaN(current) || isNaN(total) || total === 0) {
 					displayAPBError(el, `APB_Error: Invalid number`);
@@ -656,16 +850,43 @@ private applyContainerStyle(
 					APB_container.style.marginTop = '7px';
 				}
 
-
 				// Set newTemplateName to be either defaultTemplate or templates[templateIndex]
 				const templateIndex = this.getTemplateIndexByName(templateName);
 				const newTemplateName = (!templateName.trim() || templateIndex === -1)
 					? this.settings.defaultTemplate
 					: this.settings.templates[templateIndex];
 
-				this.applyContainerStyle(APB_container, 'border', newTemplateName.borderColor, '0px', this.settings.APB_pureBlack);
-				this.applyContainerStyle(APB_container, 'background', newTemplateName.backgroundColor, 'transparent', this.settings.APB_pureBlack);
-				
+				this.applyContainerStyle(APB_container, 'border', newTemplateName.borderColor, '0px', APB_PURE_BLACK);
+				this.applyContainerStyle(APB_container, 'background', newTemplateName.backgroundColor, 'transparent', APB_PURE_BLACK);
+			
+	// Determine group template
+	let groupTemplateName = this.settings.defaultTemplate;
+	if (groupTemplate && groupTemplate.trim()) {
+		const groupTemplateIndex = this.getTemplateIndexByName(groupTemplate);
+		if (groupTemplateIndex !== -1) {
+			groupTemplateName = this.settings.templates[groupTemplateIndex];
+		}
+  	}
+
+	if (isGrouped) {
+	el.addClass('grouped-progress-bar');
+	el.style.border = '1px solid ' + groupTemplateName.borderColor;
+	el.style.background = groupTemplateName.backgroundColor;
+	el.style.borderRadius = '7px';
+	el.style.marginTop = '0px';
+	el.style.padding = '5px !important';
+}
+
+// If grouped, add a group title (optional)
+  if (isGrouped && groupTitle && !titleExist) {
+    el.createEl('div', {
+      cls: 'progressBar-group-title',
+      text: groupTitle,
+      attr: { style: 'margin-left: 10px; font-weight: bold; color: ' + groupTemplateName.titleTextColor } // Match title color
+    });
+	titleExist = true;
+  }
+
 
 				const boxShadowInset = this.settings.APB_boxShadowInsetToggle ? ' inset ' : '';
 
@@ -681,11 +902,74 @@ private applyContainerStyle(
 					el.style.padding = '0px';
 				}
 
-
 				// APB_Text Container
 				const APB_textContainer = document.createElement('div');
 				APB_textContainer.addClass('progressBar-text-container');
 
+				// APB_Dates Container
+				const APB_datesContainer = document.createElement('div');
+				APB_datesContainer.addClass('progressBar-dates-container');				
+
+			if (isDatePattern) {
+				let hasContent = false;
+				const APB_dates = APB_datesContainer.createEl('div', { cls: 'progressBar-date' });
+				APB_dates.style.width = '100%';
+				APB_dates.style.display = 'flex';
+				APB_dates.style.justifyContent = 'space-between';
+				APB_dates.style.alignItems = 'center';
+
+				let startDateFormated = 'YMD';
+				let endDateFormated = 'YMD';
+				if (newTemplateName.dateFormat) {
+					startDateFormated = formatDate(startDateStr, 'MDY');
+					endDateFormated = formatDate(endDateStr, 'MDY');
+				} else {
+					startDateFormated = formatDate(startDateStr, 'DMY');
+					endDateFormated = formatDate(endDateStr, 'DMY');
+				}
+
+				if (typeof newTemplateName.colorDates === 'string' && newTemplateName.colorDates !== APB_PURE_BLACK) {
+					APB_dates.style.color = newTemplateName.colorDates as string;
+					APB_dates.createEl('span', { text: startDateFormated, cls: 'progressBar-date-start',attr: { style: `color: ${newTemplateName.colorDates}; text-align: left; flex: 0 1 auto;` } });
+					hasContent = true;
+				}
+					
+				if(typeof newTemplateName.colorDaysLeft === 'string' && newTemplateName.colorDaysLeft !== APB_PURE_BLACK) {
+					const daysLeftNumber = total - current;
+					let daysLeftText: string;
+					
+					if (daysLeftNumber === 0) {
+						daysLeftText = 'today';
+					} else if (daysLeftNumber === 1) {
+						daysLeftText = '1 day left';
+					} else if (daysLeftNumber > 1) {
+						daysLeftText = `${daysLeftNumber} days left`;
+					} else if (daysLeftNumber === -1) {
+            			daysLeftText = '1 day ago';
+					} else if (daysLeftNumber < 0) {
+						daysLeftText = `${Math.abs(daysLeftNumber)} days ago`;
+					} else {
+						daysLeftText = `${daysLeftNumber} days left`; // Fallback
+					}
+					APB_dates.createEl('span', { text: daysLeftText, cls: 'progressBar-date-left', attr: { style: `color: ${newTemplateName.colorDaysLeft}; margin: auto; flex: 0 1 auto;` } });
+					hasContent = true;				
+				}
+
+				// End date
+				if (typeof newTemplateName.colorDates === 'string' &&  newTemplateName.colorDates !== APB_PURE_BLACK) {
+					APB_dates.style.color = newTemplateName.colorDates as string;
+					APB_dates.createEl('span', { text: endDateFormated, cls: 'progressBar-date-end',attr: { style: `color: ${newTemplateName.colorDates}; text-align: right; flex: 0 1 auto;` } });
+					hasContent = true;
+				}
+
+				// Remove APB_dates if no content was added
+				if (!hasContent) {
+					APB_dates.remove();
+				}
+			
+			}
+
+				
 				// APB_ BarBackground container
 				const APB_background = document.createElement('div');
 				APB_background.addClass('progressBar-background');
@@ -697,8 +981,8 @@ private applyContainerStyle(
 				// APB_Title
 				const APB_title = document.createElement('div');
 				APB_title.addClass('progressBar-title');
-				// if (this.settings.defaultTemplate.titleTextColor !== this.settings.APB_pureBlack) {	
-				if (newTemplateName.titleTextColor !== this.settings.APB_pureBlack) {				
+
+				if (newTemplateName.titleTextColor !== APB_PURE_BLACK) {				
 
 					// Split the titleWithSubtasks into title, tag, and optional subtasks
 					const subtaskSplit = label.split('~');
@@ -716,14 +1000,14 @@ private applyContainerStyle(
 						}
 					}
 					
-					if (extractedTag) {
+					if (extractedTag) {						
 						const editorView = this.app.workspace.getActiveViewOfType(MarkdownView);
-						if (editorView) {
-							 const tagSpan = APB_title.createEl('span', { text: extractedTag });
-							 this.updateTagSpan(tagSpan, extractedTag);
+						if (editorView) {							
+							const tagSpan = APB_title.createEl('span', { text: extractedTag });
+							this.updateTagSpan(tagSpan, extractedTag);							
 						}
 					} else {
-						// console.warn("No tag was found in APB_title.");
+						// console.log("No ' + extractedTag + ' was found in APB_title: " + label);						
 					}
 
 					APB_title.createEl('span', { text: label });
@@ -731,36 +1015,39 @@ private applyContainerStyle(
 				}
 				const APB_subtask = document.createElement('div');
 
-				// Sub Tasks
-				if (this.settings.APB_allowTasksToggle && this.settings.APB_allowSubTasksToggle) {					
-					if (subtotal !== null && subtotal !==0) {
-						if (subvalue == subtotal) {
-							APB_subtask.addClass('progressBar-subtask-completed');
-							if (newTemplateName.colorSubTaskCompletedText && newTemplateName.colorSubTaskCompletedText !== this.settings.APB_pureBlack) {					
-								APB_subtask.style.color = newTemplateName.colorSubTaskCompletedText as string;							
-								APB_subtask.createEl('span', { text: 'Sub Tasks - ' + subvalue + '/' + subtotal + ' completed'});
+				const isValidTag = await this.findMatchingTasks(extractedTag);
+				if (isValidTag) {	
+					// Sub Tasks
+					if (this.settings.APB_allowTasksToggle && this.settings.APB_allowSubTasksToggle) {					
+						if (subtotal !== null && subtotal !==0) {
+							if (subvalue == subtotal) {
+								APB_subtask.addClass('progressBar-subtask-completed');
+								if (newTemplateName.colorSubTaskCompletedText && newTemplateName.colorSubTaskCompletedText !== APB_PURE_BLACK) {					
+									APB_subtask.style.color = newTemplateName.colorSubTaskCompletedText as string;							
+									APB_subtask.createEl('span', { text: 'Sub Tasks - ' + subvalue + '/' + subtotal + ' completed'});
+								} else {
+									newTemplateName.colorSubTaskCompletedText = APB_PURE_BLACK;
+								}
 							} else {
-								newTemplateName.colorSubTaskCompletedText = this.settings.APB_pureBlack;
+								APB_subtask.addClass('progressBar-subtask');
+								if (newTemplateName.colorSubTaskText && newTemplateName.colorSubTaskText !== APB_PURE_BLACK) {
+									APB_subtask.style.color = newTemplateName.colorSubTaskText as string;
+									APB_subtask.createEl('span', { text: 'Sub Tasks - ' + subvalue + '/' + subtotal });
+								} else {
+									newTemplateName.colorSubTaskText = APB_PURE_BLACK;
+								}
 							}
-						} else {
-							APB_subtask.addClass('progressBar-subtask');
-							if (newTemplateName.colorSubTaskText && newTemplateName.colorSubTaskText !== this.settings.APB_pureBlack) {
-								APB_subtask.style.color = newTemplateName.colorSubTaskText as string;
-								APB_subtask.createEl('span', { text: 'Sub Tasks - ' + subvalue + '/' + subtotal });
-							} else {
-								newTemplateName.colorSubTaskText = this.settings.APB_pureBlack;
-							}
-						}
-					}					
+						}					
+					}
 				}
 				
 				// APB_Percentage
 				const APB_percentage = document.createElement('div');
 				APB_percentage.addClass('progressBar-percentage');
-				if (newTemplateName.percentageTextColor !== this.settings.APB_pureBlack) {
+				if (newTemplateName.percentageTextColor !== APB_PURE_BLACK) {
 					if(this.settings.APB_overageToggle && overage > 0) {
 						APB_percentage.createEl('span', { text: (overage+100)+'%' });
-						APB_percentage.style.color = this.settings.APB_overageColor;
+						APB_percentage.style.color = newTemplateName.colorOverage;
 					} else {
 						APB_percentage.createEl('span', { text: clampedPercentage+'%' });
 						APB_percentage.style.color = newTemplateName.percentageTextColor;
@@ -768,57 +1055,52 @@ private applyContainerStyle(
 
 				}
 
-				// APB_Value
+				// APB_Value				
 				const APB_value = document.createElement('div');
 				APB_value.addClass('progressBar-value');
-				if (newTemplateName.fractionTextColor !== this.settings.APB_pureBlack) {
-					APB_value.createEl('span', { text: '('+current+'/'+total+')' });
+				if (newTemplateName.fractionTextColor !== APB_PURE_BLACK) {
+					const prefixValue = newTemplateName.prefixValue ?? '';
+					const suffixValue = newTemplateName.suffixValue ?? '';
+					const prefixTotal = newTemplateName.prefixTotal ?? '';
+					const suffixTotal = newTemplateName.suffixTotal ?? '';
+
+					APB_value.createEl('span', { text: '('+prefixValue+current+suffixValue+'/'+prefixTotal+total+suffixTotal+')' });
 					APB_value.style.color = newTemplateName.fractionTextColor
 				}
-
+				
 				// APB_Completed
 				const APB_completed = document.createElement('div');
 				APB_completed.addClass('progressBar-completed');
-				if (newTemplateName.completedTextColor !== this.settings.APB_pureBlack) {
+				if (newTemplateName.completedTextColor !== APB_PURE_BLACK) {
 					APB_completed.createEl('span', { text: '' });
-				}
-		
-				let template = null;
-				let isValidTemplate = false;
-				let isTemplateNameProvided = false;
-				
-				// Check if templateName is provided (not null, undefined, or empty string)
-				if (templateName && templateName.trim() !== "") {
-					isTemplateNameProvided = true;		  
-					const matchedTemplate = this.settings.templates.find(t => t.name.toLowerCase() === templateName.toLowerCase());
-				
-					isValidTemplate = !!matchedTemplate;
-					template = isValidTemplate ? matchedTemplate : this.settings.defaultTemplate;
+				}		
 
-					if (!isValidTemplate) {			
+				// Check if templateName is provided (not null, undefined, or empty string)
+				let isValidTemplate = false;
+				if (templateName && templateName.trim() !== "") {						
+					const matchedTemplate = this.settings.templates.find(t => t.name.toLowerCase() === templateName.toLowerCase());
+
+					isValidTemplate = !!matchedTemplate;
+
+					if (!isValidTemplate) {
 						displayAPBError(el, `APB_Error: Template "${templateName}" not found`);
 						return;
 					}
-				} else {			
-					// template = null; // Explicitly set to null to indicate no template
-					template = this.settings.defaultTemplate;
 				}
-		
-				const useGradient = template ? template.gradient : false;
-				const gradientType = template ? template.gradientType : false;
-				const colors = template && template.colors ? Array.isArray(template.colors) ? template.colors : [template.colors] : ["#ff0000", "#00ff00"] as string[];
+				
+				const useGradient = newTemplateName ? newTemplateName.gradient : false;
+				const gradientType = newTemplateName ? newTemplateName.gradientType : false;
+				const colors = newTemplateName && newTemplateName.colors ? Array.isArray(newTemplateName.colors) ? newTemplateName.colors : [newTemplateName.colors] : ["#ff0000", "#00ff00"] as string[];
 				const validColors = colors.filter(c => c && c !== '#000000').slice(0, 5);		
 				const numberOfValidColors = validColors.length;
-
 
 				// Create progressBar-filled (filled portion)
 				const filledBar = document.createElement('div');
 				filledBar.className = 'progressBar-filled';
 				filledBar.style.position = 'relative';
 				filledBar.style.width = `${clampedPercentage}%`;
-				filledBar.style.height = `${this.settings.APB_height}px`;
+				filledBar.style.height = `${newTemplateName.barHeight ?? DEFAULT_SETTINGS.APB_height}px`;
 				APB_background.appendChild(filledBar);
-
 
 				// progressBar
 				const APB = document.createElement('div');
@@ -838,9 +1120,9 @@ private applyContainerStyle(
 				}
 				
 				APB.style.background = newTemplateName.barBackgroundColor;
-				APB.style.height = `${this.settings.APB_height}px`;		
+				APB.style.height = `${newTemplateName.barHeight ?? DEFAULT_SETTINGS.APB_height}px`;		
 
-				this.settingsTab.setEndCaps(APB_background, APB, this.settings.APB_endcapToggle,  clampedPercentage);
+				this.settingsTab.setEndCaps(APB_background, APB, newTemplateName.endcap,  clampedPercentage);
 
 				if (clampedPercentage !== 100) {
 					APB_background.appendChild(APB);
@@ -851,12 +1133,18 @@ private applyContainerStyle(
 
 				var numberOfSections;
 
-				if (this.settings.APB_autoMarksToggle){
+				if (this.settings.APB_autoMarksToggle) {
 					numberOfSections = numberOfValidColors;
 				} else {
 					numberOfSections = this.settings.APB_manualMarks + 1;
 				}
-
+				
+				if (newTemplateName.manualMarks >= 1 && newTemplateName.manualMarks <= 19) {
+					numberOfSections = newTemplateName.manualMarks + 1;
+				} else if (newTemplateName.manualMarks === 0) {
+					numberOfSections = 0;
+				}
+	
 				// create required number of section marks if NOT completed
 				if (clampedPercentage !== 100) {
 					if (this.settings.APB_marksToggle) {
@@ -877,19 +1165,19 @@ private applyContainerStyle(
 				}
 				filledBar.appendChild(APB_completed);
 				
-				if (this.settings.APB_endcapToggle && clampedPercentage > 0 && clampedPercentage < 100){
+				if (newTemplateName.endcap && clampedPercentage > 0 && clampedPercentage < 100){
 					// ======= Create round end mask for inverse progress bar =======
 					const dpr = window.devicePixelRatio || 1; // Get device pixel ratio
 					const mask = document.createElementNS('http://www.w3.org/2000/svg', 'svg') as SVGSVGElement;
 					mask.setAttribute('class', 'progressBar-mask');
-					mask.setAttribute('width', `${(this.settings.APB_height / 2)}`); // 1 unit wide
-					mask.setAttribute('height', `${this.settings.APB_height}`);    // 2 units tall
-					mask.setAttribute('viewBox', `0 0 ${(this.settings.APB_height / 2)} ${this.settings.APB_height}`);
+					mask.setAttribute('width', `${(newTemplateName.barHeight ?? DEFAULT_SETTINGS.APB_height) / 2}`); // 1 unit wide
+					mask.setAttribute('height', `${newTemplateName.barHeight ?? DEFAULT_SETTINGS.APB_height}`);    // 2 units tall
+					mask.setAttribute('viewBox', `0 0 ${((newTemplateName.barHeight ?? DEFAULT_SETTINGS.APB_height) / 2)} ${newTemplateName.barHeight ?? DEFAULT_SETTINGS.APB_height}`);
 					mask.style.position = 'absolute';
 					mask.style.top = '0';
 					mask.style.right = `-${1 / dpr}px`; // Nudge right to close the 1-pixel gap
-					mask.style.width = `${(this.settings.APB_height + 0.5) / 2}px`;
-					mask.style.height = `${this.settings.APB_height}px`;
+					mask.style.width = `${((newTemplateName.barHeight ?? DEFAULT_SETTINGS.APB_height )+ 0.5) / 2}px`;
+					mask.style.height = `${newTemplateName.barHeight ?? DEFAULT_SETTINGS.APB_height}px`;
 
 					// Generate a unique ID for the mask to avoid conflicts
 					const uniqueId = `round-end-mask-${Math.random().toString(36).substring(2, 9)}`;
@@ -898,11 +1186,11 @@ private applyContainerStyle(
 					mask.innerHTML = `
 						<defs>
 							<mask id="${uniqueId}">
-							<rect x="0" y="-1" width="${(this.settings.APB_height + 10.5) / 2}" height="${this.settings.APB_height + 3}" fill="white"/>
-							<circle cx="0" cy="${this.settings.APB_height / 2}" r="${this.settings.APB_height / 2}" fill="black"/>
+							<rect x="0" y="-1" width="${((newTemplateName.barHeight ?? DEFAULT_SETTINGS.APB_height) + 10.5) / 2}" height="${(newTemplateName.barHeight ?? DEFAULT_SETTINGS.APB_height) + 3}" fill="white"/>
+							<circle cx="0" cy="${(newTemplateName.barHeight ?? DEFAULT_SETTINGS.APB_height) / 2}" r="${(newTemplateName.barHeight ?? DEFAULT_SETTINGS.APB_height) / 2}" fill="black"/>
 							</mask>
 						</defs>
-						<rect x="0" y="-1" width="${(this.settings.APB_height + 10.5) / 2}" height="${this.settings.APB_height +3}" fill="${newTemplateName.barBackgroundColor}" mask="url(#${uniqueId})"/>
+						<rect x="0" y="-1" width="${((newTemplateName.barHeight ?? DEFAULT_SETTINGS.APB_height) + 10.5) / 2}" height="${(newTemplateName.barHeight ?? DEFAULT_SETTINGS.APB_height) +3}" fill="${newTemplateName.barBackgroundColor}" mask="url(#${uniqueId})"/>
 						`;
 						filledBar.appendChild(mask);						
 				}
@@ -942,13 +1230,15 @@ private applyContainerStyle(
 				} else {
 					// Completed Progress Bar	
 					APB.style.backgroundColor = newTemplateName.completedColor;
-					if (newTemplateName.completedTextColor !== this.settings.APB_pureBlack) {
+					if (newTemplateName.completedTextColor !== APB_PURE_BLACK) {
 						APB_completed.addClass('progressBar-completed');
 						APB_completed.style.color = newTemplateName.completedTextColor;
 						APB_completed.textContent ='COMPLETED';
 					}						
 					filledBar.style.backgroundImage = '';
-					APB_background.style.backgroundColor = clampedPercentage === 100 ? newTemplateName.completedColor : colors[0];
+					if (newTemplateName.completedColor !== APB_PURE_BLACK) {
+						APB_background.style.backgroundColor = clampedPercentage === 100 ? newTemplateName.completedColor : colors[0];
+					}
 				}
 
 				APB_background.style.backgroundSize = '100% 100%';
@@ -957,24 +1247,28 @@ private applyContainerStyle(
 				this.settings.APB_progressBarChange = true;
 				APB_container.appendChild(APB_textContainer);
 				
-				if (newTemplateName.titleTextColor !== this.settings.APB_pureBlack) {
+				if (newTemplateName.titleTextColor !== APB_PURE_BLACK) {
 					APB_textContainer.appendChild(APB_title);
 				}
-				if (newTemplateName.percentageTextColor !== this.settings.APB_pureBlack) {
+				if (newTemplateName.percentageTextColor !== APB_PURE_BLACK) {
 					APB_textContainer.appendChild(APB_percentage);
 				}
-				if (newTemplateName.fractionTextColor !== this.settings.APB_pureBlack) {
+				if (newTemplateName.fractionTextColor !== APB_PURE_BLACK) {
 					APB_textContainer.appendChild(APB_value);
 				}
 
 				APB_container.appendChild(APB_background);
 				APB_container.appendChild(APB_subtask);
 
+				if (isDatePattern) {
+					APB_container.appendChild(APB_datesContainer);
+				}
+
 				// Progress bar has NO tag 
 				if (!extractedTag && this.settings.APB_inlineEditToggle) {
 
 					// top margin if 1st progress bar in APB block has gear icon
-					if(index == 0) {
+					if(index == 0 && this.settings.APB_TopMarginToggle) {
 						APB_container.style.marginTop = '25px';
 					} else {
 						APB_container.style.marginTop = '7px';
@@ -993,7 +1287,7 @@ private applyContainerStyle(
 							contrastTextHover ='#666666';
 					}
 
-
+				if (isProgressBarPattern) {
 					// Settings gear button
 					const settingsButton = document.createElement('button');
 					settingsButton.className = 'progressBar-settings-button';
@@ -1001,10 +1295,8 @@ private applyContainerStyle(
 					<svg class="settings-icon" width="16" height="16" viewBox="0 0 24 24" fill="`+contrastText+`" xmlns="http://www.w3.org/2000/svg">
 						<path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97s-.03-.66-.07-.97l2.03-1.63a.5.5 0 0 0 .11-.64l-2-3.46a.5.5 0 0 0-.61-.22l-2.39.96c-.51-.38-1.06-.7-1.65-.97l-.36-2.55a.5.5 0 0 0-.5-.41h-4a.5.5 0 0 0-.5.41l-.36 2.55c-.59.27-1.14.59-1.65.97l-2.39-.96a.5.5 0 0 0-.61.22l-2 3.46a.5.5 0 0 0 .11.64l2.03 1.63c-.04.31-.07.65-.07.97s.03.66.07.97l-2.03 1.63a.5.5 0 0 0-.11.64l2 3.46a.5.5 0 0 0 .61.22l2.39-.96c.51.38 1.06.7 1.65.97l.36 2.55a.5.5 0 0 0 .5.41h4a.5.5 0 0 0 .5-.41l.36-2.55c.59-.27 1.14-.59 1.65-.97l2.39.96a.5.5 0 0 0 .61-.22l2-3.46a.5.5 0 0 0-.11-.64l-2.03-1.63z"/>
 					</svg>
-					`;
-					// settingsButton.style.backgroundColor = this.settings.APB_colorBackground;
-					settingsButton.style.backgroundColor = 'transparent';
-					// settingsButton.style.border = '1px solid ' + this.settings.APB_colorBackground;
+					`;					
+					settingsButton.style.backgroundColor = 'transparent';					
 					settingsButton.style.border = '0px solid ' + 'transparent';
 					settingsButton.style.display = 'inline-flex';
 					settingsButton.style.alignItems = 'center';
@@ -1145,10 +1437,8 @@ private applyContainerStyle(
 					APB_textContainer.appendChild(settingsButton);
 					APB_textContainer.appendChild(panel);
 
-				}
+				}				
 				
-				el.appendChild(APB_container);
-
 				// Check if in dashboard and hide bullet
 				const editorView = this.app.workspace.getActiveViewOfType(MarkdownView);
 				if (editorView) {
@@ -1159,15 +1449,21 @@ private applyContainerStyle(
 						listItem.classList.add('apb-list-item');
 					}
 				}
-		  	});
+			}
+			el.appendChild(APB_container);
+
+			} catch (error) {
+        console.error('Error in row processing:', error);
+        displayAPBError(el, `APB_Error: Failed to render row: ${row}`);
+      }
+	});
 		};
 	}
 
 
 
 async updateProgressValue(file: TFile, rowIndex: number, newCurrent: number, total: number, originalRow: string) {
-	// if (this.settings.APB_autoTasksToggle) return;
-
+	
 	// Clamp newCurrent
 	let clampedCurrent = newCurrent;
 	if (!this.settings.APB_overageToggle) {
@@ -1229,28 +1525,28 @@ async updateProgressValue(file: TFile, rowIndex: number, newCurrent: number, tot
 			}
 
 
-		new Notice('APB Data Update ...', 2000);
+			new Notice('APB Data Update ...', 2000);
 
-				try {
-					this.isUpdating = true;					
-					await this.updateProgress();
-					
-					new Notice('APB Data Update Completed', 2000);	
-				} catch (error) {
-					// Show error notice if update fails
-					new Notice('APB Data Update Failed: ' + error.message, 2000);
-				} finally {
-					// Delay reset to ensure async events are caught
-					setTimeout(() => {
-						this.isUpdating = false;
-					}, 2000);
-				}
-				} else {
-        console.error("Regex failed to match row:", rowToUpdate);
-        new Notice("Failed to update: Invalid row format", 2000);
-    }
-  }
-}
+			try {
+				this.isUpdating = true;					
+				await this.updateProgress();
+				
+				new Notice('APB Data Update Completed', 2000);	
+			} catch (error) {
+				// Show error notice if update fails
+				new Notice('APB Data Update Failed: ' + error.message, 2000);
+			} finally {
+				// Delay reset to ensure async events are caught
+				setTimeout(() => {
+					this.isUpdating = false;
+				}, 2000);
+			}
+			} else {
+				console.error("Regex failed to match row:", rowToUpdate);
+				new Notice("Failed to update: Invalid row format", 2000);
+			}
+  		}
+	}
 
 	async loadSettings() {
 	  	this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
@@ -1415,13 +1711,13 @@ new Setting(containerEl)
 	const progressBarContainer = containerEl.createEl('div');
 	progressBarContainer.addClass('progressBar-container');
 
-	if (this.plugin.settings.defaultTemplate.borderColor !== this.plugin.settings.APB_pureBlack) {
+	if (this.plugin.settings.defaultTemplate.borderColor !== APB_PURE_BLACK) {
 		progressBarContainer.style.border = '1px solid'+ this.plugin.settings.defaultTemplate.borderColor;
 	} else {
 		progressBarContainer.style.border = '0px';
 	}
 
-	if (this.plugin.settings.defaultTemplate.backgroundColor !== this.plugin.settings.APB_pureBlack) {
+	if (this.plugin.settings.defaultTemplate.backgroundColor !== APB_PURE_BLACK) {
 		progressBarContainer.style.background = this.plugin.settings.defaultTemplate.backgroundColor;
 	} else {
 		progressBarContainer.style.background = 'transparent';
@@ -1450,7 +1746,7 @@ new Setting(containerEl)
 	// DemoBar Title
 	const progressBarTitle = containerEl.createEl('div');
 	progressBarTitle.addClass('progressBar-title');
-	if (this.plugin.settings.defaultTemplate.titleTextColor !== this.plugin.settings.APB_pureBlack) {
+	if (this.plugin.settings.defaultTemplate.titleTextColor !== APB_PURE_BLACK) {
 		progressBarTitle.createEl('span', { text: this.plugin.settings.APB_title });
 		progressBarTitle.style.color = this.plugin.settings.defaultTemplate.titleTextColor;
 	}
@@ -1458,7 +1754,7 @@ new Setting(containerEl)
 	// DemoBar Percentage
 	const progressBarPercentage = containerEl.createEl('div');
 	progressBarPercentage.addClass('progressBar-percentage');
-	if (this.plugin.settings.defaultTemplate.percentageTextColor !== this.plugin.settings.APB_pureBlack) {
+	if (this.plugin.settings.defaultTemplate.percentageTextColor !== APB_PURE_BLACK) {
 		progressBarPercentage.createEl('span', { text: this.plugin.settings.APB_progressBarPercentage+'%' });
 		progressBarPercentage.style.color = this.plugin.settings.defaultTemplate.percentageTextColor;
 	}
@@ -1467,8 +1763,13 @@ new Setting(containerEl)
 	const progressBarValue = containerEl.createEl('div');
 	progressBarValue.addClass('progressBar-value');
 	const valueFromPercentageOfTotal = Math.floor((this.plugin.settings.APB_total/100) * this.plugin.settings.APB_progressBarPercentage);
-	if (this.plugin.settings.defaultTemplate.fractionTextColor !== this.plugin.settings.APB_pureBlack) {
-		progressBarValue.createEl('span', { text: '('+valueFromPercentageOfTotal+'/'+this.plugin.settings.APB_total+')' });
+	if (this.plugin.settings.defaultTemplate.fractionTextColor !== APB_PURE_BLACK) {
+		const prefixValue = this.plugin.settings.defaultTemplate.prefixValue ?? '';
+		const suffixValue = this.plugin.settings.defaultTemplate.suffixValue ?? '';
+		const prefixTotal = this.plugin.settings.defaultTemplate.prefixTotal ?? '';
+		const suffixTotal = this.plugin.settings.defaultTemplate.suffixTotal ?? '';
+		
+		progressBarValue.createEl('span', { text: '('+prefixValue+valueFromPercentageOfTotal+suffixValue+'/'+prefixTotal+this.plugin.settings.APB_total+suffixTotal+')' });
 		progressBarValue.style.color = this.plugin.settings.defaultTemplate.fractionTextColor;
 	}
 
@@ -1494,43 +1795,42 @@ new Setting(containerEl)
 	progressbar.style.background = this.plugin.settings.defaultTemplate.barBackgroundColor;
 
 	progressBarContainer.style.margin = '17px';
-	progressbar.style.height = `${this.plugin.settings.APB_height}px`;
+	progressbar.style.height = `${this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height}px`;
 
-	this.setEndCaps(progressBarBackground, progressbar, this.plugin.settings.APB_endcapToggle, clampedPercentage);
+	this.setEndCaps(progressBarBackground, progressbar, this.plugin.settings.defaultTemplate.endcap, clampedPercentage);
 	
 	// Create progressBar-filled (filled portion)
 	const filledBar = document.createElement('div');
 	filledBar.className = 'progressBar-filled';
 	filledBar.style.position = 'relative';
 	filledBar.style.width = `${clampedPercentage}%`; // e.g. 75%
-	filledBar.style.height = `${this.plugin.settings.APB_height}px`;
+	filledBar.style.height = `${this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height}px`;
 	progressBarBackground.appendChild(filledBar);
 
-	if (this.plugin.settings.APB_endcapToggle && clampedPercentage > 0 && clampedPercentage < 100){
+	if (this.plugin.settings.defaultTemplate.endcap && clampedPercentage > 0 && clampedPercentage < 100){
 		// ======= Create round end mask for inverse progress bar =======
 		const dpr = window.devicePixelRatio || 1; // Get device pixel ratio
 		const mask = document.createElementNS('http://www.w3.org/2000/svg', 'svg') as SVGSVGElement;
 		mask.setAttribute('class', 'progressBar-mask');
-		mask.setAttribute('width', `${(this.plugin.settings.APB_height / 2)}`); // 1 unit wide
-		mask.setAttribute('height', `${this.plugin.settings.APB_height}`);    // 2 units tall
-		mask.setAttribute('viewBox', `0 0 ${(this.plugin.settings.APB_height / 2)} ${this.plugin.settings.APB_height}`);
+		mask.setAttribute('width', `${((this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height) / 2)}`); // 1 unit wide
+		mask.setAttribute('height', `${this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height}`);    // 2 units tall
+		mask.setAttribute('viewBox', `0 0 ${((this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height) / 2)} ${this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height}`);
 		mask.style.position = 'absolute';
 		mask.style.top = '0';
 		mask.style.right = `-${1 / dpr}px`; // Nudge right to close the 1-pixel gap
-		mask.style.width = `${(this.plugin.settings.APB_height + 0.5) / 2}px`;
-		mask.style.height = `${this.plugin.settings.APB_height}px`;
+		mask.style.width = `${((this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height) + 0.5) / 2}px`;
+		mask.style.height = `${this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height}px`;
 
 		mask.innerHTML = `
 			<defs>
 				<mask id="round-end-mask-demo">
-				<rect x="0" y="-1" width="${(this.plugin.settings.APB_height + 10.5) / 2}" height="${this.plugin.settings.APB_height + 3}" fill="white"/>
-				<circle cx="0" cy="${this.plugin.settings.APB_height / 2}" r="${this.plugin.settings.APB_height / 2}" fill="black"/>
+				<rect x="0" y="-1" width="${((this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height) + 10.5) / 2}" height="${(this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height) + 3}" fill="white"/>
+				<circle cx="0" cy="${(this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height) / 2}" r="${(this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height) / 2}" fill="black"/>
 				</mask>
 			</defs>
-			<rect x="0" y="-1" width="${(this.plugin.settings.APB_height + 10.5) / 2}" height="${this.plugin.settings.APB_height +3}" fill="${this.plugin.settings.defaultTemplate.barBackgroundColor}" mask="url(#round-end-mask-demo)"/>
+			<rect x="0" y="-1" width="${((this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height) + 10.5) / 2}" height="${(this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height) +3}" fill="${this.plugin.settings.defaultTemplate.barBackgroundColor}" mask="url(#round-end-mask-demo)"/>
 			`;
 			filledBar.appendChild(mask);
-	// console.log(mask.outerHTML)
 	}
 
 	progressBarBackground.appendChild(progressbar);
@@ -1578,7 +1878,7 @@ new Setting(containerEl)
 		// Completed Progress Bar
 		const completed = containerEl.createEl('div');
 		completed.addClass('progressBar-completed');
-		if (this.plugin.settings.defaultTemplate.completedTextColor !== this.plugin.settings.APB_pureBlack) {
+		if (this.plugin.settings.defaultTemplate.completedTextColor !== APB_PURE_BLACK) {
 			completed.style.color = this.plugin.settings.defaultTemplate.completedTextColor;
 
 			if (this.plugin.settings.APB_progressBarPercentage == 100) {
@@ -1592,7 +1892,7 @@ new Setting(containerEl)
 		}
 		filledBar.style.backgroundImage = '';
 		filledBar.appendChild(completed);
-		if (this.plugin.settings.defaultTemplate.completedColor !== this.plugin.settings.APB_pureBlack) {
+		if (this.plugin.settings.defaultTemplate.completedColor !== APB_PURE_BLACK) {
 			progressBarBackground.style.backgroundColor = clampedPercentage === 100 ? this.plugin.settings.defaultTemplate.completedColor : colors[0];
 		}
 	}
@@ -1602,13 +1902,19 @@ new Setting(containerEl)
 
 	const marks = containerEl.createEl('div');
 	marks.addClass('marks');
-	;
 	var numberOfSections;
 
 	if (this.plugin.settings.APB_autoMarksToggle){
 		numberOfSections = numberOfValidColors;
 	} else {
 		numberOfSections = this.plugin.settings.APB_manualMarks + 1;
+	}
+	
+	const manualMarks = this.plugin.settings.defaultTemplate.manualMarks;
+	if (manualMarks >= 1 && manualMarks <= 19) {
+		numberOfSections = manualMarks + 1;
+	} else if (manualMarks === 0) {
+		numberOfSections = 0;
 	}
 
 	// create required number of section marks if NOT completed
@@ -1642,13 +1948,13 @@ new Setting(containerEl)
 	containerprogress.appendChild(progresstext);
 
 	progressBarContainer.appendChild(progressBarTextContainer);
-	if (this.plugin.settings.defaultTemplate.titleTextColor !== this.plugin.settings.APB_pureBlack) {
+	if (this.plugin.settings.defaultTemplate.titleTextColor !== APB_PURE_BLACK) {
 		progressBarTextContainer.appendChild(progressBarTitle);
 	}
-	if (this.plugin.settings.defaultTemplate.percentageTextColor !== this.plugin.settings.APB_pureBlack) {
+	if (this.plugin.settings.defaultTemplate.percentageTextColor !== APB_PURE_BLACK) {
 		progressBarTextContainer.appendChild(progressBarPercentage);
 	}
-	if (this.plugin.settings.defaultTemplate.fractionTextColor !== this.plugin.settings.APB_pureBlack) {
+	if (this.plugin.settings.defaultTemplate.fractionTextColor !== APB_PURE_BLACK) {
 		progressBarTextContainer.appendChild(progressBarValue);
 	}
 
@@ -1806,37 +2112,47 @@ new Setting(containerEl)
 			);
 	}
 
-	/************ Height *************/	
-	new Setting(containerEl)
-		.setName('Height')
-		.setDesc('Set the height of the progress bar in pixels.  (See demonstration progress bar above)')
-		.addSlider((slider) => {		
-			slider
-				.setLimits(1, 15, 1)
-				.setDynamicTooltip()				
-				.setValue(this.plugin.settings.APB_height ?? DEFAULT_SETTINGS.APB_height)
-				.onChange(async(value) =>  {
-					this.plugin.settings.APB_height = value;
-					this.setEndCaps(progressBarBackground, progressbar, this.plugin.settings.APB_endcapToggle, this.plugin.settings.APB_progressBarPercentage); 
-					this.plugin.settings.APB_progressBarChange = true;
+	/************ Default Day Number *************/
+let timeoutIdDate: ReturnType<typeof setTimeout>;
+
+descText = 'Set the default %%date increment%% of a new date progress bar.'
+segments = this.splitTextIntoSegments(descText);
+new Setting(containerEl)
+	.setName('Default date increment')
+	.setDesc(createFragment(frag => this.renderSegments(segments, frag)))
+	.addText(text => text
+		.setPlaceholder('7')
+		.setValue (this.plugin.settings.APB_dateIncrement !== undefined ? String(this.plugin.settings.APB_dateIncrement) : String(DEFAULT_SETTINGS.APB_toAPB_dateIncrementtal))
+		.onChange((value) => {
+			clearTimeout(timeoutIdDate);
+			timeoutIdDate = setTimeout(async() => {
+				const parsedValue = parseInt(value, 10);
+
+				if (parsedValue >= 1 && (!isNaN(parsedValue) && parsedValue === parseFloat(value))) {
+					this.plugin.settings.APB_dateIncrement = parsedValue;
 					await this.plugin.saveSettings();
-					this.display();				
-				})
-			})
-			.addButton((button) =>
-				button.setIcon('rotate-ccw').setTooltip('Reset to default')
-				.onClick(async() => {
-					this.plugin.settings.APB_height = DEFAULT_SETTINGS.APB_height as number;
-					this.plugin.settings.APB_progressBarChange = true;
+					this.display();
+				} else {						
+					text.setValue(String(this.plugin.settings.APB_dateIncrement ?? DEFAULT_SETTINGS.APB_dateIncrement));
+
 					await this.plugin.saveSettings();
-					this.display();					
-				})
-			);
-			
-	/************ End Caps *************/
-	this.createToggleSetting(containerEl, 'Round end caps',
-		'When toggled, the progress bar will have either a round or square end cap.  (See demonstration progress bar above)',
-		'APB_endcapToggle');
+					this.display();
+					new Notice('Please enter a value 1 or above.');
+				}
+			}, 1000);
+		})
+		.inputEl.classList.add('custom-textbox')
+	)
+	.addButton((button) =>
+		button.setIcon('rotate-ccw').setTooltip('Reset to default')
+		.onClick(async() => {
+			this.plugin.settings.APB_dateIncrement = DEFAULT_SETTINGS.APB_dateIncrement as number;
+			this.plugin.settings.APB_progressBarChange = true;
+			await this.plugin.saveSettings();
+			this.display();
+		})
+	);
+
 
 	/************ SECTION Section Marks *************/
 	const setting4 = new Setting(containerEl).setName('Section marks').setHeading();
@@ -1854,12 +2170,6 @@ new Setting(containerEl)
 		this.createToggleSetting(containerEl, 'Automatically assigned marks',
 			'When toggled on, your progress bar will automatically assign equally spaced vertical marks based on how many colors your progress bar template (or default template) uses.<br>Note: if the bar reaches 100% or the bar has only one color or is a gradient, no marks will be displayed automatically.  (toggle off to override this behavior)',
 			'APB_autoMarksToggle');
-
-		if (!this.plugin.settings.APB_autoMarksToggle) {
-			/************ Manual Marks *************/
-			this.createSliderSetting(containerEl, 'Number of marks', 'Manually override the number of evenly spaced marks along the gradient progress bar regardless of the number of colors used.',
-			'APB_manualMarks', 1, 4, 1 );
-		}
 
 		/************ Section Mark Color *************/
 		this.createColorPickerSetting(containerEl, 'Section mark color', 'Select the color of the section %%Marks%%.<br>Note: The color will be set to 50% transparency, allowing the progress bar\'s color to blend and influence the final appearance.',
@@ -1896,12 +2206,6 @@ new Setting(containerEl)
 		'When toggled on, you will not get an error when the %%Value%% is greater than the %%Total%%',
 		'APB_overageToggle');
 	
-	if (this.plugin.settings.APB_overageToggle) {
-		/************ Overage Color *************/
-		this.createColorPickerSetting(containerEl, 'Overage percentage text color', 'Select the color of the %%Percentage%% text when it is greater than 100%.',
-			'APB_overageColor', undefined, undefined, DEFAULT_SETTINGS.APB_overageLightColor as string, DEFAULT_SETTINGS.APB_overageColor as string);
-	}
-
 	/************ SECTION Progress Bar Container *************/	
 	const setting8 = new Setting(containerEl).setName('Progress bar container').setHeading();
 	const heading8 = setting8.settingEl.querySelector('.setting-item-name');
@@ -2011,7 +2315,18 @@ new Setting(containerEl)
 			completedColor: '#000000',
 			barBackgroundColor: '#000000',
 			colorSubTaskCompletedText: '#000000',
-			colorSubTaskText: '#000000'
+			colorSubTaskText: '#000000',
+			prefixValue: '',
+			suffixValue: '',
+			prefixTotal: '',
+			suffixTotal: '',
+			colorDates: '#000000',
+			colorDaysLeft: '#000000',
+			dateFormat: false,
+			colorOverage: '#000000',
+			endcap: true,
+			barHeight: 8,
+			manualMarks: 3
 		});
 		await this.plugin.saveSettings();
 		this.display();
@@ -2020,7 +2335,7 @@ new Setting(containerEl)
 	const rowContainer = containerEl.createDiv({ cls: 'settings-row-container' });
 	const headersRow = rowContainer.createDiv({ cls: 'settings-row-headers' });
 
-	const headers = ['Template Name', '|',  'Settings', '|', 'Gradient Toggle', '|', 'Gradient Type Toggle', '|',  'Color 1 - 5', '|',  '3 Color Presets'];
+	const headers = ['Template Name', '|',  'Settings', '|', 'Gradient Toggle', '|', 'Gradient Type Toggle', '|',  'Color 1 - 5', '|',  '3 Color Presets', '|',  'Duplicate'];
 	headers.forEach((header, index) => {
 		headersRow.createEl('span', {
 			text: header,
@@ -2047,7 +2362,7 @@ new Setting(containerEl)
 	defaultSetting.addButton((button) => {
 		button
 		.setIcon('gear')
-		.setTooltip('Edit Extended Colors')
+		.setTooltip('Edit Extended Settings')
 		.setClass(this.plugin.settings.defaultTemplate.isColorPanelVisible ? 'active-default-gear' : 'inactive-gear')
 		.onClick(async () => {
 			this.collapseOtherPanels('default'); // Collapse other panels
@@ -2092,13 +2407,13 @@ new Setting(containerEl)
 	for (let i = 0; i < 5; i++) {
 		defaultSetting.addColorPicker((color) => {
 			color
-			.setValue(this.plugin.settings.defaultTemplate.colors[i] || this.plugin.settings.APB_pureBlack)
+			.setValue(this.plugin.settings.defaultTemplate.colors[i] || APB_PURE_BLACK)
 			.onChange(async (value) => {
 				this.plugin.settings.defaultTemplate.colors[i] = value;
 				await this.plugin.saveSettings();
 				this.display();
 			});
-		});		
+		});
 	}
 	
 	// Light colors Default
@@ -2177,9 +2492,10 @@ new Setting(containerEl)
 					this.plugin.settings.templates[index].name = newName;
 					await this.plugin.saveSettings();
 					this.display();
-				}, 1000);
+				}, 3000);
 			});
-		text.inputEl.style.flex = '1';
+		text.inputEl.style.flex = '1';	
+		text.inputEl.style.minWidth = '150px';
 	});
 
 
@@ -2187,7 +2503,7 @@ new Setting(containerEl)
     setting.addButton((button) =>
         button
         .setIcon('gear')
-        .setTooltip('Edit Extended Colors')
+        .setTooltip('Edit Extended Settings')
 		.setClass(this.plugin.settings.templates[index].isColorPanelVisible ? 'active-template-gear' : 'inactive-gear')
         .onClick(async () => {
 			this.collapseOtherPanels(index); // Collapse other panels
@@ -2235,7 +2551,7 @@ new Setting(containerEl)
 	for (let i = 0; i < 5; i++) {
 	setting.addColorPicker((color: ColorComponent) => {
 		color
-		.setValue(template.colors[i] || this.plugin.settings.APB_pureBlack)
+		.setValue(template.colors[i] || APB_PURE_BLACK)
 		.onChange(async value => {
 			this.plugin.settings.templates[index].colors[i] = value;
 			await this.plugin.saveSettings();
@@ -2278,6 +2594,66 @@ new Setting(containerEl)
 			await this.plugin.saveSettings();
 			this.display();
 		});
+	});
+
+
+
+
+
+	setting.addButton((button) => {
+			button
+			.setIcon('copy')
+			.setTooltip('Duplicate this template')
+			.setClass('subtle-button')	
+			.onClick(async () => {
+
+				// Hide all color panels
+				this.plugin.settings.templates.forEach((t) => {
+					t.isColorPanelVisible = false;
+				});
+				this.plugin.settings.defaultTemplate.isColorPanelVisible = false;
+
+				// Find a unique template name
+				let templateCount = this.plugin.settings.templates.length;
+				let uniqueName = `${template.name} ${templateCount + 1}`;
+				let suffix = templateCount + 1;
+				const existingNames = new Set(this.plugin.settings.templates.map(t => t.name));
+				while (existingNames.has(uniqueName)) {
+					suffix++;
+					uniqueName = `${template.name} ${suffix}`;
+				}
+
+				this.plugin.settings.templates.push({
+					name: uniqueName,
+					gradient: template.gradient,
+					gradientType: template.gradientType,
+					colors: [template.colors[0], template.colors[1], template.colors[2], template.colors[3], template.colors[4]],
+					isColorPanelVisible: true,
+					borderColor: template.borderColor,
+					backgroundColor: template.backgroundColor,
+					titleTextColor: template.titleTextColor,
+					percentageTextColor: template.percentageTextColor,
+					fractionTextColor: template.fractionTextColor,
+					completedTextColor: template.completedTextColor,
+					completedColor: template.completedColor,
+					barBackgroundColor: template.barBackgroundColor,
+					colorSubTaskCompletedText: template.colorSubTaskCompletedText,
+					colorSubTaskText: template.colorSubTaskText,
+					prefixValue: template.prefixValue,
+					suffixValue: template.suffixValue,
+					prefixTotal: template.prefixTotal,
+					suffixTotal: template.suffixTotal,
+					colorDates: template.colorDates,
+					colorDaysLeft: template.colorDaysLeft,
+					dateFormat: template.dateFormat,
+					colorOverage: template.colorOverage,
+					endcap: template.endcap,
+					barHeight: template.barHeight,
+					manualMarks: template.manualMarks
+				});
+				await this.plugin.saveSettings();
+				this.display();
+			});
 	});
 
 	// Move up button
@@ -2377,6 +2753,196 @@ defaultContainerColorPickerPanel(): void {
 		this.createColorPickerSetting(container, 'Default Sub task completed text color', 'Choose the %%completed text%% color for the sub task shown under your progress bar.',
 				'default', undefined, 'colorSubTaskCompletedText', DEFAULT_SETTINGS.APB_colorLightSubTaskCompletedText as string, DEFAULT_SETTINGS.APB_colorSubTaskCompletedText as string);
 
+
+	/************ Default Value Prefix *************/
+	let descriptionText: string;
+    let textSegments: { text: string; isHighlighted: boolean; isNewLine?: boolean }[];
+
+	descriptionText = 'Set the default %%Value prefix%%.'
+	textSegments = this.splitTextIntoSegments(descriptionText);
+	new Setting(container)
+		.setName('Default value prefix')
+		.setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+		.addText(text => {
+			let debounceTimeout: ReturnType<typeof setTimeout>;							
+			text
+			.setPlaceholder('Enter your value prefix')
+			.setValue(this.plugin.settings.defaultTemplate.prefixValue || '')
+			.onChange((value) => {
+				clearTimeout(debounceTimeout);
+
+				debounceTimeout = setTimeout(async() => {		
+					this.plugin.settings.defaultTemplate.prefixValue = value;
+					this.plugin.settings.APB_progressBarChange = true;
+					await this.plugin.saveSettings();
+					this.display();
+				}, 2000);
+			})
+		});
+
+	/************ Default Value Suffix *************/
+	descriptionText = 'Set the default %%Value suffix%%.'
+	textSegments = this.splitTextIntoSegments(descriptionText);
+	new Setting(container)
+		.setName('Default value suffix')
+		.setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+		.addText(text => {
+			let debounceTimeout: ReturnType<typeof setTimeout>;							
+			text
+			.setPlaceholder('Enter your value suffix')
+			.setValue(this.plugin.settings.defaultTemplate.suffixValue || '')
+			.onChange((value) => {
+				clearTimeout(debounceTimeout);
+
+				debounceTimeout = setTimeout(async() => {		
+					this.plugin.settings.defaultTemplate.suffixValue = value;
+					this.plugin.settings.APB_progressBarChange = true;
+					await this.plugin.saveSettings();
+					this.display();
+				}, 2000);
+			})
+		});
+
+		/************ Default Total Prefix *************/
+	descriptionText = 'Set the default %%Total prefix%%.'
+	textSegments = this.splitTextIntoSegments(descriptionText);
+	new Setting(container)
+		.setName('Default total prefix')
+		.setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+		.addText(text => {
+			let debounceTimeout: ReturnType<typeof setTimeout>;							
+			text
+			.setPlaceholder('Enter your total prefix')
+			.setValue(this.plugin.settings.defaultTemplate.prefixTotal || '')
+			.onChange((value) => {
+				clearTimeout(debounceTimeout);
+
+				debounceTimeout = setTimeout(async() => {		
+					this.plugin.settings.defaultTemplate.prefixTotal = value;
+					this.plugin.settings.APB_progressBarChange = true;
+					await this.plugin.saveSettings();
+					this.display();
+				}, 2000);
+			})
+		});
+
+	/************ Default Total Suffix *************/
+	descriptionText = 'Set the default %%Total suffix%%.'
+	textSegments = this.splitTextIntoSegments(descriptionText);
+	new Setting(container)
+		.setName('Default total suffix')
+		.setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+		.addText(text => {
+			let debounceTimeout: ReturnType<typeof setTimeout>;							
+			text
+			.setPlaceholder('Enter your total suffix')
+			.setValue(this.plugin.settings.defaultTemplate.suffixTotal || '')
+			.onChange((value) => {
+				clearTimeout(debounceTimeout);
+
+				debounceTimeout = setTimeout(async() => {		
+					this.plugin.settings.defaultTemplate.suffixTotal = value;
+					this.plugin.settings.APB_progressBarChange = true;
+					await this.plugin.saveSettings();
+					this.display();
+				}, 2000);
+			})
+		});
+
+		this.createColorPickerSetting(container, 'Default dates color', 'Choose the color for the dates shown under your progress bar.',
+				'default', undefined, 'colorDates', DEFAULT_SETTINGS.APB_colorLightDates as string, DEFAULT_SETTINGS.APB_colorDates as string);
+	
+		this.createColorPickerSetting(container, 'Default days left color', 'Choose the color for the days left shown under your progress bar.',
+				'default', undefined, 'colorDaysLeft', DEFAULT_SETTINGS.APB_colorLightDaysLeft as string, DEFAULT_SETTINGS.APB_colorDaysLeft as string);
+
+
+		/************ Date Format *************/
+		descriptionText = 'When toggled on, your dates will be in the format %%Dec 31, 2025%% when toggled off %%31 Dec 2025%% will be the format used.'
+		textSegments = this.splitTextIntoSegments(descriptionText);
+        new Setting(container)
+            .setName('Default enable USA date format')
+            .setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.defaultTemplate.dateFormat)
+                .onChange(async (value) => {
+                    this.plugin.settings.defaultTemplate.dateFormat = value;
+                    await this.plugin.saveSettings();
+                    this.display(); // Refresh to show/hide radio buttons
+                }));
+
+		/************ Manual Marks *************/
+		descriptionText = 'Manually override the number of evenly spaced marks along the progress bar.  Set to %%-1%% to use default automatically calculated value and %%0%% for no marks at all.'
+		textSegments = this.splitTextIntoSegments(descriptionText);
+		new Setting(container)
+			.setName('Default number of marks')
+			.setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+			.addSlider((slider) => {
+				slider
+					.setLimits(-1, 19, 1)
+					.setDynamicTooltip()				
+					.setValue(this.plugin.settings.defaultTemplate.manualMarks ?? DEFAULT_SETTINGS.APB_manualMarks)
+					.onChange(async(value) =>  {
+						this.plugin.settings.defaultTemplate.manualMarks = value;
+						this.plugin.settings.APB_progressBarChange = true;
+						await this.plugin.saveSettings();
+						this.display();				
+					})
+				})
+				.addButton((button) =>
+					button.setIcon('rotate-ccw').setTooltip('Reset to default')
+					.onClick(async() => {
+						this.plugin.settings.defaultTemplate.manualMarks = DEFAULT_SETTINGS.APB_manualMarks as number;
+						this.plugin.settings.APB_progressBarChange = true;
+						await this.plugin.saveSettings();
+						this.display();					
+					}));
+
+		/************ endcap *************/
+		descriptionText = 'When toggled on, the progress bar will have a %%round end cap%% and when toggled off it will have a %%square end cap%%.'
+		textSegments = this.splitTextIntoSegments(descriptionText);
+        new Setting(container)
+            .setName('Default end caps style')
+            .setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.defaultTemplate.endcap)
+                .onChange(async (value) => {
+                    this.plugin.settings.defaultTemplate.endcap = value;
+                    await this.plugin.saveSettings();
+                    this.display(); // Refresh to show/hide radio buttons
+                }));
+				
+		/************ Height *************/	
+		descriptionText = 'Set the %%height%% of the progress bar in pixels.'
+		textSegments = this.splitTextIntoSegments(descriptionText);
+		new Setting(container)
+			.setName('Default bar height')
+			.setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+			.addSlider((slider) => {		
+				slider
+					.setLimits(1, 15, 1)
+					.setDynamicTooltip()				
+					.setValue(this.plugin.settings.defaultTemplate.barHeight ?? DEFAULT_SETTINGS.APB_height)
+					.onChange(async(value) =>  {
+						this.plugin.settings.defaultTemplate.barHeight = value;
+						// this.setEndCaps(progressBarBackground, progressbar, this.plugin.settings.defaultTemplate.endcap, this.plugin.settings.APB_progressBarPercentage); 
+						this.plugin.settings.APB_progressBarChange = true;
+						await this.plugin.saveSettings();
+						this.display();				
+					})
+				})
+				.addButton((button) =>
+					button.setIcon('rotate-ccw').setTooltip('Reset to default')
+					.onClick(async() => {
+						this.plugin.settings.defaultTemplate.barHeight = DEFAULT_SETTINGS.APB_height as number;
+						this.plugin.settings.APB_progressBarChange = true;
+						await this.plugin.saveSettings();
+						this.display();					
+					})
+				);
+
+		this.createColorPickerSetting(container, 'Default overage percentage text color', 'Select the color of the %%Percentage%% text when it is greater than 100%.',
+			'default', undefined, 'colorOverage', DEFAULT_SETTINGS.APB_overageLightColor as string, DEFAULT_SETTINGS.APB_overageColor as string);
+
 		/************ Transfer default values to default template *************/
 		const descText = 'All the above settings within the green border have been removed from standard settings and are now integrated into this default template.  Use this button to copy %%ALL pre v1.1.4%% values into this default template container settings.'
 		const segments = this.splitTextIntoSegments(descText);
@@ -2387,28 +2953,30 @@ defaultContainerColorPickerPanel(): void {
 			.addButton((button) =>
 			button.setIcon('copy').setTooltip('Transfer default values')	
 			.onClick(async() => {	
-				// Set default template colors to old colors - with a pureBlack fallback color (and taking into account toggles)
-				this.plugin.settings.defaultTemplate.borderColor = this.plugin.settings.APB_borderToggle ? this.plugin.settings.APB_colorBorder ?? this.plugin.settings.APB_pureBlack : this.plugin.settings.APB_pureBlack;
-				this.plugin.settings.defaultTemplate.backgroundColor = this.plugin.settings.APB_backgroundToggle ? this.plugin.settings.APB_colorBackground ?? this.plugin.settings.APB_pureBlack : this.plugin.settings.APB_pureBlack;
-				this.plugin.settings.defaultTemplate.titleTextColor = this.plugin.settings.APB_titleToggle ? this.plugin.settings.APB_titleColor ?? this.plugin.settings.APB_pureBlack : this.plugin.settings.APB_pureBlack;
-				this.plugin.settings.defaultTemplate.percentageTextColor = this.plugin.settings.APB_percentageToggle ? this.plugin.settings.APB_percentageColor ?? this.plugin.settings.APB_pureBlack : this.plugin.settings.APB_pureBlack;
-				this.plugin.settings.defaultTemplate.fractionTextColor = this.plugin.settings.APB_fractionToggle ? this.plugin.settings.APB_fractionColor ?? this.plugin.settings.APB_pureBlack : this.plugin.settings.APB_pureBlack;
-				this.plugin.settings.defaultTemplate.completedTextColor = this.plugin.settings.APB_completedToggle ? this.plugin.settings.APB_completedColor ?? this.plugin.settings.APB_pureBlack : this.plugin.settings.APB_pureBlack;		
-				this.plugin.settings.defaultTemplate.completedColor = this.plugin.settings.APB_colorBarCompleted ?? this.plugin.settings.APB_pureBlack;
-				this.plugin.settings.defaultTemplate.barBackgroundColor = this.plugin.settings.APB_colorBarBackground ?? this.plugin.settings.APB_pureBlack;
+				// Set default template colors to old colors - with a APB_PURE_BLACK fallback color (and taking into account toggles)
+				this.plugin.settings.defaultTemplate.borderColor = this.plugin.settings.APB_borderToggle ? this.plugin.settings.APB_colorBorder ?? APB_PURE_BLACK : APB_PURE_BLACK;
+				this.plugin.settings.defaultTemplate.backgroundColor = this.plugin.settings.APB_backgroundToggle ? this.plugin.settings.APB_colorBackground ?? APB_PURE_BLACK : APB_PURE_BLACK;
+				this.plugin.settings.defaultTemplate.titleTextColor = this.plugin.settings.APB_titleToggle ? this.plugin.settings.APB_titleColor ?? APB_PURE_BLACK : APB_PURE_BLACK;
+				this.plugin.settings.defaultTemplate.percentageTextColor = this.plugin.settings.APB_percentageToggle ? this.plugin.settings.APB_percentageColor ?? APB_PURE_BLACK : APB_PURE_BLACK;
+				this.plugin.settings.defaultTemplate.fractionTextColor = this.plugin.settings.APB_fractionToggle ? this.plugin.settings.APB_fractionColor ?? APB_PURE_BLACK : APB_PURE_BLACK;
+				this.plugin.settings.defaultTemplate.completedTextColor = this.plugin.settings.APB_completedToggle ? this.plugin.settings.APB_completedColor ?? APB_PURE_BLACK : APB_PURE_BLACK;		
+				this.plugin.settings.defaultTemplate.completedColor = this.plugin.settings.APB_colorBarCompleted ?? APB_PURE_BLACK;
+				this.plugin.settings.defaultTemplate.barBackgroundColor = this.plugin.settings.APB_colorBarBackground ?? APB_PURE_BLACK;
 
 				if (this.plugin.settings.APB_allowTasksToggle && this.plugin.settings.APB_allowSubTasksToggle) {
-					this.plugin.settings.defaultTemplate.colorSubTaskText = this.plugin.settings.APB_colorSubTaskText ?? this.plugin.settings.APB_pureBlack;
-					this.plugin.settings.defaultTemplate.colorSubTaskCompletedText = this.plugin.settings.APB_colorSubTaskCompletedText ?? this.plugin.settings.APB_pureBlack;
+					this.plugin.settings.defaultTemplate.colorSubTaskText = this.plugin.settings.APB_colorSubTaskText ?? APB_PURE_BLACK;
+					this.plugin.settings.defaultTemplate.colorSubTaskCompletedText = this.plugin.settings.APB_colorSubTaskCompletedText ?? APB_PURE_BLACK;
 				} else {
-					this.plugin.settings.defaultTemplate.colorSubTaskText = this.plugin.settings.APB_pureBlack;
-					this.plugin.settings.defaultTemplate.colorSubTaskCompletedText = this.plugin.settings.APB_pureBlack;
+					this.plugin.settings.defaultTemplate.colorSubTaskText = APB_PURE_BLACK;
+					this.plugin.settings.defaultTemplate.colorSubTaskCompletedText = APB_PURE_BLACK;
 				}
 
 				await this.plugin.saveSettings();
 				this.display();
-			}));
+			}));	
+
 	}
+	
 }
 
 containerColorPickerPanel(templateIndex: number): void {
@@ -2424,35 +2992,225 @@ containerColorPickerPanel(templateIndex: number): void {
 
 	if (template.isColorPanelVisible) {
 		this.createColorPickerSetting(container, 'Container border color', 'Choose the %%border%% color of the %%progress bar%% container.',
-				'templates', templateIndex, 'borderColor', this.plugin.settings.defaultTemplate?.borderColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+				'templates', templateIndex, 'borderColor', this.plugin.settings.defaultTemplate?.borderColor as string, APB_PURE_BLACK as string);
 
 		this.createColorPickerSetting(container, 'Container background color', 'Choose the %%background%% color of the %%progress bar%% container.',
-				'templates', templateIndex, 'backgroundColor', this.plugin.settings.defaultTemplate?.backgroundColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+				'templates', templateIndex, 'backgroundColor', this.plugin.settings.defaultTemplate?.backgroundColor as string, APB_PURE_BLACK as string);
 
 		this.createColorPickerSetting(container, 'Container title text color', 'Choose the %%Title%% text color for this template.',
-				'templates', templateIndex, 'titleTextColor', this.plugin.settings.defaultTemplate?.titleTextColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+				'templates', templateIndex, 'titleTextColor', this.plugin.settings.defaultTemplate?.titleTextColor as string, APB_PURE_BLACK as string);
 
 		this.createColorPickerSetting(container, 'Container percentage text color', 'Choose the %%Percentage%% text color for this template.',
-				'templates', templateIndex, 'percentageTextColor', this.plugin.settings.defaultTemplate?.percentageTextColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+				'templates', templateIndex, 'percentageTextColor', this.plugin.settings.defaultTemplate?.percentageTextColor as string, APB_PURE_BLACK as string);
 	
 		this.createColorPickerSetting(container, 'Container fraction text color', 'Choose the %%Fraction%% text color for this template.',
-				'templates', templateIndex, 'fractionTextColor', this.plugin.settings.defaultTemplate?.fractionTextColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+				'templates', templateIndex, 'fractionTextColor', this.plugin.settings.defaultTemplate?.fractionTextColor as string, APB_PURE_BLACK as string);
 
 		this.createColorPickerSetting(container, 'Container completed text color', 'Choose the %%Completed%% text color for this template.',
-				'templates', templateIndex, 'completedTextColor', this.plugin.settings.defaultTemplate?.completedTextColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+				'templates', templateIndex, 'completedTextColor', this.plugin.settings.defaultTemplate?.completedTextColor as string, APB_PURE_BLACK as string);
 
 		this.createColorPickerSetting(container, 'Bar background color', 'Choose the %%Background Bar%% color for this template.  NOTE: this is the only color that can be set to pure black #000000 as it can not be transparent for the progress bar to work corectly',
-				'templates', templateIndex, 'barBackgroundColor', this.plugin.settings.defaultTemplate?.barBackgroundColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+				'templates', templateIndex, 'barBackgroundColor', this.plugin.settings.defaultTemplate?.barBackgroundColor as string, APB_PURE_BLACK as string);
 
 		this.createColorPickerSetting(container, 'Completed bar color', 'Choose the %%Completed%% bar color for this template.',
-				'templates', templateIndex, 'completedColor', this.plugin.settings.defaultTemplate?.completedColor as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+				'templates', templateIndex, 'completedColor', this.plugin.settings.defaultTemplate?.completedColor as string, APB_PURE_BLACK as string);
 		
 		this.createColorPickerSetting(container, 'Sub task color', 'Choose the %%text%% color for the sub task shown under your progress bar.',
-				'templates', templateIndex, 'colorSubTaskText', this.plugin.settings.defaultTemplate?.colorSubTaskText as string, DEFAULT_SETTINGS.APB_pureBlack as string);
+				'templates', templateIndex, 'colorSubTaskText', this.plugin.settings.defaultTemplate?.colorSubTaskText as string, APB_PURE_BLACK as string);
 		
 		this.createColorPickerSetting(container, 'Sub task completed color', 'Choose the %%completed text%% color for the sub task shown under your progress bar.',
-				'templates', templateIndex, 'colorSubTaskCompletedText', this.plugin.settings.defaultTemplate?.colorSubTaskCompletedText as string, DEFAULT_SETTINGS.APB_pureBlack as string);
-    }
+				'templates', templateIndex, 'colorSubTaskCompletedText', this.plugin.settings.defaultTemplate?.colorSubTaskCompletedText as string, APB_PURE_BLACK as string);
+  
+	
+	/************ Template ValuePrefix *************/
+	let descriptionText: string;
+    let textSegments: { text: string; isHighlighted: boolean; isNewLine?: boolean }[];
+
+	descriptionText = 'Set this templates %%Value prefix%%.'
+	textSegments = this.splitTextIntoSegments(descriptionText);
+	new Setting(container)
+		.setName('Value prefix')
+		.setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+		.addText(text => {
+			let debounceTimeout: ReturnType<typeof setTimeout>;							
+			text
+			.setPlaceholder('Enter your value prefix')
+			.setValue(this.plugin.settings.templates[templateIndex].prefixValue || '')
+			.onChange((value) => {
+				clearTimeout(debounceTimeout);
+
+				debounceTimeout = setTimeout(async() => {		
+					this.plugin.settings.templates[templateIndex].prefixValue = value;
+					this.plugin.settings.APB_progressBarChange = true;
+					await this.plugin.saveSettings();
+					this.display();
+				}, 2000);
+			})
+		});
+
+	/************ Template Value Suffix *************/
+	descriptionText = 'Set this templates %%Value suffix%%.'
+	textSegments = this.splitTextIntoSegments(descriptionText);
+	new Setting(container)
+		.setName('Value suffix')
+		.setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+		.addText(text => {
+			let debounceTimeout: ReturnType<typeof setTimeout>;							
+			text
+			.setPlaceholder('Enter your value suffix')
+			.setValue(this.plugin.settings.templates[templateIndex].suffixValue || '')
+			.onChange((value) => {
+				clearTimeout(debounceTimeout);
+
+				debounceTimeout = setTimeout(async() => {		
+					this.plugin.settings.templates[templateIndex].suffixValue = value;
+					this.plugin.settings.APB_progressBarChange = true;
+					await this.plugin.saveSettings();
+					this.display();
+				}, 2000);
+			})
+		});
+
+		/************ Template Total Prefix *************/
+		descriptionText = 'Set this templates %%Total prefix%%.'
+	textSegments = this.splitTextIntoSegments(descriptionText);
+	new Setting(container)
+		.setName('Total prefix')
+		.setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+		.addText(text => {
+			let debounceTimeout: ReturnType<typeof setTimeout>;							
+			text
+			.setPlaceholder('Enter your total prefix')
+			.setValue(this.plugin.settings.templates[templateIndex].prefixTotal || '')
+			.onChange((value) => {
+				clearTimeout(debounceTimeout);
+
+				debounceTimeout = setTimeout(async() => {		
+					this.plugin.settings.templates[templateIndex].prefixTotal = value;
+					this.plugin.settings.APB_progressBarChange = true;
+					await this.plugin.saveSettings();
+					this.display();
+				}, 2000);
+			})
+		});
+
+	/************ Template Total Suffix *************/
+	descriptionText = 'Set this templates %%Total suffix%%.'
+	textSegments = this.splitTextIntoSegments(descriptionText);
+	new Setting(container)
+		.setName('Total suffix')
+		.setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+		.addText(text => {
+			let debounceTimeout: ReturnType<typeof setTimeout>;							
+			text
+			.setPlaceholder('Enter your total suffix')
+			.setValue(this.plugin.settings.templates[templateIndex].suffixTotal || '')
+			.onChange((value) => {
+				clearTimeout(debounceTimeout);
+
+				debounceTimeout = setTimeout(async() => {		
+					this.plugin.settings.templates[templateIndex].suffixTotal = value;
+					this.plugin.settings.APB_progressBarChange = true;
+					await this.plugin.saveSettings();
+					this.display();
+				}, 2000);
+			})
+		});
+
+	this.createColorPickerSetting(container, 'Dates color', 'Choose the color for the dates shown under your progress bar.',
+			'templates', templateIndex, 'colorDates', this.plugin.settings.defaultTemplate?.colorDates as string, APB_PURE_BLACK as string);
+
+	this.createColorPickerSetting(container, 'Days Left color', 'Choose the color for the days left shown under your progress bar.',
+			'templates', templateIndex, 'colorDaysLeft', this.plugin.settings.defaultTemplate?.colorDaysLef as string, APB_PURE_BLACK as string);
+	
+	/************ Date Format *************/
+	descriptionText = 'When toggled on, your dates will be in the format %%Dec 31, 2025%% when toggled off %%31 Dec 2025%% will be the format used.'
+	textSegments = this.splitTextIntoSegments(descriptionText);
+	new Setting(container)
+		.setName('Enable USA date format')
+		.setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+		.addToggle(toggle => toggle
+			.setValue(this.plugin.settings.templates[templateIndex].dateFormat)
+			.onChange(async (value) => {
+				this.plugin.settings.templates[templateIndex].dateFormat = value;
+				await this.plugin.saveSettings();
+				this.display(); // Refresh to show/hide radio buttons
+			}));
+	
+	/************ Manual Marks *************/
+	descriptionText = 'Manually override the number of evenly spaced marks along the progress bar.  Set to %%-1%% to use default automatically calculated value and %%0%% for no marks at all.'
+	textSegments = this.splitTextIntoSegments(descriptionText);
+	new Setting(container)
+		.setName('Number of marks')
+		.setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+		.addSlider((slider) => {		
+			slider
+				.setLimits(-1, 19, 1)
+				.setDynamicTooltip()				
+				.setValue(this.plugin.settings.templates[templateIndex].manualMarks ?? DEFAULT_SETTINGS.APB_manualMarks)
+				.onChange(async(value) =>  {
+					this.plugin.settings.templates[templateIndex].manualMarks = value;
+					// this.setEndCaps(progressBarBackground, progressbar, this.plugin.settings.defaultTemplate.endcap, this.plugin.settings.APB_progressBarPercentage); 
+					this.plugin.settings.APB_progressBarChange = true;
+					await this.plugin.saveSettings();
+					this.display();				
+				})
+			})
+			.addButton((button) =>
+				button.setIcon('rotate-ccw').setTooltip('Reset to default')
+				.onClick(async() => {
+					this.plugin.settings.templates[templateIndex].manualMarks = DEFAULT_SETTINGS.APB_manualMarks as number;
+					this.plugin.settings.APB_progressBarChange = true;
+					await this.plugin.saveSettings();
+					this.display();					
+				}));
+	
+	/************ endcap *************/
+	descriptionText = 'When toggled on, the progress bar will have a %%round end cap%% and when toggled off it will have a %%square end cap%%.'
+	textSegments = this.splitTextIntoSegments(descriptionText);
+	new Setting(container)
+		.setName('End caps style')
+		.setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+		.addToggle(toggle => toggle
+			.setValue(this.plugin.settings.templates[templateIndex].endcap)
+			.onChange(async (value) => {
+				this.plugin.settings.templates[templateIndex].endcap = value;
+				await this.plugin.saveSettings();
+				this.display(); // Refresh to show/hide radio buttons
+			}));
+
+	/************ bar Height *************/	
+	descriptionText = 'Set the height of the progress bar in pixels.'
+	textSegments = this.splitTextIntoSegments(descriptionText);
+	new Setting(container)
+		.setName('Bar height')
+		.setDesc(createFragment(frag => this.renderSegments(textSegments, frag)))
+		.addSlider((slider) => {		
+			slider
+				.setLimits(1, 15, 1)
+				.setDynamicTooltip()				
+				.setValue(this.plugin.settings.templates[templateIndex].barHeight ?? DEFAULT_SETTINGS.APB_height)
+				.onChange(async(value) =>  {
+					this.plugin.settings.templates[templateIndex].barHeight = value;
+					// this.setEndCaps(progressBarBackground, progressbar, this.plugin.settings.defaultTemplate.endcap, this.plugin.settings.APB_progressBarPercentage); 
+					this.plugin.settings.APB_progressBarChange = true;
+					await this.plugin.saveSettings();
+					this.display();				
+				})
+			})
+			.addButton((button) =>
+				button.setIcon('rotate-ccw').setTooltip('Reset to default')
+				.onClick(async() => {
+					this.plugin.settings.templates[templateIndex].barHeight = DEFAULT_SETTINGS.APB_height as number;
+					this.plugin.settings.APB_progressBarChange = true;
+					await this.plugin.saveSettings();
+					this.display();					
+				}));
+
+	this.createColorPickerSetting(container, 'Overage percentage text color', 'Select the color of the %%Percentage%% text when it is greater than 100%.',
+			'templates', templateIndex, 'colorOverage', this.plugin.settings.defaultTemplate?.colorOverage ?? APB_PURE_BLACK as string, APB_PURE_BLACK as string);
+
+	}
   }
 
 	
@@ -2561,10 +3319,10 @@ createColorPickerSetting(
 		.addColorPicker((colorPicker: ColorComponent) => {
                 this.colorPickers[settingKey] = colorPicker; // Store color picker
                 const value = index !== undefined && settingName
-                    ? (this.plugin.settings.templates[index][settingName] as string) || this.plugin.settings.APB_pureBlack
+                    ? (this.plugin.settings.templates[index][settingName] as string) || APB_PURE_BLACK
                     : settingName
-                    ? (this.plugin.settings.defaultTemplate[settingName] as string) || this.plugin.settings.APB_pureBlack
-                    : (this.plugin.settings[settingKey] as string) || this.plugin.settings.APB_pureBlack;
+                    ? (this.plugin.settings.defaultTemplate[settingName] as string) || APB_PURE_BLACK
+                    : (this.plugin.settings[settingKey] as string) || APB_PURE_BLACK;
                 colorPicker
                     .setValue(value)
                     .onChange(async (value: string) => {
@@ -2746,6 +3504,69 @@ createSliderSetting(
                 }
             }
         });
+    }
+}
+
+function  formatDate(dateString: string, format: 'DMY' | 'MDY' | 'YMD'): string {
+    const date = new Date(dateString);
+
+    // Validate date
+    if (isNaN(date.getTime())) {
+        throw new Error(`Invalid date string: ${dateString}`);
+    }
+
+    switch (format) {
+        case 'DMY':
+            // Format: 31 Dec 2025
+            return new Intl.DateTimeFormat('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }).format(date);
+
+		case 'MDY':
+            // Format: Dec 31, 2025
+            return new Intl.DateTimeFormat('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            }).format(date).replace(/(\d+),/, '$1,');
+
+        // case 'MDY':
+        //     // Format: Dec 31st 2025
+        //     return new Intl.DateTimeFormat('en-GB', {
+        //         day: 'numeric',
+        //         month: 'short',
+        //         year: 'numeric'
+        //     }).format(date).replace(/(\d+)(?=,)/, (day) => {
+        //         const num = parseInt(day);
+        //         const suffix = num === 1 ? 'st' : num === 2 ? 'nd' : num === 3 ? 'rd' : 'th';
+        //         return `${day}${suffix}`;
+        //     });
+
+		case 'YMD':
+            // Format: 2025 Dec 31
+            const parts = new Intl.DateTimeFormat('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }).formatToParts(date);
+            const year = parts.find(p => p.type === 'year')?.value;
+            const month = parts.find(p => p.type === 'month')?.value;
+            const day = parts.find(p => p.type === 'day')?.value;
+            return `${year} ${month} ${day}`;
+
+        // case 'YMD':
+        //     // Format: 31/12/2025
+        //     return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+
+        // case 'mmmddyyyy':
+        //     // Format: Dec 31, 2025
+        //     const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        //     return `${monthsShort[date.getMonth()]} ${String(date.getDate()).padStart(2, '0')}, ${date.getFullYear()}`;
+
+        default:
+            throw new Error(`Unsupported format: ${format}`);
     }
 }
 

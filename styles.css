@@ -57,11 +57,9 @@
     padding: 5px;
     position: relative;
     width: 100%;
-
-
-    min-height: 20px; /* Adjust based on progress bar height */
+    min-height: 20px;
     overflow: visible; /* Prevent clipping */
-    display: block; /* Ensure block-level behavior */
+    display: block;
 }
 
 .progressBar-text-container {
@@ -286,8 +284,8 @@ li.apb-list-item .list-bullet {
     padding: 2px;
     opacity: 0.5; /* Lower opacity to make less noticeable */
     filter: grayscale(50%); /* Muted color effect */
-    background-color: transparent; /* Remove default background */
-    border: none; /* Remove border */
+    background-color: transparent;
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -388,7 +386,7 @@ li.apb-list-item .list-bullet {
 
 .default-container-color-picker-panel {
     padding: 10px;
-    border: 2px solid light-dark(#45ba69, #5eed89); /* var(--background-modifier-border); */
+    border: 2px solid light-dark(#45ba69, #5eed89);
     background-color: var(--background-secondary);
     margin-top: 10px;
     margin-left: 20px;
@@ -405,4 +403,34 @@ li.apb-list-item .list-bullet {
 
 .inactive-gear  {
     border: 2px solid var(--background-modifier-border); 
+}
+
+.progressBar-dates-container {
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: row nowrap;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.65em;
+    font-weight: 500;
+    /* justify-content: space-between; */
+    overflow: hidden;
+    padding: 0.3em 5px 0.3em 5px;
+    width: 100%;
+}
+
+.grouped-progress-bar {
+    display: flex;
+    flex-flow: row wrap;
+    flex-direction: column;   
+    justify-content: center;  
+    overflow: hidden;
+    padding: 5px !important;
+    position: relative;
+    width: 100%;
+}
+
+.setting-item input[type="color"] {
+    border: 1px solid #363636;
+    border-radius: 50%;
 }
