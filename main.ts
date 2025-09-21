@@ -3121,7 +3121,7 @@ containerColorPickerPanel(templateIndex: number): void {
 			'templates', templateIndex, 'colorDates', this.plugin.settings.defaultTemplate?.colorDates as string, APB_PURE_BLACK as string);
 
 	this.createColorPickerSetting(container, 'Days Left color', 'Choose the color for the days left shown under your progress bar.',
-			'templates', templateIndex, 'colorDaysLeft', this.plugin.settings.defaultTemplate?.colorDaysLef as string, APB_PURE_BLACK as string);
+			'templates', templateIndex, 'colorDaysLeft', this.plugin.settings.defaultTemplate?.colorDaysLeft as string, APB_PURE_BLACK as string);
 	
 	/************ Date Format *************/
 	descriptionText = 'When toggled on, your dates will be in the format %%Dec 31, 2025%% when toggled off %%31 Dec 2025%% will be the format used.'
