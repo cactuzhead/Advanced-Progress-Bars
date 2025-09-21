@@ -36,7 +36,7 @@ If you want to manually trigger a task update without switching between notes, y
 ![Hotkey](/assets/Obsidian Advanced Progress Bars - Manual Refresh Hotkey.png)
 
 
-## Paste Date Code Block Hotkey Setup <span class="label label-green badge">NEW v1.1.4</span>
+## Paste Date Code Block Hotkey Setup <span class="label label-green badge">NEW v1.2.0</span>
 To make it more convenient, you can add a hotkey that automatically inserts a date progress bar code block into Obsidian. Simply follow these steps:
 
 1. Open Obsidian and go to the **Settings** by clicking the gear icon in the bottom left corner.
