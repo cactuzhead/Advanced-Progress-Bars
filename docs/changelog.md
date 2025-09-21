@@ -20,7 +20,9 @@ nav_order: 999
 - Increased time to 3 seconds for editing template name.
 ### Documentation
 - Updated `Usage` page to include information about the new Date Progress Bars.
+- Updated `Templates` page to add Duplicate Template Button information.
 - Updated `Templates Extended` page to include Prefix & Suffix information.
+- Updated `Hotkeys` page to include Paste Date Code Block.
 - Added a new `Grouping` page to include information on how to create and customise your groups.
 ### Bug Fixes
 - Fixed bug where the subtask text can be visible for progress bars without a tag or without a task matching tag.
