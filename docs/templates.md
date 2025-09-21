@@ -14,7 +14,7 @@ This update removed a lot of the color and gradient settings from the `Progress 
 The default template will automatically be applied to all progress bars that have not been alocated a specific custom template.
 
 {: .note }
-**All** progress bars will still use all the other defaults set outwith the templating feature.  These include, but are not limited to marks, text and tasks.
+**All** progress bars will still use all the other defaults set outwith the templating feature.  These include, but are not limited to marks, inline edit and tasks.
 
 With the introduction of templates, you can now have gradients with up to 5 equally spaced color stops for greater customisation.
 
@@ -29,7 +29,7 @@ To add a new template, press the `Add Template` button and a new template row wi
 Each row will consist of these following settings:-
 
 ### Template Name
-Assign a unique, short, and descriptive name to your template. This name will be used in the code block for each progress bar where you want the template applied.
+Every new template is automatically assigned a unique name, but we recommend customizing it to a short, descriptive, and unique name for clarity. This name will be used in the code block to apply the template to each progress bar.
 
 {: .note }
 The template names are case insensative so `My Template` is the same as `mY teMpLATE`.
@@ -129,6 +129,15 @@ These 3 buttons when pressed, will fill all 5 color pickers with either the `Lig
 
 {: .note }
 When pressed these will overwrite any colors you have already assigned and can not be undone.
+
+### Duplicate Template Button
+This button was added in `v1.2.0` and once clicked, will create a new template at the bottom of the list with all the same settings as the current custom template.
+![Duplicate Button](/assets/Obsidian Advanced Progress Bars - Templates Duplicate Button.png)
+
+By duplicating the entire template, you can quickly create similar varients.
+
+{: .note }
+Every new template is automatically assigned a unique name, but we suggest customizing it to a more descriptive, unique, and meaningful name to simplify identification and usage.
 
 ### Movement Buttons (up & down)
 If you wish to order your templates in the list, use these two buttons to move the row up or down.

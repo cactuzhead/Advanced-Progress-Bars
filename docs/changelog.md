@@ -8,7 +8,28 @@ nav_order: 999
 
 # Changelog
 
-## Release v1.1.4 <span class="label label-green badge">NEW</span>
+## Release v1.2.0 <span class="label label-green badge">NEW</span>
+### New Features
+- Added date funtionality so you can use a start and end date to keep track of days.
+- Added prefix and suffix to templates so that you can add custom text before and/or after the value and total.
+- Added grouping of multiple progress bars with optional title and template.
+- Added a hotkey to insert a date code block using todays date as the start and 1 week later for the end date (you can change default duration).
+- Added a copy button on every custom template to duplicate the entire template which is useful for creating similar varients.
+- <span class="label label-red badge">REMOVED</span> `Height`, `Round end caps`, `Number of marks` and `Overage color` from the standard settings as they are now primarily template based.
+- Added a border around color pickers so they can be easily seen on mobile.
+- Increased time to 3 seconds for editing template name.
+### Documentation
+- Updated `Usage` page to include information about the new Date Progress Bars.
+- Updated `Templates Extended` page to include Prefix & Suffix information.
+- Added a new `Grouping` page to include information on how to create and customise your groups.
+### Bug Fixes
+- Fixed bug where the subtask text can be visible for progress bars without a tag or without a task matching tag.
+- Fixed a bug where if you set the completed bar color to pure black (#000000) it would still be displayed instead of hidden.
+- Made sure that the template name's textbox is not shrunk down in width on mobile so you can actually see the name.
+- Fixed the template name not being case insensative as intended.
+
+
+## Release v1.1.4
 ### New Features
 - Expanded the templates system to allow for additional per template container, text and bar colors.
 - Added a button to transfer all your default settings to the default template.

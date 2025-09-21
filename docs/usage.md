@@ -58,3 +58,32 @@ The above stacked bars example would be rendered like this (using default dark c
 
 {: .note }
 The code block example on the settings page will only include one progress bar. You will need to manually add any additional progress bars once pasted into Obsidian.
+
+
+## Date Progress Bars <span class="label label-green badge">NEW 1.2.0</span>
+With release `v1.2.0` you now have the ability to automatically track the days between a start and end date.
+
+![dates](/assets/Obsidian Advanced Progress Bars - Templates Extended Dates.png)
+
+You can manually add a date progress bar by creating a code block which matches the pattern  `Title: Start_date||End_date{template}`
+
+An example code block would be the following:-
+
+````
+```apb
+My Title: 2025-08-28||2025-12-31{template}
+```
+````
+
+Just like a normal progress bar, at the start, you have to use a title followed by a colon `:`.
+
+{: .note }
+Although you need to use a title followed by a colon for any valid progress bar, you can hide this title if you wish to by changing the title's color to pure black (`#000000`) from within the template system.
+
+Both dates have to be in the format `YYYY-MM-DD` and seperated by a double pipe `||`
+
+And just like a normal progress bar you can optionally add a valid template name within curly braces at the end of the line.
+
+You can stack progress bars of any type (normal or date) within a single code block if you wish.
+
+Additional styling options are found in your templates extended settings panel by clicking the gear button next to your template name.
