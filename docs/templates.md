@@ -132,6 +132,7 @@ When pressed these will overwrite any colors you have already assigned and can n
 
 ### Duplicate Template Button
 This button was added in `v1.2.0` and once clicked, will create a new template at the bottom of the list with all the same settings as the current custom template.
+
 ![Duplicate Button](/assets/Obsidian Advanced Progress Bars - Templates Duplicate Button.png)
 
 By duplicating the entire template, you can quickly create similar varients.
