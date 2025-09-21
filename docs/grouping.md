@@ -84,6 +84,6 @@ Only these three colors are used from the template - all other settings are igno
 {: .note }
 You can use any template you want, although I recommend creating a template specifically for this grouping purpose.
 
-You can be as creative as you wish with the all the templates, and can make custom tempaltes for each progress bar within a group like the example below. 
+You can be as creative as you wish with the all the templates, and can make custom templates for each progress bar within a group like the example below. 
 
 ![date example](/assets/Obsidian Advanced Progress Bars - Templates Extended Date Example.png)
