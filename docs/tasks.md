@@ -43,6 +43,11 @@ My Title#orange: 1/2
 ````
 In the example above, the tag is #orange (all lowercase) and is added to the end of your `Title` (but before the colon).
 
+### Status Markers <span class="label label-green badge">NEW v1.2.1</span>
+Progress bars using task linking count tasks with any status markers for the **Total** in top-level and sub-tasks.
+
+Completed tasks using [x] or [X] are the only ones counting towards the **Value**
+
 ### Add Tags to Tasks
 Now simply add the same tag to the end of each top task you want to link to this progress bar.
 ```php

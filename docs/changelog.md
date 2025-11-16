@@ -8,7 +8,14 @@ nav_order: 999
 
 # Changelog
 
-## Release v1.2.0 <span class="label label-green badge">NEW</span>
+## Release v1.2.1 <span class="label label-green badge">NEW</span>
+### Bug Fixes
+- Inline edit gear settings icon is now hidden when a wikilink is used to display the progress bar on another note (it will still be viewable on the original note).
+- Progress bars within callouts should now work as intended.
+- Progress bars using task linking were only counting tasks marked with [x] for the **Total** in top-level and sub-tasks.  Now any custom status markers will also be counted towards the **Total**.
+Completed tasks using [x] or [X] are the only ones counting towards the **Value**
+
+## Release v1.2.0
 ### New Features
 - Added date functionality so you can use a start and end date to keep track of days.
 - Added prefix and suffix to templates so that you can add custom text before and/or after the value and total.
