@@ -15,6 +15,9 @@ nav_order: 999
 - Progress bars using task linking were only counting tasks marked with [x] for the **Total** in top-level and sub-tasks.  Now any custom status markers will also be counted towards the **Total**.
 Completed tasks using [x] or [X] are the only ones counting towards the **Value**
 
+### Documentation
+- Updated `Tasks` page to include information about the custom status markers.
+
 ## Release v1.2.0
 ### New Features
 - Added date functionality so you can use a start and end date to keep track of days.
