@@ -530,7 +530,9 @@ export default class ObsidianProgressBars extends Plugin {
 		
 		// Read the content of the updated file
 		const content = await this.app.vault.read(activeFile);		
-		const taskRegex = /(?:^|\n)([ \t]*)(?:-|\*|\d+\.) \[([ x])\] (.+)$/gm;
+		
+		// Added any custom task status characters
+		const taskRegex = /(?:^|\n)([ \t]*)(?:-|\*|\d+\.) \[(.)\] (.+)$/gm;
 
 		let match;
 		let currentTopTag = null; // Tracks the current top-level task's tag
@@ -553,14 +555,14 @@ export default class ObsidianProgressBars extends Plugin {
 						tagMap.set(currentTopTag, { total: 0, completed: 0, subTotal: 0, subCompleted: 0 });
 					}
 					tagMap.get(currentTopTag).total++;
-					if (status.trim() === 'x') {
+					if (status.trim().toLowerCase() === 'x') {
 						tagMap.get(currentTopTag).completed++;
 					}
 				}
 			} else if (currentTopTag) {
 				// Subtask: Count under currentTopTag, ignoring taskTag
 				tagMap.get(currentTopTag).subTotal++;
-				if (status.trim() === 'x') {
+				if (status.trim().toLowerCase() === 'x') {
 					tagMap.get(currentTopTag).subCompleted++;
 				}
 			}
@@ -696,7 +698,8 @@ private applyContainerStyle(
 	renderProgressBar(source: string, el: HTMLElement) { {
   	 	const groupRegex = /^\s*\[\[group\]\](?:([^{}\s][^{}]*))?(?:\s*\{([^}]+)\})?\s*$/iu;
 		const regex = new RegExp(
-		`^` +
+		//`^\\s*>?\\s*` + // allow optional ">" and spaces before the line for blockquote
+		`^\\s*(?:>\\s*)*` +
 		`(?:` +
 			`(.+?)(?:#([\\p{L}\\p{N}\\p{Emoji}_-]+))?(?:~(\\d+)/(\\d+))?(?::\\s*(\\d+)/(\\d+))(?:\\{([^}]+)\\})?(?:\\s.*)?` +
 			`|` +
@@ -1434,9 +1437,13 @@ const APB_dates = document.createElement('div');
 					
 					panel.appendChild(buttonContainer);
 
-					APB_textContainer.appendChild(settingsButton);
-					APB_textContainer.appendChild(panel);
+					// Remove inline gear settings icon if embeded via wikilink
+					const isEmbedded = el.closest('.markdown-embed') !== null;
+					if (!isEmbedded) {
+						APB_textContainer.appendChild(settingsButton);
+					}
 
+					APB_textContainer.appendChild(panel);
 				}				
 				
 				// Check if in dashboard and hide bullet
@@ -1479,10 +1486,14 @@ async updateProgressValue(file: TFile, rowIndex: number, newCurrent: number, tot
 	// Find the row matching originalRow
     let targetRowIndex = -1;
     for (let i = 0; i < rows.length; i++) {
-        if (rows[i].trim() === originalRow.trim()) {
-            targetRowIndex = i;
-            break;
-        }
+		// Normalize both lines by stripping all leading blockquote markers and spaces
+		const normalizedFileRow = rows[i].replace(/^\s*(?:>\s*)+/, '').trim();
+		const normalizedOriginal = originalRow.replace(/^\s*(?:>\s*)+/, '').trim();
+
+		if (normalizedFileRow === normalizedOriginal) {
+        targetRowIndex = i;
+        break;
+    	}
     }
 
 	if (targetRowIndex === -1) {
@@ -1493,10 +1504,16 @@ async updateProgressValue(file: TFile, rowIndex: number, newCurrent: number, tot
 
    	// Parse and update the row
     const rowToUpdate = rows[targetRowIndex];
+
+	// Capture any leading blockquote markers (e.g. >> or >>>)
+	const leadingQuotesMatch = rowToUpdate.match(/^[ \t]*(?:>[ \t]*)*/);
+	const leadingQuotes = leadingQuotesMatch ? leadingQuotesMatch[0] : '';
+
 	// Update the specific row
 	if (rowIndex < rows.length) {
 		// console.log("rowIndex:", rowIndex, "rows.length:", rows.length);
-		const match = rowToUpdate.match(/^(.+?)(?:#([\p{L}\p{N}\p{Emoji}_-]+))?(?:~(\d+)\/(\d+))?(?::\s*(\d+)\/(\d+))(?:\{([^}]+)\})?(?:\s.*)?$/u);
+		const match = rowToUpdate.match(/^\s*(?:>\s*)*(.+?)(?:#([\p{L}\p{N}\p{Emoji}_-]+))?(?:~(\d+)\/(\d+))?(?::\s*(\d+)\/(\d+))(?:\{([^}]+)\})?(?:\s.*)?$/u);
+		
 		if (match) {
 			const label = match[1] || '';
 			const tag = match[2] ? `#${match[2]}` : '';
@@ -1504,49 +1521,38 @@ async updateProgressValue(file: TFile, rowIndex: number, newCurrent: number, tot
 			const subtotal = match[4] || '';
 			const subtasks = subvalue && subtotal ? `~${subvalue}/${subtotal}` : '';
 			const template = match[7] ? `{${match[7]}}` : '';
-			const trailing = rowToUpdate.match(/(?:\s.*)?$/)?.[0] || '';
-			const newRow = `${label}${tag}${subtasks}: ${clampedCurrent}/${total}${template}`;
+
+			// Build updated row, preserving blockquote prefix
+			const newRow = `${leadingQuotes}${label}${tag}${subtasks}: ${clampedCurrent}/${total}${template}`;
 
 			rows[targetRowIndex] = newRow;
 
 			// Write updated content
 			const newContent = rows.join('\n');
-			await this.app.vault.modify(file, newContent);
 			
 			try {
 				await this.app.vault.modify(file, newContent);
+				new Notice('APB Data Update ...', 2000);
+
+				this.isUpdating = true;
+				await this.updateProgress();
+				new Notice('APB Data Update Completed', 2000);
+
 				// console.log("File modified successfully");
-				const updatedContent = await this.app.vault.read(file);
+				// const updatedContent = await this.app.vault.read(file);
 				// console.log("Updated file content:", updatedContent);
 			} catch (error) {
 				console.error("File write failed:", error);
 				new Notice("Failed to write to file: " + error.message, 2000);
-				return;
-			}
-
-
-			new Notice('APB Data Update ...', 2000);
-
-			try {
-				this.isUpdating = true;					
-				await this.updateProgress();
-				
-				new Notice('APB Data Update Completed', 2000);	
-			} catch (error) {
-				// Show error notice if update fails
-				new Notice('APB Data Update Failed: ' + error.message, 2000);
 			} finally {
-				// Delay reset to ensure async events are caught
-				setTimeout(() => {
-					this.isUpdating = false;
-				}, 2000);
+			setTimeout(() => (this.isUpdating = false), 2000);
 			}
-			} else {
-				console.error("Regex failed to match row:", rowToUpdate);
-				new Notice("Failed to update: Invalid row format", 2000);
-			}
-  		}
+		} else {
+			console.error("Regex failed to match row:", rowToUpdate);
+			new Notice("Failed to update: Invalid row format", 2000);
+		}
 	}
+}
 
 	async loadSettings() {
 	  	this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
