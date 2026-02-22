@@ -89,7 +89,7 @@ You can be as creative as you wish with the all the templates, and can make cust
 ![date example](/assets/Obsidian Advanced Progress Bars - Templates Extended Date Example.png)
 
 
-## Percentage Sorting
+## Percentage Sorting  <span class="label label-green badge">NEW v1.3.0</span>
 With the introduction of version `1.3.0` you have the ability to sort any grouped progress bars, either in ascending or descending order.
 
 For sorting to work, you must have a title line with either `[[asc]]` or `[[desc]]` added to the end of the line.
@@ -108,7 +108,7 @@ Very Large Total: 2034/2345
 
 All progress bars will be sorted apropriately based on percentage completed, regardless of what type of progress bar or scales they use i.e. numeric or date progress bars.
 
-### Manual Sort Hotkey Setup <span class="label label-green badge">NEW v1.3.0</span>
+### Manual Sort Hotkey Setup
 To add a hotkey that automatically sorts grouped progress bars either in ascending or desdcending order. Simply follow these steps:
 
 1. Open Obsidian and go to the **Settings** by clicking the gear icon in the bottom left corner.
