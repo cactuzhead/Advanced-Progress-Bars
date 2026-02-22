@@ -36,7 +36,7 @@ If you want to manually trigger a task update without switching between notes, y
 ![Hotkey](/assets/Obsidian Advanced Progress Bars - Manual Refresh Hotkey.png)
 
 
-## Paste Date Code Block Hotkey Setup <span class="label label-green badge">NEW v1.2.0</span>
+## Paste Date Code Block Hotkey Setup <span class="label label-grey badge">NEW v1.2.0</span>
 To make it more convenient, you can add a hotkey that automatically inserts a date progress bar code block into Obsidian. Simply follow these steps:
 
 1. Open Obsidian and go to the **Settings** by clicking the gear icon in the bottom left corner.
@@ -46,3 +46,15 @@ To make it more convenient, you can add a hotkey that automatically inserts a da
 
 4. Click on the round plus button next to the found action, and assign the desired hotkey combination (e.g., `Ctrl + Shift + D` or any other combo that suits you).
 ![Date Hotkey](/assets/Obsidian Advanced Progress Bars - Date Hotkey.png)
+
+
+## Manual Sort Hotkey Setup <span class="label label-green badge">NEW v1.3.0</span>
+To add a hotkey that automatically sorts grouped progress bars either in ascending or desdcending order. Simply follow these steps:
+
+1. Open Obsidian and go to the **Settings** by clicking the gear icon in the bottom left corner.
+2. From the **Settings** menu, go to the **Hotkeys** section on the left sidebar.
+3. In the filter search bar found at the top of the Hotkeys section, start typing **"Advanced Progress Bars"** to find the `Advanced Progress Bars: Manual Sort` action.
+![Sort Hotkey Search](/assets/Obsidian Advanced Progress Bars - Manual Sort.png)
+
+4. Click on the round plus button next to the found action, and assign the desired hotkey combination (e.g., `Ctrl + Shift + S` or any other combo that suits you).
+![Sort Hotkey](/assets/Obsidian Advanced Progress Bars - Sort Hotkey.png)

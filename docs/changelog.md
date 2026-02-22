@@ -8,7 +8,17 @@ nav_order: 999
 
 # Changelog
 
-## Release v1.2.1 <span class="label label-green badge">NEW</span>
+## Release v1.3.0 <span class="label label-green badge">NEW</span>
+### New Features
+- Added sort functionality so you can arrange grouped progress bars in either ascending or descending order.
+- Added a hotkey to manually trigger a sort of progress bars in a group based on percentage completed.
+
+### Documentation
+- Updated `Hotkeys` page to include manual sort hotkey.
+- Updated `Grouping` page to include information on how to customise your groups to sort.
+
+
+## Release v1.2.1
 ### Bug Fixes
 - Inline edit gear settings icon is now hidden when a wikilink is used to display the progress bar on another note (it will still be viewable on the original note).
 - Progress bars within callouts should now work as intended.
