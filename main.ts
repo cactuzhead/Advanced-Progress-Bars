@@ -416,6 +416,95 @@ export default class ObsidianProgressBars extends Plugin {
 			},
 		});
 
+
+		// Register a custom command to manually sort grouped APB's
+		this.addCommand({
+			id: 'manual-sort',
+			name: 'Manual sort',
+
+			callback: async () => {
+				const activeFile = this.app.workspace.getActiveFile();
+				if (!activeFile) return;
+
+				new Notice('Sorting Grouped Progress Bars ...', 2000);
+
+				let content = await this.app.vault.read(activeFile);
+
+				const apbRegex = /```apb\n([\s\S]*?)\n```/g;
+
+				content = content.replace(apbRegex, (fullMatch, innerContent) => {
+
+					const rows = innerContent.split('\n');
+					if (rows.length === 0) return fullMatch;		
+
+					// Extract rows excluding group header
+					const header = rows[0];
+
+					if (!/\[\[group\]\]/i.test(header)) return fullMatch;
+
+					const sortMatch = header.match(/\[\[(asc|desc)\]\]/i);
+					if (!sortMatch) return fullMatch;
+
+					const sortDirection = sortMatch[1].toLowerCase();
+					// console.log("Sort direction:", sortDirection);
+
+					const progressRows = rows.slice(1);
+
+					type ParsedRow = {
+						row: string;
+						percent: number;
+					};
+
+					const parsedRows: ParsedRow[] = progressRows.map((row: string) => {
+
+						const normalMatch = row.match(/:\s*(\d+)\/(\d+)/);
+						const dateMatch = row.match(/:\s*((19|20)\d{2}-\d{2}-\d{2})\|\|((19|20)\d{2}-\d{2}-\d{2})/);
+
+						let percent = 0;
+
+						if (normalMatch) {
+							const current = parseInt(normalMatch[1], 10);
+							const total = parseInt(normalMatch[2], 10);
+							if (total > 0) percent = current / total;
+						}
+
+						else if (dateMatch) {
+							const start = new Date(dateMatch[1]);
+							const end = new Date(dateMatch[3]);
+							const today = new Date();
+
+							const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+							const totalDays = Math.floor((end.getTime() - start.getTime()) / MS_PER_DAY);
+							const elapsedDays = Math.floor((today.getTime() - start.getTime()) / MS_PER_DAY);
+
+
+							if (totalDays !== 0) {
+								percent = elapsedDays / totalDays;
+							}
+						}
+						// console.log("Row:", row, "Percent:", percent);
+
+						return { row, percent };
+					});
+
+					parsedRows.sort((a, b) => {
+						return sortDirection === 'asc'
+							? a.percent - b.percent
+							: b.percent - a.percent;
+					});
+
+					const sortedRows = parsedRows.map(r => r.row);
+
+					return `\`\`\`apb\n${header}\n${sortedRows.join('\n')}\n\`\`\``;
+				});
+
+				await this.app.vault.modify(activeFile, content);
+				new Notice('Grouped Progress Bars Sorted ✓', 2000);
+			}
+		});
+
+
 	}
 
 	// Check for apb code blocks with tags
@@ -695,8 +784,9 @@ private applyContainerStyle(
         : defaultValue;
 }
 
-	renderProgressBar(source: string, el: HTMLElement) { {
-  	 	const groupRegex = /^\s*\[\[group\]\](?:([^{}\s][^{}]*))?(?:\s*\{([^}]+)\})?\s*$/iu;
+	renderProgressBar(source: string, el: HTMLElement) { {  	 	
+		const groupRegex = /^\s*\[\[group\]\](?:([^{}\s][^{}]*))?(?:\s*\{([^}]+)\})?(?:\s*\[\[(asc|desc)\]\])?\s*$/i;
+
 		const regex = new RegExp(
 		//`^\\s*>?\\s*` + // allow optional ">" and spaces before the line for blockquote
 		`^\\s*(?:>\\s*)*` +
@@ -710,6 +800,7 @@ private applyContainerStyle(
 
 		// Split the source string into rows
 		const rows = source.trim().split('\n');
+
 		el.empty(); // Clear the default rendering
 
 		let isGrouped = false;
@@ -718,14 +809,22 @@ private applyContainerStyle(
 		let titleExist = false;
 		let startIndex = 0;
 		if (rows.length > 0) {
-    		const groupMatch = rows[0].match(groupRegex);
-	
+			const rawHeader = rows[0];
+			const groupMatch = rawHeader.match(groupRegex);
+
 			if (groupMatch) {
 				isGrouped = true;
-				groupTitle = groupMatch[1];
-				groupTemplate = groupMatch[2];
-				startIndex = 1; // Skip the first line for regular processing			
+
+				// Remove [[asc]] or [[desc]] from header before extracting title
+				const cleanedHeader = rawHeader.replace(/\s*\[\[(asc|desc)\]\]\s*$/i, '');
+				const titleMatch = cleanedHeader.match(/^\s*\[\[group\]\]([^{]*)/i);
+
+				groupTitle = titleMatch?.[1]?.trim() || '';
+				groupTemplate = groupMatch[2] || '';
+
+				startIndex = 1;
 			}
+
 		}
   		
 		let isValidTemplate = false;		
@@ -872,13 +971,13 @@ const APB_dates = document.createElement('div');
   	}
 
 	if (isGrouped) {
-	el.addClass('grouped-progress-bar');
-	el.style.border = '1px solid ' + groupTemplateName.borderColor;
-	el.style.background = groupTemplateName.backgroundColor;
-	el.style.borderRadius = '7px';
-	el.style.marginTop = '0px';
-	el.style.padding = '5px !important';
-}
+		el.addClass('grouped-progress-bar');
+		el.style.border = '1px solid ' + groupTemplateName.borderColor;
+		el.style.background = groupTemplateName.backgroundColor;
+		el.style.borderRadius = '7px';
+		el.style.marginTop = '0px';
+		el.style.padding = '5px !important';
+	}
 
 // If grouped, add a group title (optional)
   if (isGrouped && groupTitle && !titleExist) {
