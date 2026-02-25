@@ -815,7 +815,7 @@ private applyContainerStyle(
 			if (groupMatch) {
 				isGrouped = true;
 
-				// Remove [[asc]] or [[desc]] from header before extracting title
+				// Remove [[asc]] or [[desc]] from header before extracting title 
 				const cleanedHeader = rawHeader.replace(/\s*\[\[(asc|desc)\]\]\s*$/i, '');
 				const titleMatch = cleanedHeader.match(/^\s*\[\[group\]\]([^{]*)/i);
 
