@@ -8,7 +8,7 @@ nav_order: 999
 
 # Changelog
 
-## Release v1.3.0 <span class="label label-green badge">NEW</span>
+## Release v1.3.1 <span class="label label-green badge">NEW</span>
 ### New Features
 - Added sort functionality so you can arrange grouped progress bars in either ascending or descending order.
 - Added a hotkey to manually trigger a sort of progress bars in a group based on percentage completed.
@@ -16,6 +16,11 @@ nav_order: 999
 ### Documentation
 - Updated `Hotkeys` page to include manual sort hotkey.
 - Updated `Grouping` page to include information on how to customise your groups to sort.
+
+
+## Release v1.3.0 <span class="label label-red badge">BROKEN</span>
+### Do Not Use
+⚠️ Release was built using a development build by mistake please use v1.3.1
 
 
 ## Release v1.2.1
